@@ -37,7 +37,7 @@
                                 @foreach($screens as $item)
                                     <tr>
                                         <td>{{ $item->id }}</td>
-                                        <td>{{ $item->title }}</td><td>{{ $item->message }}</td><td>{{ $item->icon }}</td>
+                                        <td>{{ $item->title }}</td><td>{{ $item->message }}</td><td>{{ asset('storage/'.$item->icon) }}</td>
                                         <td>
                                             <a href="{{ url('/admin/screens/' . $item->id) }}" title="View Screen"><button class="btn btn-info btn-xs"><i class="fa fa-eye" aria-hidden="true"></i> View</button></a>
                                             <a href="{{ url('/admin/screens/' . $item->id . '/edit') }}" title="Edit Screen"><button class="btn btn-primary btn-xs"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</button></a>

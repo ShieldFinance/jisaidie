@@ -52,6 +52,9 @@ There is only one api endpoints that processes all the requests: /api/serviceReq
 **Available fields**
   - activation_code
   - mobile_number
+  
+- **FetchScreens** Fetch app screens (get method), 
+
 
 ## Response codes and customer status
 Check configurations on app config
