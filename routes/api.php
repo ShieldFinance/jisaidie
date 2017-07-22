@@ -17,3 +17,8 @@ Route::middleware(['auth.apikey'])->post('/serviceRequest', function (Request $r
     $serviceProcessor = new App\Http\Controllers\ServiceProcessor();
     return $serviceProcessor->doProcess($request);
 });
+
+Route::middleware(['auth.apikey'])->get('/serviceRequest', function (Request $request) {
+    $serviceProcessor = new App\Http\Controllers\ServiceProcessor();
+    return $serviceProcessor->doProcess($request);
+});

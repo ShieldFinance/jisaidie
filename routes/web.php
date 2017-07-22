@@ -32,3 +32,4 @@ Route::resource('admin/organizations', 'Organizations\\OrganizationsController')
 Route::resource('admin/customers', 'Customers\\CustomersController');
 Route::resource('admin/customer-device', 'CustomerDevice\\CustomerDeviceController');
 Route::resource('admin/transactions', 'Transaction\\TransactionsController');
+Route::resource('admin/screens', 'Screens\\ScreensController');
