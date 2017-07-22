@@ -1,0 +1,83 @@
+{
+	"fields": [{
+			"name": "first_name",
+			"type": "string"
+		},
+		{
+			"name": "middle_name",
+			"type": "string"
+		},
+		{
+			"name": "surname",
+			"type": "string"
+		},
+		{
+			"name": "mobile_number",
+			"type": "integer#unsigned"
+		},
+		{
+			"name": "employee_number",
+			"type": "string"
+		},
+		{
+			"name": "id_number",
+			"type": "text"
+		}
+		,{
+			"name": "net_salary",
+			"type": "double"
+		}
+		,{
+			"name": "email",
+			"type": "double"
+		},
+		{
+			"name": "is_checkoff",
+			"type": "tinyint"
+		}
+		,{
+			"name": "status",
+			"type": "integer"
+		}
+		,{
+			"name": "activation_code",
+			"type": "text"
+		},{
+			"name": "organization_id",
+			"type": "integer"
+		}
+
+	],
+	"foreign_keys": [{
+		"column": "organization_id",
+		"references": "id",
+		"on": "organizations",
+		"onDelete": "cascade"
+	}],
+	"relationships": [{
+		"name": "organization",
+		"type": "belongsTo",
+		"class": "App\\Organization"
+	}],
+	"validations": [{
+			"field": "first_name",
+			"rules": "required"
+		},
+		{
+			"field": "last_name",
+			"rules": "required"
+		},
+		{
+			"field": "id_number",
+			"rules": "required"
+		},
+		{
+			"field": "net_salary",
+			"rules": "required"
+		},
+		{
+			"field": "organization_id",
+			"rules": "required"
+		}
+	]
+}
