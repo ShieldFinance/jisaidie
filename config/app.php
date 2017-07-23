@@ -239,7 +239,19 @@ return [
         'existing_device_new_msisdn' => 101,//registered device but new mobile number
         'existing_msisdn_new_device' => 102,//new phone but existing mobile number. create new device row.Dont send sms
         'existing_msisdn_existing_device' => 103,//new phone but existing mobile number.Dont send sms
-        'invalid_request'=>'99',
+        'customer_does_not_exist' =>104,//customer with a given msisdn does not exist
+        'loan_pending' => 200,//A new loan pending approval,
+        'loan_approved'=>201,//A loan approved successfully
+        'loan_rejected'=>202,//A loan approval rejected
+        'loan_disbursed'=>203,//A loan sent to customer
+        'loan_application_rejected'=>204,//Customer cannot borrow, contact customer care
+        'loan_paid'=>205,
+        'overpayment'=>206,
+        'no_response'=>300,
+        'command_failed'=>301,
+        'command_successful'=>302,//command executed successfully
+        'invalid_amount'=>303,
+        'invalid_payment'=>304,
     ],
     'transactionStatus' =>[
         'completed' => 0,//completed transaction

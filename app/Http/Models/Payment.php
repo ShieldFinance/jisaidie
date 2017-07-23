@@ -4,14 +4,14 @@ namespace App\Http\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Organization extends Model
+class Payment extends Model
 {
     /**
      * The database table used by the model.
      *
      * @var string
      */
-    protected $table = 'organizations';
+    protected $table = 'payments';
 
     /**
     * The database primary key value.
@@ -19,16 +19,16 @@ class Organization extends Model
     * @var string
     */
     protected $primaryKey = 'id';
-
+    
+    protected $attributes = [
+        'currency'=>'KES'
+    ];
     /**
      * Attributes that should be mass-assignable.
      *
      * @var array
      */
-    protected $fillable = ['name', 'email', 'description', 'status'];
+    protected $fillable = ['amount','customer_id', 'currency', 'reference', 'gateway', 'loan_id'];
 
-    public function customers()
-    {
-        return $this->hasMany('App\Http\Models\Customer');
-    }
+    
 }

@@ -27,5 +27,7 @@ class Setting extends Model
      */
     protected $fillable = ['setting_name', 'setting_value', 'setting_description', 'created_at', 'updated_at'];
 
-    
+    public static function getSettings($key){
+        return self::where('setting_name',$key)->first()->setting_value;
+    }
 }

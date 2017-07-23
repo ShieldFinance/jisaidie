@@ -24,7 +24,7 @@ class AppServiceProvider extends ServiceProvider
     public function register()
     {
         $this->app->bind('Customer', \App\Services\CustomerService::class);
-        $this->app->bind('Loan', \App\Services\UserService::class);
+        $this->app->bind('Loan', \App\Services\LoanService::class);
         $this->app->bind('Screen', \App\Services\ScreenService::class);
     }
 }

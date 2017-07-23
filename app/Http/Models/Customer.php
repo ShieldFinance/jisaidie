@@ -29,12 +29,17 @@ class Customer extends Model
 
     public function organization()
     {
-	return $this->belongsTo('App\Organization');
+	return $this->belongsTo('App\Http\Models\Organization');
     }
     public function getCustomerByKey($key, $value)
     {
         $customer = self::where($key,$value)->first();
         return $customer;
     }
+    public function loans()
+    {
+        return $this->hasMany('App\Http\Models\Loan');
+    }
+   
 	
 }

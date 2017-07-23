@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Schema;
 use App\Http\Models\Service;
 use App\Http\Models\Transaction;
+use App\Setting;
 class ServiceProcessor extends Controller
 {
     public function __construct(){
@@ -17,17 +18,27 @@ class ServiceProcessor extends Controller
         $response = array();
         $serviceModel = Service::where('name',$request->input('action'))->first();
         if($serviceModel){
-            $service =  $this->app->make($serviceModel->product);
+            $service =  $this->app->make($serviceModel->product, [new Setting()]);
             $serviceCommands = $serviceModel->getServiceCommandsByServiceName($request->input('action'));
             $payload = json_decode($request['request'], true);
             
             $payload['transaction_id']=$this->logTransaction($serviceModel, $request);
+            //first command will always execute
+            $canProcessNext = true;
             foreach($serviceCommands as $command){
                 if (method_exists($service, $command->processing_function))
                 {
                     $processing_function=$command->processing_function;
-                    $payload=$service->$processing_function($payload);
-                    $response[$command->processing_function]=$payload;
+                    if($canProcessNext){
+                        $payload=$service->$processing_function($payload);
+                        $response[$command->processing_function]=$payload;
+                    }
+                    if(isset($payload['command_status']) && $payload['command_status']==config('app.responseCodes')['command_successful']){
+                        $canProcessNext = true;
+                    }else{
+                        $canProcessNext = false;
+                        break;
+                    }
                 }
                 else
                 {

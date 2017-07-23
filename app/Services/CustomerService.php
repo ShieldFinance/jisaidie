@@ -27,6 +27,7 @@ class CustomerService extends ApiGuardController{
                 $payload['response_status'] =  config('app.responseCodes')['new_device_new_msisdn'];
                 $payload['response_string'] = "User created successfully";
                 $payload['send_notification'] = true;
+                $payload['command_status'] = config('app.responseCodes')['command_successful'];
             }elseif(count($customer) && count($device)==0 and $payload['device_id'] && isset($customer->id_number) && strlen($customer->id_number)){
                 //add new device and deactivate old account
                 $newDevice = new \App\Http\Models\CustomerDevice(['device_id'=>$payload['device_id'],'customer_id_number'=>$customer->id_number]);
@@ -34,10 +35,12 @@ class CustomerService extends ApiGuardController{
                 $payload['customer'] =  $this->response->withItem($customer, new CustomerTransformer());
                 $payload['response_status'] =config('app.responseCodes')['existing_msisdn_new_device'];
                 $payload['response_string'] = "User device added successfully";
+                $payload['command_status'] = config('app.responseCodes')['command_successful'];
             }elseif($customer and count($device)){
                 $payload['send_notification'] = true;
                 $payload['customer'] =  $this->response->withItem($customer, new CustomerTransformer());
                 $payload['response_status'] =config('app.responseCodes')['existing_msisdn_existing_device'];
+                $payload['command_status'] = config('app.responseCodes')['command_successful'];
             }
             elseif(count($device) and !count($customer)){
                 $attributes = ['mobile_number'=>$payload['mobile_number'],'id_number'=>'','first_name'=>'','last_name'=>'','surname'=>'','email'=>'','status'=>'new'];
@@ -46,19 +49,23 @@ class CustomerService extends ApiGuardController{
                 $newCustomer->save();
                 $payload['customer'] =  $this->response->withItem($newCustomer, new CustomerTransformer());
                 $payload['response_status'] =config('app.responseCodes')['existing_device_new_msisdn'];
+                $payload['command_status'] = config('app.responseCodes')['command_successful'];
             }
             else{
                 $payload['response_status'] ='99';
                 $payload['response_string'] = "Missing parameters";
+                $payload['command_status'] = config('app.responseCodes')['failed'];
             }
         }else{
             $payload['response_status'] ='99';
             $payload['response_string'] = "You must provide both device id and phone number";
+            $payload['command_status'] = config('app.responseCodes')['failed'];
         }
       
     }catch(Exception $ex){
         $payload['response_string'] ="Error creating user";
         $payload['response_status'] ='99';
+        $payload['command_status'] = config('app.responseCodes')['failed'];
     }
     return $payload;
     }
@@ -86,12 +93,15 @@ class CustomerService extends ApiGuardController{
                 $payload['customer'] =  $this->response->withItem($customer, new CustomerTransformer());
                 $payload['response_string'] ="Customer Details Updated";
                 $payload['response_status'] ='00';
+                $payload['command_status'] = config('app.responseCodes')['command_successful'];
             }else{
                 $payload['response_string'] ="Customer Does not exist";
                 $payload['response_status'] ='96';
+                $payload['command_status'] = config('app.responseCodes')['failed'];
             }
         } catch (Exception $ex) {
             $payload['response_string'] ="Error updating customer";
+            $payload['command_status'] = config('app.responseCodes')['failed'];
             $payload['response_status'] ='99';
         }
         return $payload;
@@ -106,9 +116,11 @@ class CustomerService extends ApiGuardController{
                 $payload['response_status'] ='00';
                 $payload['response_string'] ="Activation Code Added";
                 $payload['customer']=$this->response->withItem($customer, new CustomerTransformer());
+                $payload['command_status'] = config('app.responseCodes')['command_successful'];
             }else{
                 $payload['response_status'] ="99";
                 $payload['response_string'] ="Customer not found";
+                $payload['command_status'] = config('app.responseCodes')['failed'];
             }
         }
         return $payload;
@@ -123,9 +135,11 @@ class CustomerService extends ApiGuardController{
                 $payload['response_status'] ='00';
                 $payload['response_string'] ="Account Activated";
                 $payload['customer']=$this->response->withItem($customer, new CustomerTransformer());
+                $payload['command_status'] = config('app.responseCodes')['command_successful'];
             }else{
                 $payload['response_status'] ="99";
                 $payload['response_string'] ="Invalid activation code";
+                $payload['command_status'] = config('app.responseCodes')['failed'];
             }
         }
         return $payload;
@@ -137,8 +151,11 @@ class CustomerService extends ApiGuardController{
                 $customer->status = $payload['customer_status'];
                 $customer->save();
                 $payload['response_status'] = "00";
+                $payload['command_status'] = config('app.responseCodes')['command_successful'];
             }
             $payload['customer']=$this->response->withItem($customer, new CustomerTransformer());
+        }else{
+            $payload['command_status'] = config('app.responseCodes')['failed'];
         }
         return $payload;
     }

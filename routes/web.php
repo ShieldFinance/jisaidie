@@ -33,3 +33,5 @@ Route::resource('admin/customers', 'Customers\\CustomersController');
 Route::resource('admin/customer-device', 'CustomerDevice\\CustomerDeviceController');
 Route::resource('admin/transactions', 'Transaction\\TransactionsController');
 Route::resource('admin/screens', 'Screens\\ScreensController');
+Route::resource('admin/loan', 'Loans\\LoanController');
+Route::resource('admin/payments', 'Payments\\PaymentsController');
