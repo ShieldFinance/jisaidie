@@ -12,7 +12,8 @@ use App\Http\Models\Screen;
 class ScreenService extends ApiGuardController{
     public function  fetch_screens($payload){
         $screens = Screen::where('status',1)->orderBy('order','asc')->get();
-        return $this->response->withCollection($screens, new ScreenTransformer());
+        $payload['screens'] = $this->response->withCollection($screens, new ScreenTransformer());
+        return $payload;
     }
 }
 
