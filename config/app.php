@@ -240,6 +240,10 @@ return [
         'existing_msisdn_new_device' => 102,//new phone but existing mobile number. create new device row.Dont send sms
         'existing_msisdn_existing_device' => 103,//new phone but existing mobile number.Dont send sms
         'customer_does_not_exist' =>104,//customer with a given msisdn does not exist
+        'customer_profile_updated' =>105,//customer details updated successfully
+        'customer_profile_not_updated' =>106,//customer details updated successfully
+        'activation_code_updated'=>107,//customer activation code updated successfully
+        'activation_code_not updated'=>108,//customer activation code not updated
         'loan_pending' => 200,//A new loan pending approval,
         'loan_approved'=>201,//A loan approved successfully
         'loan_rejected'=>202,//A loan approval rejected

@@ -24,7 +24,6 @@ class ServiceProcessor extends Controller
             $service =  $this->app->make($serviceModel->product, [$settings, $responseProcessor]);
             $serviceCommands = $serviceModel->getServiceCommandsByServiceName($request->input('action'));
             $payload = json_decode($request['request'], true);
-            
             $payload['transaction_id']=$this->logTransaction($serviceModel, $request);
             $payload['service_id'] = $serviceModel->id;
             //first command will always execute

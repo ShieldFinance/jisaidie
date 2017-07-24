@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Schema;
 use App\Transformers\CustomerTransformer;
 use Chrisbjr\ApiGuard\Http\Controllers\ApiGuardController;
 use App\Http\Models\Customer;
+use App\Http\Models\Loan;
 class CustomerService extends ApiGuardController{
     
     public function  create_customer_profile($payload){
@@ -112,7 +113,7 @@ class CustomerService extends ApiGuardController{
                 }
                 $payload['customer'] =  $this->response->withItem($customer, new CustomerTransformer());
                 $payload['response_string'] ="Customer Details Updated";
-                $payload['response_status'] ='00';
+                $payload['response_status'] =config('app.responseCodes')['customer_profile_updated'];
                 $payload['command_status'] = config('app.responseCodes')['command_successful'];
             }else{
                 $payload['response_string'] ="Customer Does not exist";
@@ -122,7 +123,7 @@ class CustomerService extends ApiGuardController{
         } catch (Exception $ex) {
             $payload['response_string'] ="Error updating customer";
             $payload['command_status'] = config('app.responseCodes')['command_failed'];
-            $payload['response_status'] ='99';
+            $payload['response_status'] =config('app.responseCodes')['customer_profile_not_updated'];;
         }
         return $payload;
     }
@@ -133,12 +134,12 @@ class CustomerService extends ApiGuardController{
                 $customer->activation_code = $payload['activation_code'];
                 $customer->status = config('app.customerStatus')['activation_code'];
                 $customer->save();
-                $payload['response_status'] ='00';
+                $payload['response_status'] =config('app.responseCodes')['activation_code_updated'];
                 $payload['response_string'] ="Activation Code Added";
                 $payload['customer']=$this->response->withItem($customer, new CustomerTransformer());
                 $payload['command_status'] = config('app.responseCodes')['command_successful'];
             }else{
-                $payload['response_status'] ="99";
+                $payload['response_status'] =config('app.responseCodes')['activation_code_not_updated'];
                 $payload['response_string'] ="Customer not found";
                 $payload['command_status'] = config('app.responseCodes')['command_failed'];
             }
@@ -166,7 +167,7 @@ class CustomerService extends ApiGuardController{
     }
     public function change_customer_status($payload){
         if(isset($payload['mobile_number'])){
-            $customer = Customer::where('mobile_number',$payload['mobile_number']);
+            $customer = Customer::where('mobile_number',$payload['mobile_number'])->first();
             if($customer){
                 $customer->status = $payload['customer_status'];
                 $customer->save();
@@ -179,8 +180,24 @@ class CustomerService extends ApiGuardController{
         }
         return $payload;
     }
-    public function customer_statement($payload){
-        
+    public function fetch_customer_statement($payload){
+        $loans = array();
+        $where = [];
+        if(isset($payload['mobile_number'])){
+            $limit = 10;
+            if(isset($payload['limit'])){
+                $limit = int($payload['limit']);
+            }
+            $customer = Customer::where('mobile_number',$payload['mobile_number'])->first();
+            $where[]=['customer_id','=',$customer->id];
+            $loans = Loan::where($where);
+            if(isset($payload['date_from']) && isset($payload['date_to'])){
+               $loans =$loans->whereDate('created_at','>=',$payload['date_from']);
+                $loans =$loans->whereDate('created_at','<=',$payload['date_to']);
+            }
+            $loans = $loans->orderBy('id','desc')->limit($limit)->get();
+        }
+        return $loans;
     }
     public function send_notification($payload){
         $response = array();
