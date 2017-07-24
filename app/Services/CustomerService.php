@@ -54,18 +54,18 @@ class CustomerService extends ApiGuardController{
             else{
                 $payload['response_status'] ='99';
                 $payload['response_string'] = "Missing parameters";
-                $payload['command_status'] = config('app.responseCodes')['failed'];
+                $payload['command_status'] = config('app.responseCodes')['command_failed'];
             }
         }else{
             $payload['response_status'] ='99';
             $payload['response_string'] = "You must provide both device id and phone number";
-            $payload['command_status'] = config('app.responseCodes')['failed'];
+            $payload['command_status'] = config('app.responseCodes')['command_failed'];
         }
       
     }catch(Exception $ex){
         $payload['response_string'] ="Error creating user";
         $payload['response_status'] ='99';
-        $payload['command_status'] = config('app.responseCodes')['failed'];
+        $payload['command_status'] = config('app.responseCodes')['command_failed'];
     }
     return $payload;
     }
@@ -97,11 +97,11 @@ class CustomerService extends ApiGuardController{
             }else{
                 $payload['response_string'] ="Customer Does not exist";
                 $payload['response_status'] ='96';
-                $payload['command_status'] = config('app.responseCodes')['failed'];
+                $payload['command_status'] = config('app.responseCodes')['command_failed'];
             }
         } catch (Exception $ex) {
             $payload['response_string'] ="Error updating customer";
-            $payload['command_status'] = config('app.responseCodes')['failed'];
+            $payload['command_status'] = config('app.responseCodes')['command_failed'];
             $payload['response_status'] ='99';
         }
         return $payload;
@@ -120,7 +120,7 @@ class CustomerService extends ApiGuardController{
             }else{
                 $payload['response_status'] ="99";
                 $payload['response_string'] ="Customer not found";
-                $payload['command_status'] = config('app.responseCodes')['failed'];
+                $payload['command_status'] = config('app.responseCodes')['command_failed'];
             }
         }
         return $payload;
@@ -139,7 +139,7 @@ class CustomerService extends ApiGuardController{
             }else{
                 $payload['response_status'] ="99";
                 $payload['response_string'] ="Invalid activation code";
-                $payload['command_status'] = config('app.responseCodes')['failed'];
+                $payload['command_status'] = config('app.responseCodes')['command_failed'];
             }
         }
         return $payload;
