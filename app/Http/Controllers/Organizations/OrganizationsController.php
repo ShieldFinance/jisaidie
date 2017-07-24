@@ -31,7 +31,7 @@ class OrganizationsController extends Controller
             $organizations = Organization::paginate($perPage);
         }
 
-        return view('admin\organizations.organizations.index', compact('organizations'));
+        return view('admin/organizations.organizations.index', compact('organizations'));
     }
 
     /**
@@ -41,7 +41,7 @@ class OrganizationsController extends Controller
      */
     public function create()
     {
-        return view('admin\organizations.organizations.create');
+        return view('admin/organizations.organizations.create');
     }
 
     /**
@@ -74,7 +74,7 @@ class OrganizationsController extends Controller
     {
         $organization = Organization::findOrFail($id);
 
-        return view('admin\organizations.organizations.show', compact('organization'));
+        return view('admin/organizations.organizations.show', compact('organization'));
     }
 
     /**
@@ -88,7 +88,7 @@ class OrganizationsController extends Controller
     {
         $organization = Organization::findOrFail($id);
 
-        return view('admin\organizations.organizations.edit', compact('organization'));
+        return view('admin/organizations.organizations.edit', compact('organization'));
     }
 
     /**

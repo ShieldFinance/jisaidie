@@ -31,7 +31,7 @@ class ServiceCommandsController extends Controller
             $servicecommands = ServiceCommand::paginate($perPage);
         }
 
-        return view('admin\servicecommands.service-commands.index', compact('servicecommands'));
+        return view('admin/servicecommands.service-commands.index', compact('servicecommands'));
     }
 
     /**
@@ -41,7 +41,7 @@ class ServiceCommandsController extends Controller
      */
     public function create()
     {
-        return view('admin\servicecommands.service-commands.create');
+        return view('admin/servicecommands.service-commands.create');
     }
 
     /**
@@ -78,7 +78,7 @@ class ServiceCommandsController extends Controller
     {
         $servicecommand = ServiceCommand::findOrFail($id);
 
-        return view('admin\servicecommands.service-commands.show', compact('servicecommand'));
+        return view('admin/servicecommands.service-commands.show', compact('servicecommand'));
     }
 
     /**
@@ -92,7 +92,7 @@ class ServiceCommandsController extends Controller
     {
         $servicecommand = ServiceCommand::findOrFail($id);
 
-        return view('admin\servicecommands.service-commands.edit', compact('servicecommand'));
+        return view('admin/servicecommands.service-commands.edit', compact('servicecommand'));
     }
 
     /**
