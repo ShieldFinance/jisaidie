@@ -1,20 +1,20 @@
-<div class="form-group {{ $errors->has('first_name') ? 'has-error' : ''}}">
-    {!! Form::label('first_name', 'First Name', ['class' => 'col-md-4 control-label']) !!}
-    <div class="col-md-6">
-        {!! Form::text('first_name', null, ['class' => 'form-control', 'required' => 'required']) !!}
-        {!! $errors->first('first_name', '<p class="help-block">:message</p>') !!}
-    </div>
-</div><div class="form-group {{ $errors->has('middle_name') ? 'has-error' : ''}}">
-    {!! Form::label('middle_name', 'Middle Name', ['class' => 'col-md-4 control-label']) !!}
-    <div class="col-md-6">
-        {!! Form::text('middle_name', null, ['class' => 'form-control']) !!}
-        {!! $errors->first('middle_name', '<p class="help-block">:message</p>') !!}
-    </div>
-</div><div class="form-group {{ $errors->has('surname') ? 'has-error' : ''}}">
+<div class="form-group {{ $errors->has('surname') ? 'has-error' : ''}}">
     {!! Form::label('surname', 'Surname', ['class' => 'col-md-4 control-label']) !!}
     <div class="col-md-6">
-        {!! Form::text('surname', null, ['class' => 'form-control']) !!}
+        {!! Form::text('surname', null, ['class' => 'form-control', 'required' => 'required']) !!}
         {!! $errors->first('surname', '<p class="help-block">:message</p>') !!}
+    </div>
+</div><div class="form-group {{ $errors->has('middle_name') ? 'has-error' : ''}}">
+    {!! Form::label('last_name', 'Last Name', ['class' => 'col-md-4 control-label']) !!}
+    <div class="col-md-6">
+        {!! Form::text('last_name', null, ['class' => 'form-control']) !!}
+        {!! $errors->first('last_name', '<p class="help-block">:message</p>') !!}
+    </div>
+</div><div class="form-group {{ $errors->has('other_name') ? 'has-error' : ''}}">
+    {!! Form::label('other_name', 'Other Name', ['class' => 'col-md-4 control-label']) !!}
+    <div class="col-md-6">
+        {!! Form::text('other_name', null, ['class' => 'form-control']) !!}
+        {!! $errors->first('other_name', '<p class="help-block">:message</p>') !!}
     </div>
 </div><div class="form-group {{ $errors->has('mobile_number') ? 'has-error' : ''}}">
     {!! Form::label('mobile_number', 'Mobile Number', ['class' => 'col-md-4 control-label']) !!}

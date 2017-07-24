@@ -33,7 +33,7 @@
                                     <tr>
                                         <th>ID</th><td>{{ $customer->id }}</td>
                                     </tr>
-                                    <tr><th> First Name </th><td> {{ $customer->first_name }} </td></tr><tr><th> Middle Name </th><td> {{ $customer->middle_name }} </td></tr><tr><th> Surname </th><td> {{ $customer->surname }} </td></tr>
+                                    <tr><th> Surname </th><td> {{ $customer->surname }} </td></tr><tr><th> Last Name </th><td> {{ $customer->last_name }} </td></tr><tr><th> Other Name </th><td> {{ $customer->other_name }} </td></tr>
                                 </tbody>
                             </table>
                         </div>

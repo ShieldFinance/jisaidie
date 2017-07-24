@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Jul 24, 2017 at 12:02 AM
+-- Generation Time: Jul 24, 2017 at 11:30 AM
 -- Server version: 5.6.33
 -- PHP Version: 5.6.26
 
@@ -43,7 +43,7 @@ CREATE TABLE `api_keys` (
 --
 
 INSERT INTO `api_keys` (`id`, `apikeyable_id`, `apikeyable_type`, `key`, `last_ip_address`, `last_used_at`, `created_at`, `updated_at`, `deleted_at`) VALUES
-(1, NULL, NULL, 'dcae6a94f50c04358768fec139d55420ea17c3db', '127.0.0.1', '2017-07-23 22:21:41', '2017-07-22 08:22:53', '2017-07-23 19:21:41', NULL);
+(1, NULL, NULL, 'dcae6a94f50c04358768fec139d55420ea17c3db', '127.0.0.1', '2017-07-24 18:29:41', '2017-07-22 08:22:53', '2017-07-24 15:29:41', NULL);
 
 -- --------------------------------------------------------
 
@@ -53,9 +53,9 @@ INSERT INTO `api_keys` (`id`, `apikeyable_id`, `apikeyable_type`, `key`, `last_i
 
 CREATE TABLE `customers` (
   `id` int(10) UNSIGNED NOT NULL,
-  `first_name` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `middle_name` varchar(191) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `surname` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `other_name` varchar(191) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `last_name` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
   `mobile_number` varchar(12) COLLATE utf8mb4_unicode_ci NOT NULL,
   `employee_number` varchar(191) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `id_number` text COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -74,9 +74,10 @@ CREATE TABLE `customers` (
 -- Dumping data for table `customers`
 --
 
-INSERT INTO `customers` (`id`, `first_name`, `middle_name`, `surname`, `mobile_number`, `employee_number`, `id_number`, `net_salary`, `email`, `is_checkoff`, `status`, `activation_code`, `organization_id`, `withholding_balance`, `created_at`, `updated_at`) VALUES
+INSERT INTO `customers` (`id`, `surname`, `other_name`, `last_name`, `mobile_number`, `employee_number`, `id_number`, `net_salary`, `email`, `is_checkoff`, `status`, `activation_code`, `organization_id`, `withholding_balance`, `created_at`, `updated_at`) VALUES
 (1, 'John', 'Mwenda', 'Rimberia', '254723383856', NULL, '25025368', '0', '', 0, 1, '', NULL, '4470', '2017-07-22 11:27:25', '2017-07-23 16:16:13'),
-(2, 'Jane', 'Doe', 'Rimberia', '254723383456', NULL, '25025369', '0', '', 0, 1, '', NULL, '800', '2017-07-23 11:40:25', '2017-07-23 15:54:41');
+(2, 'Jane', 'Doe', 'Rimberia', '254723383456', NULL, '25025369', '0', '', 0, 1, '', NULL, '800', '2017-07-23 11:40:25', '2017-07-23 15:54:41'),
+(5, '', '', '', '254723383457', NULL, '', '0', '', 0, 0, 'kjkjkjkj', NULL, '0', '2017-07-24 15:29:41', '2017-07-24 15:29:41');
 
 -- --------------------------------------------------------
 
@@ -686,7 +687,12 @@ INSERT INTO `transactions` (`id`, `service_id`, `request`, `response`, `status`,
 (194, '6', '{"action":"ApplyLoan","request":{"amount":"1500","mobile_number":"254723383856"}}', NULL, 'pending', '0', '0', NULL, '2017-07-23 19:12:52', '2017-07-23 19:12:52'),
 (195, '6', '{"action":"ApplyLoan","request":{"amount":"1500","mobile_number":"254723383856"}}', NULL, 'pending', '0', '0', NULL, '2017-07-23 19:15:38', '2017-07-23 19:15:38'),
 (196, '6', '{"action":"ApplyLoan","request":{"amount":"1500","mobile_number":"254723383856"}}', NULL, 'pending', '0', '0', NULL, '2017-07-23 19:18:10', '2017-07-23 19:18:10'),
-(197, '6', '{"action":"ApplyLoan","request":{"amount":"1500","mobile_number":"254723383856"}}', NULL, 'pending', '0', '0', NULL, '2017-07-23 19:21:41', '2017-07-23 19:21:41');
+(197, '6', '{"action":"ApplyLoan","request":{"amount":"1500","mobile_number":"254723383856"}}', NULL, 'pending', '0', '0', NULL, '2017-07-23 19:21:41', '2017-07-23 19:21:41'),
+(198, '1', '{"action":"CreateCustomer","request":{"surname":"Martha","last_name":"Kinyua","other_name":"Kinyua","email ":"test3@gmail.com","mobile_number":"254723383457","device_id":5555576,"activation_code":"kjkjkjkj"}}', NULL, 'pending', '0', '0', NULL, '2017-07-24 15:20:37', '2017-07-24 15:20:37'),
+(199, '1', '{"action":"CreateCustomer","request":{"surname":"Martha","last_name":"Kinyua","other_name":"Kinyua","email ":"test3@gmail.com","mobile_number":"254723383457","device_id":5555576,"activation_code":"kjkjkjkj"}}', NULL, 'pending', '0', '0', NULL, '2017-07-24 15:21:38', '2017-07-24 15:21:38'),
+(200, '1', '{"action":"CreateCustomer","request":{"surname":"Martha","last_name":"Kinyua","other_name":"Kinyua","email ":"test3@gmail.com","mobile_number":"254723383457","device_id":5555576,"activation_code":"kjkjkjkj"}}', NULL, 'pending', '0', '0', NULL, '2017-07-24 15:21:51', '2017-07-24 15:21:51'),
+(201, '1', '{"action":"CreateCustomer","request":{"surname":"Martha","last_name":"Kinyua","other_name":"Kinyua","email ":"test3@gmail.com","mobile_number":"254723383457","device_id":5555576,"activation_code":"kjkjkjkj"}}', NULL, 'pending', '0', '0', NULL, '2017-07-24 15:23:38', '2017-07-24 15:23:38'),
+(202, '1', '{"action":"CreateCustomer","request":{"surname":"Martha","last_name":"Kinyua","other_name":"Kinyua","email ":"test3@gmail.com","mobile_number":"254723383457","device_id":5555576,"activation_code":"kjkjkjkj"}}', NULL, 'pending', '0', '0', NULL, '2017-07-24 15:29:41', '2017-07-24 15:29:41');
 
 -- --------------------------------------------------------
 
@@ -855,7 +861,7 @@ ALTER TABLE `api_keys`
 -- AUTO_INCREMENT for table `customers`
 --
 ALTER TABLE `customers`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 --
 -- AUTO_INCREMENT for table `customer_devices`
 --
@@ -925,7 +931,7 @@ ALTER TABLE `settings`
 -- AUTO_INCREMENT for table `transactions`
 --
 ALTER TABLE `transactions`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=198;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=203;
 --
 -- AUTO_INCREMENT for table `users`
 --

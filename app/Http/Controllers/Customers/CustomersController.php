@@ -39,7 +39,7 @@ class CustomersController extends Controller
             $customers = Customer::paginate($perPage);
         }
 
-        return view('admin\customers.customers.index', compact('customers'));
+        return view('admin/customers.customers.index', compact('customers'));
     }
 
     /**
@@ -49,7 +49,7 @@ class CustomersController extends Controller
      */
     public function create()
     {
-        return view('admin\customers.customers.create');
+        return view('admin/customers.customers.create');
     }
 
     /**
@@ -88,7 +88,7 @@ class CustomersController extends Controller
     {
         $customer = Customer::findOrFail($id);
 
-        return view('admin\customers.customers.show', compact('customer'));
+        return view('admin/customers.customers.show', compact('customer'));
     }
 
     /**
@@ -102,7 +102,7 @@ class CustomersController extends Controller
     {
         $customer = Customer::findOrFail($id);
 
-        return view('admin\customers.customers.edit', compact('customer'));
+        return view('admin/customers.customers.edit', compact('customer'));
     }
 
     /**

@@ -9,8 +9,9 @@ class CustomerTransformer extends TransformerAbstract
     {
         return [
             'id'         => $customer->id,
-            'first_name'       => $customer->first_name,
-            'last_name'       => $customer->middle_name,
+            'surname'       => $customer->surname,
+            'last_name'       => $customer->last_name,
+            'other_name'       => $customer->other_name,
             'status'         => $customer->status,
             'activation_code' =>$customer->activation_code,
             'mobile_number'=>$customer->mobile_number,

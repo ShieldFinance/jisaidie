@@ -18,8 +18,20 @@ class CustomerService extends ApiGuardController{
             //first check if customer exists
             $customer =  Customer::where('mobile_number', $payload['mobile_number'])->first();
             $device = \App\Http\Models\CustomerDevice::where("device_id", $payload['device_id'])->get();
+            $activation_code = "";
+            if(isset($payload['activation_code'])){
+                $activation_code = $payload['activation_code'];
+            }
             if(count($customer)==0 && count($device)==0){
-                $attributes = ['mobile_number'=>$payload['mobile_number'],'id_number'=>'','first_name'=>'','last_name'=>'','surname'=>'','email'=>'','status'=>'new'];
+                $attributes = [
+                    'mobile_number'=>$payload['mobile_number'],
+                    'id_number'=>'',
+                    'last_name'=>'',
+                    'other_name'=>'',
+                    'surname'=>'',
+                    'email'=>'',
+                    'status'=>'new',
+                    'activation_code'=>$activation_code];
                 $newCustomer = new Customer($attributes);
                 $newCustomer->status = config('app.customerStatus')['new'];
                 $newCustomer->save();
@@ -43,7 +55,15 @@ class CustomerService extends ApiGuardController{
                 $payload['command_status'] = config('app.responseCodes')['command_successful'];
             }
             elseif(count($device) and !count($customer)){
-                $attributes = ['mobile_number'=>$payload['mobile_number'],'id_number'=>'','first_name'=>'','last_name'=>'','surname'=>'','email'=>'','status'=>'new'];
+                $attributes = [
+                    'mobile_number'=>$payload['mobile_number'],
+                    'id_number'=>'',
+                    'last_name'=>'',
+                    'other_name'=>'',
+                    'surname'=>'',
+                    'email'=>'',
+                    'status'=>'new',
+                    'activation_code'=>$activation_code];
                 $newCustomer = new Customer($attributes);
                 $newCustomer->status = config('app.customerStatus')['new'];
                 $newCustomer->save();
@@ -158,6 +178,9 @@ class CustomerService extends ApiGuardController{
             $payload['command_status'] = config('app.responseCodes')['command_failed'];
         }
         return $payload;
+    }
+    public function customer_statement($payload){
+        
     }
     public function send_notification($payload){
         $response = array();
