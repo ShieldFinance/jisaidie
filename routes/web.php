@@ -35,3 +35,5 @@ Route::resource('admin/transactions', 'Transaction\\TransactionsController');
 Route::resource('admin/screens', 'Screens\\ScreensController');
 Route::resource('admin/loan', 'Loans\\LoanController');
 Route::resource('admin/payments', 'Payments\\PaymentsController');
+Route::resource('admin/response-templates', 'Services\\ResponseTemplatesController');
+Route::resource('admin/messages', 'Services\\MessagesController');

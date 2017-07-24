@@ -4,7 +4,9 @@ use Carbon\Carbon;
 use App\Http\Models\Loan;
 use App\Http\Models\Customer;
 use App\Http\Models\Payment;
+use App\Http\Models\Service;
 use App\Setting;
+use App\Http\Controllers\Services\ResponseTemplatesController;
 /* 
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -12,8 +14,9 @@ use App\Setting;
  */
 
 class LoanService{
-    public function __construct(Setting $setting){
+    public function __construct(Setting $setting, ResponseTemplatesController $responseProcessor){
         $this->setting = $setting;
+        $this->responseProcessor = $responseProcessor;
     }
     /**
      * Create a new loan if a cutomer qualifies
@@ -44,6 +47,23 @@ class LoanService{
                     $payload['response_string'] = 'Loan Created';
                     $payload['response_status'] = config('app.responseCodes')['command_successful'];
                     $payload['command_status'] = config('app.responseCodes')['command_successful'];
+                    $payload['send_notification'] = true;
+                    $payload['email'] = $this->setting->where('setting_name','new_loan_application_recipients')->first()->setting_value;
+                    $payload['subject_placeholders'] = array();
+                    $payload['message_placeholders'] = array();
+                    $payload['subject_placeholders']['[mobile_number]'] = $payload['mobile_number'];
+                    $payload['message_placeholders']['[first_name]'] = $customer->first_name;
+                    $payload['message_placeholders']['[amount]'] = $loan->amount_requested;
+                    $customerName = $customer->first_name;
+                    
+                    if($customer->middle_name){
+                        $customerName.=' '.$customer->middle_name;
+                    }
+                    if($customer->surname){
+                        $customerName.=' '.$customer->surname;
+                    }
+                    $payload['message_placeholders']['[customer_name]'] = $customerName;
+                    $payload['message_placeholders']['[mobile_number]'] = $payload['mobile_number'];
                 }
             }else{
                 $payload['response_string'] = 'Customer cannot borrow';
@@ -125,6 +145,11 @@ class LoanService{
         return $payload;
     }
     
+    /**
+     * Disburse a loan to client
+     * @param type $payload
+     * @return type
+     */
     public function send_funds($payload){
         $responseString = '';
         $responseStatus = '';
@@ -270,10 +295,27 @@ class LoanService{
         return $payload;
     }
     public function send_notification($payload){
+        $responseString = '';
+        $responseStatus = '';
+        $commandStatus = config('app.responseCodes')['no_response'];
+        $commandStatus = config('app.responseCodes')['command_failed'];
         if(isset($payload['send_notification']) && $payload['send_notification']){
-           $payload['response_status'] = config('app.responseCodes')['command_successful'];
-           $payload['response_string']="Notification sent";
+           $payload['msisdn'] = $payload['mobile_number'];
+           $payload['email'] = $payload['email'];
+           if($this->responseProcessor->processResponse($payload)){
+               $responseStatus = config('app.responseCodes')['command_successful'];
+               $commandStatus = config('app.responseCodes')['command_successful'];
+               $responseString="Notification sent";
+           }else{
+               $responseStatus = config('app.responseCodes')['command_failed'];
+               $commandStatus = config('app.responseCodes')['command_failed'];
+               $responseString="Notification not sent";
+           }
         }
+        $payload['response_string'] = $responseString;
+        $payload['response_status'] = $responseStatus;
+        $payload['command_status'] = $commandStatus;
+        return $payload;
     }
     
     /**
@@ -326,6 +368,9 @@ class LoanService{
         $loan->total = $loan->amount_processed+$fees;
         $loan->save();
         return $loan;
+    }
+    public function getCustomerStatement($payload){
+        
     }
 }
 

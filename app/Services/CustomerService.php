@@ -155,7 +155,7 @@ class CustomerService extends ApiGuardController{
             }
             $payload['customer']=$this->response->withItem($customer, new CustomerTransformer());
         }else{
-            $payload['command_status'] = config('app.responseCodes')['failed'];
+            $payload['command_status'] = config('app.responseCodes')['command_failed'];
         }
         return $payload;
     }

@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Schema;
 use App\Http\Models\Service;
 use App\Http\Models\Transaction;
 use App\Setting;
+use App\Http\Controllers\Services\ResponseTemplatesController;
 class ServiceProcessor extends Controller
 {
     public function __construct(){
@@ -18,11 +19,14 @@ class ServiceProcessor extends Controller
         $response = array();
         $serviceModel = Service::where('name',$request->input('action'))->first();
         if($serviceModel){
-            $service =  $this->app->make($serviceModel->product, [new Setting()]);
+            $responseProcessor = new ResponseTemplatesController();
+            $settings = new Setting();
+            $service =  $this->app->make($serviceModel->product, [$settings, $responseProcessor]);
             $serviceCommands = $serviceModel->getServiceCommandsByServiceName($request->input('action'));
             $payload = json_decode($request['request'], true);
             
             $payload['transaction_id']=$this->logTransaction($serviceModel, $request);
+            $payload['service_id'] = $serviceModel->id;
             //first command will always execute
             $canProcessNext = true;
             foreach($serviceCommands as $command){
