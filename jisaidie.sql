@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Jul 23, 2017 at 12:18 PM
+-- Generation Time: Jul 24, 2017 at 12:02 AM
 -- Server version: 5.6.33
 -- PHP Version: 5.6.26
 
@@ -43,7 +43,7 @@ CREATE TABLE `api_keys` (
 --
 
 INSERT INTO `api_keys` (`id`, `apikeyable_id`, `apikeyable_type`, `key`, `last_ip_address`, `last_used_at`, `created_at`, `updated_at`, `deleted_at`) VALUES
-(1, NULL, NULL, 'dcae6a94f50c04358768fec139d55420ea17c3db', '127.0.0.1', '2017-07-23 19:16:12', '2017-07-22 08:22:53', '2017-07-23 16:16:12', NULL);
+(1, NULL, NULL, 'dcae6a94f50c04358768fec139d55420ea17c3db', '127.0.0.1', '2017-07-23 22:21:41', '2017-07-22 08:22:53', '2017-07-23 19:21:41', NULL);
 
 -- --------------------------------------------------------
 
@@ -132,7 +132,43 @@ INSERT INTO `loans` (`id`, `customer_id`, `amount_requested`, `amount_processed`
 (2, 1, '2000.00', '2000', 0, 10, 2010, '', 2010, '0', 205, '2017-07-23 16:15:11', 0, '2017-07-22 18:33:56', '2017-07-23 16:16:13'),
 (3, 1, '2000.00', '2000', 0, 10, 2010, '', 2010, '0', 205, '2017-07-23 16:07:05', 0, '2017-07-22 18:47:42', '2017-07-23 16:08:04'),
 (4, 1, '2000.00', '2000', 0, 10, 2010, '', 2010, '0', 205, '2017-07-23 15:53:37', 0, '2017-07-22 19:04:21', '2017-07-23 16:08:04'),
-(5, 2, '500.00', '500', 0, 10, 510, '', 510, '0', 205, '2017-07-23 14:22:44', 0, '2017-07-23 13:29:17', '2017-07-23 15:40:50');
+(5, 2, '500.00', '500', 0, 10, 510, '', 510, '0', 205, '2017-07-23 14:22:44', 0, '2017-07-23 13:29:17', '2017-07-23 15:40:50'),
+(19, 1, '1500.00', '0', 0, 0, 0, '', 0, '0', 200, NULL, 0, '2017-07-23 19:21:42', '2017-07-23 19:21:42');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `messages`
+--
+
+CREATE TABLE `messages` (
+  `id` int(10) UNSIGNED NOT NULL,
+  `subject` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `message` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `recipient` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `type` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `status` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `attempts` int(11) NOT NULL,
+  `service_id` int(11) NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `messages`
+--
+
+INSERT INTO `messages` (`id`, `subject`, `message`, `recipient`, `type`, `status`, `attempts`, `service_id`, `created_at`, `updated_at`) VALUES
+(1, 'Loan application received', 'Hi [first_name], Your loan application has been received and is being processed.', 'test@example.com', 'email', 'pending', 0, 6, '2017-07-23 19:01:05', '2017-07-23 19:01:05'),
+(2, 'Loan application received', 'Hi, A new loan application has been received and awaits your action. <br>\r\n<h3>Details</h3>\r\n<strong>Name:</strong>[customer_name]<br>\r\n<strong>Mobile Number:</strong>[mobile_number]<br>\r\n<strong>Amount:</strong>[amount]<br>', 'test@example.com', 'email', 'pending', 0, 6, '2017-07-23 19:01:05', '2017-07-23 19:01:05'),
+(3, 'Loan application received', 'Hi [first_name], Your loan application has been received and is being processed.', '254723383856', 'sms', 'pending', 0, 6, '2017-07-23 19:12:52', '2017-07-23 19:12:52'),
+(4, 'Loan application received', 'Hi, A new loan application has been received and awaits your action. <br>\r\n<h3>Details</h3>\r\n<strong>Name:</strong>1500<br>\r\n<strong>Mobile Number:</strong>254723383856<br>\r\n<strong>Amount:</strong>1500<br>', 'test@example.com', 'email', 'pending', 0, 6, '2017-07-23 19:12:52', '2017-07-23 19:12:52'),
+(5, 'Loan application received', 'Hi [first_name], Your loan application has been received and is being processed.', '254723383856', 'sms', 'pending', 0, 6, '2017-07-23 19:15:38', '2017-07-23 19:15:38'),
+(6, 'Loan application received', 'Hi, A new loan application has been received and awaits your action. <br>\r\n<h3>Details</h3>\r\n<strong>Name:</strong>John<br>\r\n<strong>Mobile Number:</strong>254723383856<br>\r\n<strong>Amount:</strong>1500<br>', 'test@example.com', 'email', 'pending', 0, 6, '2017-07-23 19:15:38', '2017-07-23 19:15:38'),
+(7, 'Loan application received', 'Hi [first_name], Your loan application has been received and is being processed.', '254723383856', 'sms', 'pending', 0, 6, '2017-07-23 19:18:10', '2017-07-23 19:18:10'),
+(8, 'Loan application received', 'Hi, A new loan application has been received and awaits your action. <br>\r\n<h3>Details</h3>\r\n<strong>Name:</strong>John Mwenda Rimberia<br>\r\n<strong>Mobile Number:</strong>254723383856<br>\r\n<strong>Amount:</strong>1500<br>', 'test@example.com', 'email', 'pending', 0, 6, '2017-07-23 19:18:10', '2017-07-23 19:18:10'),
+(9, 'Loan application received', 'Hi John, Your loan application has been received and is being processed.', '254723383856', 'sms', 'pending', 0, 6, '2017-07-23 19:21:42', '2017-07-23 19:21:42'),
+(10, 'Loan application received', 'Hi, A new loan application has been received and awaits your action. <br>\r\n<h3>Details</h3>\r\n<strong>Name:</strong>John Mwenda Rimberia<br>\r\n<strong>Mobile Number:</strong>254723383856<br>\r\n<strong>Amount:</strong>1500<br>', 'test@example.com', 'email', 'pending', 0, 6, '2017-07-23 19:21:42', '2017-07-23 19:21:42');
 
 -- --------------------------------------------------------
 
@@ -165,7 +201,9 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
 (16, '2017_07_22_140512_create_transactions_table', 10),
 (17, '2017_07_22_170147_create_screens_table', 11),
 (18, '2017_07_22_195736_create_loans_table', 12),
-(19, '2017_07_23_180643_create_payments_table', 13);
+(19, '2017_07_23_180643_create_payments_table', 13),
+(20, '2017_07_23_200357_create_response_templates_table', 14),
+(21, '2017_07_23_210604_create_messages_table', 15);
 
 -- --------------------------------------------------------
 
@@ -251,6 +289,33 @@ CREATE TABLE `permission_role` (
   `permission_id` int(10) UNSIGNED NOT NULL,
   `role_id` int(10) UNSIGNED NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `response_templates`
+--
+
+CREATE TABLE `response_templates` (
+  `id` int(10) UNSIGNED NOT NULL,
+  `name` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `subject` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `message` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `type` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `service_id` int(11) NOT NULL,
+  `description` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `status` int(11) NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `response_templates`
+--
+
+INSERT INTO `response_templates` (`id`, `name`, `subject`, `message`, `type`, `service_id`, `description`, `status`, `created_at`, `updated_at`) VALUES
+(1, 'Loan application received', 'Loan application received', 'Hi [first_name], Your loan application has been received and is being processed.', 'sms', 6, 'Text sent to customer when loan application is received', 1, '2017-07-23 17:28:25', '2017-07-23 19:04:25'),
+(2, 'Loan application received - [mobile_number]', 'Loan application received', 'Hi, A new loan application has been received and awaits your action. <br>\r\n<h3>Details</h3>\r\n<strong>Name:</strong>[customer_name]<br>\r\n<strong>Mobile Number:</strong>[mobile_number]<br>\r\n<strong>Amount:</strong>[amount]<br>', 'email', 6, 'Alert admin of a new loan application', 1, '2017-07-23 17:31:48', '2017-07-23 19:21:10');
 
 -- --------------------------------------------------------
 
@@ -398,7 +463,8 @@ INSERT INTO `settings` (`id`, `setting_name`, `setting_value`, `setting_descript
 (5, 'nco_processing_fee', '10', 'The processing fee for non-check-off loans', '2017-07-21 19:22:12', '2017-07-21 19:22:12'),
 (6, 'minimum_loan', '500', 'Minimum loan applicable', '2017-07-22 17:30:27', '2017-07-22 17:30:27'),
 (7, 'maximum_loan', '50000', 'Maximum loan applicable', '2017-07-22 17:30:57', '2017-07-22 17:30:57'),
-(8, 'co_processing_fee', '8', 'loan fee for check off loans', '2017-07-22 19:59:51', '2017-07-22 19:59:51');
+(8, 'co_processing_fee', '8', 'loan fee for check off loans', '2017-07-22 19:59:51', '2017-07-22 19:59:51'),
+(9, 'new_loan_application_recipients', 'test@example.com', 'Who should receive new loan applications alert on email', '2017-07-23 17:35:11', '2017-07-23 17:35:11');
 
 -- --------------------------------------------------------
 
@@ -605,7 +671,22 @@ INSERT INTO `transactions` (`id`, `service_id`, `request`, `response`, `status`,
 (179, '9', '{"action":"DisburseLoan","request":{"loan_id":"2"}}', NULL, 'pending', '0', '0', NULL, '2017-07-23 16:15:11', '2017-07-23 16:15:11'),
 (180, '9', '{"action":"DisburseLoan","request":{"loan_id":"2"}}', NULL, 'pending', '0', '0', NULL, '2017-07-23 16:15:15', '2017-07-23 16:15:15'),
 (181, '11', '{"action":"RepayLoan","request":{"amount":"2300","mobile_number":"254723383856","reference":"RTY56MYE","gateway":"mpesa"}}', NULL, 'pending', '0', '0', NULL, '2017-07-23 16:15:59', '2017-07-23 16:15:59'),
-(182, '11', '{"action":"RepayLoan","request":{"amount":"2300","mobile_number":"254723383856","reference":"RTY56GYE","gateway":"mpesa"}}', NULL, 'pending', '0', '0', NULL, '2017-07-23 16:16:12', '2017-07-23 16:16:12');
+(182, '11', '{"action":"RepayLoan","request":{"amount":"2300","mobile_number":"254723383856","reference":"RTY56GYE","gateway":"mpesa"}}', NULL, 'pending', '0', '0', NULL, '2017-07-23 16:16:12', '2017-07-23 16:16:12'),
+(183, '6', '{"action":"ApplyLoan","request":{"amount":"1500","mobile_number":"254723383856"}}', NULL, 'pending', '0', '0', NULL, '2017-07-23 18:18:13', '2017-07-23 18:18:13'),
+(184, '6', '{"action":"ApplyLoan","request":{"amount":"1500","mobile_number":"254723383856"}}', NULL, 'pending', '0', '0', NULL, '2017-07-23 18:39:00', '2017-07-23 18:39:00'),
+(185, '6', '{"action":"ApplyLoan","request":{"amount":"1500","mobile_number":"254723383856"}}', NULL, 'pending', '0', '0', NULL, '2017-07-23 18:41:34', '2017-07-23 18:41:34'),
+(186, '6', '{"action":"ApplyLoan","request":{"amount":"1500","mobile_number":"254723383856"}}', NULL, 'pending', '0', '0', NULL, '2017-07-23 18:44:28', '2017-07-23 18:44:28'),
+(187, '6', '{"action":"ApplyLoan","request":{"amount":"1500","mobile_number":"254723383856"}}', NULL, 'pending', '0', '0', NULL, '2017-07-23 18:50:20', '2017-07-23 18:50:20'),
+(188, '6', '{"action":"ApplyLoan","request":{"amount":"1500","mobile_number":"254723383856"}}', NULL, 'pending', '0', '0', NULL, '2017-07-23 18:50:52', '2017-07-23 18:50:52'),
+(189, '6', '{"action":"ApplyLoan","request":{"amount":"1500","mobile_number":"254723383856"}}', NULL, 'pending', '0', '0', NULL, '2017-07-23 18:51:16', '2017-07-23 18:51:16'),
+(190, '6', '{"action":"ApplyLoan","request":{"amount":"1500","mobile_number":"254723383856"}}', NULL, 'pending', '0', '0', NULL, '2017-07-23 18:53:26', '2017-07-23 18:53:26'),
+(191, '6', '{"action":"ApplyLoan","request":{"amount":"1500","mobile_number":"254723383856"}}', NULL, 'pending', '0', '0', NULL, '2017-07-23 18:55:42', '2017-07-23 18:55:42'),
+(192, '6', '{"action":"ApplyLoan","request":{"amount":"1500","mobile_number":"254723383856"}}', NULL, 'pending', '0', '0', NULL, '2017-07-23 18:57:47', '2017-07-23 18:57:47'),
+(193, '6', '{"action":"ApplyLoan","request":{"amount":"1500","mobile_number":"254723383856"}}', NULL, 'pending', '0', '0', NULL, '2017-07-23 19:01:05', '2017-07-23 19:01:05'),
+(194, '6', '{"action":"ApplyLoan","request":{"amount":"1500","mobile_number":"254723383856"}}', NULL, 'pending', '0', '0', NULL, '2017-07-23 19:12:52', '2017-07-23 19:12:52'),
+(195, '6', '{"action":"ApplyLoan","request":{"amount":"1500","mobile_number":"254723383856"}}', NULL, 'pending', '0', '0', NULL, '2017-07-23 19:15:38', '2017-07-23 19:15:38'),
+(196, '6', '{"action":"ApplyLoan","request":{"amount":"1500","mobile_number":"254723383856"}}', NULL, 'pending', '0', '0', NULL, '2017-07-23 19:18:10', '2017-07-23 19:18:10'),
+(197, '6', '{"action":"ApplyLoan","request":{"amount":"1500","mobile_number":"254723383856"}}', NULL, 'pending', '0', '0', NULL, '2017-07-23 19:21:41', '2017-07-23 19:21:41');
 
 -- --------------------------------------------------------
 
@@ -662,6 +743,12 @@ ALTER TABLE `loans`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `messages`
+--
+ALTER TABLE `messages`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `migrations`
 --
 ALTER TABLE `migrations`
@@ -697,6 +784,12 @@ ALTER TABLE `permissions`
 ALTER TABLE `permission_role`
   ADD PRIMARY KEY (`permission_id`,`role_id`),
   ADD KEY `permission_role_role_id_foreign` (`role_id`);
+
+--
+-- Indexes for table `response_templates`
+--
+ALTER TABLE `response_templates`
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `roles`
@@ -772,17 +865,22 @@ ALTER TABLE `customer_devices`
 -- AUTO_INCREMENT for table `loans`
 --
 ALTER TABLE `loans`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
+--
+-- AUTO_INCREMENT for table `messages`
+--
+ALTER TABLE `messages`
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 --
 -- AUTO_INCREMENT for table `migrations`
 --
 ALTER TABLE `migrations`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 --
 -- AUTO_INCREMENT for table `organizations`
 --
 ALTER TABLE `organizations`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
 --
 -- AUTO_INCREMENT for table `payments`
 --
@@ -793,6 +891,11 @@ ALTER TABLE `payments`
 --
 ALTER TABLE `permissions`
   MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+--
+-- AUTO_INCREMENT for table `response_templates`
+--
+ALTER TABLE `response_templates`
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 --
 -- AUTO_INCREMENT for table `roles`
 --
@@ -817,12 +920,12 @@ ALTER TABLE `service_commands`
 -- AUTO_INCREMENT for table `settings`
 --
 ALTER TABLE `settings`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 --
 -- AUTO_INCREMENT for table `transactions`
 --
 ALTER TABLE `transactions`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=183;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=198;
 --
 -- AUTO_INCREMENT for table `users`
 --
