@@ -144,4 +144,11 @@ class MessagesController extends Controller
 
         return redirect('admin/messages');
     }
+    
+    public function sendQueuedMessages()
+    {
+        $app = \App::getFacadeRoot();
+        $messagingService = $app->make('Message');
+        $messagingService->sendMessages();
+    }
 }

@@ -15,7 +15,7 @@
 Auth::routes();
 Route::get('/', 'HomeController@index')->name('home');
 Route::get('/home', 'HomeController@index')->name('home');
-
+Route::get('/sendMessages', 'Services\\MessagesController@sendQueuedMessages');
 Route::get('admin', 'Admin\AdminController@index');
 Route::get('admin/give-role-permissions', 'Admin\AdminController@getGiveRolePermissions');
 Route::post('admin/give-role-permissions', 'Admin\AdminController@postGiveRolePermissions');

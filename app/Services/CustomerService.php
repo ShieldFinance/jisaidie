@@ -10,8 +10,12 @@ use App\Transformers\CustomerTransformer;
 use Chrisbjr\ApiGuard\Http\Controllers\ApiGuardController;
 use App\Http\Models\Customer;
 use App\Http\Models\Loan;
+use App\Setting;
+use App\Http\Controllers\Services\ResponseTemplatesController;
 class CustomerService extends ApiGuardController{
-    
+    public function __construct(Setting $setting, ResponseTemplatesController $responseProcessor){
+        
+    }
     public function  create_customer_profile($payload){
         try{
         
@@ -50,7 +54,7 @@ class CustomerService extends ApiGuardController{
                 $payload['response_string'] = "User device added successfully";
                 $payload['command_status'] = config('app.responseCodes')['command_successful'];
             }elseif($customer and count($device)){
-                $payload['send_notification'] = true;
+                $payload['send_notification'] = false;
                 $payload['customer'] =  $this->response->withItem($customer, new CustomerTransformer());
                 $payload['response_status'] =config('app.responseCodes')['existing_msisdn_existing_device'];
                 $payload['command_status'] = config('app.responseCodes')['command_successful'];
@@ -68,6 +72,7 @@ class CustomerService extends ApiGuardController{
                 $newCustomer = new Customer($attributes);
                 $newCustomer->status = config('app.customerStatus')['new'];
                 $newCustomer->save();
+                $payload['send_notification'] = true;
                 $payload['customer'] =  $this->response->withItem($newCustomer, new CustomerTransformer());
                 $payload['response_status'] =config('app.responseCodes')['existing_device_new_msisdn'];
                 $payload['command_status'] = config('app.responseCodes')['command_successful'];
@@ -200,15 +205,27 @@ class CustomerService extends ApiGuardController{
         return $loans;
     }
     public function send_notification($payload){
-        $response = array();
+        $responseString = '';
+        $responseStatus = '';
+        $commandStatus = config('app.responseCodes')['no_response'];
+        $commandStatus = config('app.responseCodes')['command_failed'];
         if(isset($payload['send_notification']) && $payload['send_notification']){
-            $response['response_string'] ="Notification sent";
-            $response['response_status'] ='00';
-        }else{
-            $response['response_string'] ="Notification not sent";
-            $response['response_status'] ='00';
+           $payload['msisdn'] = $payload['mobile_number'];
+           $payload['email'] = $payload['email'];
+           if($this->responseProcessor->processResponse($payload)){
+               $responseStatus = config('app.responseCodes')['command_successful'];
+               $commandStatus = config('app.responseCodes')['command_successful'];
+               $responseString="Notification sent";
+           }else{
+               $responseStatus = config('app.responseCodes')['command_failed'];
+               $commandStatus = config('app.responseCodes')['command_failed'];
+               $responseString="Notification not sent";
+           }
         }
-        return $response;
+        $payload['response_string'] = $responseString;
+        $payload['response_status'] = $responseStatus;
+        $payload['command_status'] = $commandStatus;
+        return $payload;
     }
     
 }

@@ -26,5 +26,6 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind('Customer', \App\Services\CustomerService::class);
         $this->app->bind('Loan', \App\Services\LoanService::class);
         $this->app->bind('Screen', \App\Services\ScreenService::class);
+        $this->app->bind('Message', \App\Services\MessageService::class);
     }
 }
