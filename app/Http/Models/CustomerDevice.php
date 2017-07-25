@@ -25,7 +25,7 @@ class CustomerDevice extends Model
      *
      * @var array
      */
-    protected $fillable = ['device_id', 'customer_id_number'];
+    protected $fillable = ['device_id', 'customer_id'];
 
     
 }

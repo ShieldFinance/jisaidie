@@ -117,7 +117,7 @@ class ResponseTemplatesController extends Controller
 			'subject' => 'required',
 			'message' => 'required',
 			'type' => 'required',
-			'service' => 'required',
+			'service_id' => 'required',
 			'description' => 'required'
 		]);
         $requestData = $request->all();
@@ -156,6 +156,10 @@ class ResponseTemplatesController extends Controller
                     $message = $template->message;
                     $subject = $template->subject;
                     $details = array();
+                    $status = 'pending';
+                    if(isset($payload['send_now']) and $payload['send_now']){
+                        $status = 'Success';
+                    }
                     if(!empty($payload['message_placeholders'])){
                         foreach($payload['message_placeholders'] as $key => $value){
                             $message = str_replace($key, $value, $message);
@@ -173,13 +177,19 @@ class ResponseTemplatesController extends Controller
                         'message'=>$message,
                         'recipient'=>$recipient,
                         'type'=>$template->type,
-                        'status'=>'pending',
+                        'status'=>$status,
                         'service_id'=>$payload['service_id'],
                         'attempts'=>0
                     ]);
                     if($messaging->save($details)){
                         $saved++;
+                        if(isset($payload['send_now']) and $payload['send_now']){
+                            $app = \App::getFacadeRoot();
+                            $messagingService = $app->make('Message');
+                            $messagingService->sendMessage(array('message_id'=>$messaging->id,'type'=>$messaging->type));
+                        }
                     }
+                    
                 }
                 if($saved){
                     

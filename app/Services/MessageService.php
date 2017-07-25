@@ -13,11 +13,10 @@ use App\Http\Models\Message;
 use App\Setting;
 
 class MessageService {
-
+    public $messageTypes = array('sms','email','inapp');
     public function sendMessages() {
         $messages = Message::where([
                     ['status', '=', 'pending'],
-                    ['type', '=', 'email']
                 ])->limit(2)->get();
         if (count($messages)) {
             foreach ($messages as $message) {
@@ -33,7 +32,22 @@ class MessageService {
             }
         }
     }
-
+    public function sendMessage($payload){
+        if(isset($payload['message_id'])){
+            $message = Message::find($payload['message_id']);
+            if($message){
+                $messageFunction = 'send' . $message->type;
+                $details = array();
+                $details['recepient'] = $message->recipient;
+                $details['message'] = $message->message;
+                $data = $this->$messageFunction($details);
+                $message->status = $data['status'];
+                $message->attempts += $data['attempts'];
+                $message->save();
+            }
+            
+        }
+    }
     public function sendSMS($payload) {
         $username = Setting::where('setting_name', 'prsp_username')->first()->setting_value;
         $key = Setting::where('setting_name', 'prsp_api_key')->first()->setting_value;
