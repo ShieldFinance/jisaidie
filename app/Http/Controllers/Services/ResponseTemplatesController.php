@@ -27,7 +27,7 @@ class ResponseTemplatesController extends Controller
 				->orWhere('subject', 'LIKE', "%$keyword%")
 				->orWhere('message', 'LIKE', "%$keyword%")
 				->orWhere('type', 'LIKE', "%$keyword%")
-				->orWhere('service', 'LIKE', "%$keyword%")
+				->orWhere('service_id', 'LIKE', "%$keyword%")
 				->orWhere('description', 'LIKE', "%$keyword%")
 				->orWhere('status', 'LIKE', "%$keyword%")
 				->paginate($perPage);
@@ -62,7 +62,7 @@ class ResponseTemplatesController extends Controller
 			'subject' => 'required',
 			'message' => 'required',
 			'type' => 'required',
-			'service' => 'required',
+			'service_id' => 'required',
 			'description' => 'required'
 		]);
         $requestData = $request->all();
