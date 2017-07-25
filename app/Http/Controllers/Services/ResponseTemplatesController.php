@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Services;
 
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
-
+use App\Mail\AppEmail;
 use App\Http\Models\ResponseTemplate;
 use App\Http\Models\Message;
 use Illuminate\Http\Request;

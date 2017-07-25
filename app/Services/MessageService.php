@@ -11,7 +11,7 @@ namespace App\Services;
 use App\Helpers\AfricasTalkingGateway;
 use App\Http\Models\Message;
 use App\Setting;
-
+use App\Mail\AppEmail;
 class MessageService {
     public $messageTypes = array('sms','email','inapp');
     public function sendMessages() {
@@ -25,6 +25,7 @@ class MessageService {
                 $payload = array();
                 $payload['recepient'] = $message->recipient;
                 $payload['message'] = $message->message;
+                $payload['subject'] = $message->subject;
                 $data = $this->$messageFunction($payload);
                 $message->status = $data['status'];
                 $message->attempts += $data['attempts'];
@@ -32,6 +33,10 @@ class MessageService {
             }
         }
     }
+    /**
+     * Send single message
+     * @param type $payload
+     */
     public function sendMessage($payload){
         if(isset($payload['message_id'])){
             $message = Message::find($payload['message_id']);
@@ -40,6 +45,7 @@ class MessageService {
                 $details = array();
                 $details['recepient'] = $message->recipient;
                 $details['message'] = $message->message;
+                $details['subject'] = $message->subject;
                 $data = $this->$messageFunction($details);
                 $message->status = $data['status'];
                 $message->attempts += $data['attempts'];
@@ -48,6 +54,7 @@ class MessageService {
             
         }
     }
+   
     public function sendSMS($payload) {
         $username = Setting::where('setting_name', 'prsp_username')->first()->setting_value;
         $key = Setting::where('setting_name', 'prsp_api_key')->first()->setting_value;
@@ -88,7 +95,8 @@ class MessageService {
     }
 
     public function sendEMAIL($payload) {
-
+       \Mail::to($payload['recepient'])->send(new AppEmail($payload['message'],$payload['subject']));
+       return array('status'=>1,'attempts'=>1);
     }
 
 }

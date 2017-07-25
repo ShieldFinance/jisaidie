@@ -181,18 +181,29 @@ class CustomerService extends ApiGuardController{
         if(isset($payload['activation_code']) && isset($payload['mobile_number'])){
             $customer = Customer::where('mobile_number',$payload['mobile_number'])->first();
             if($customer && $customer->activation_code==$payload['activation_code']){
+                $payload['subject_placeholders'] = array();
+                $payload['message_placeholders'] = array();
                 $customer->activation_code = '';
                 $customer->status = config('app.customerStatus')['active'];
                 $customer->save();
-                $payload['response_status'] ='00';
+                $payload['response_status'] =config('app.responseCodes')['profile_activated'];
                 $payload['response_string'] ="Account Activated";
                 $payload['customer']=$this->response->withItem($customer, new CustomerTransformer());
                 $payload['command_status'] = config('app.responseCodes')['command_successful'];
+                $payload['send_notification'] = true;
+                $payload['send_now']=true;
+                $payload['message_placeholders']['[customer_name]']=$customer->surname;
+                $payload['email'] = $customer->email;
+                $payload['msisdn'] = $customer->mobile_number;
             }else{
-                $payload['response_status'] ="99";
+                $payload['response_status'] =config('app.responseCodes')['profile_not_activated'];
                 $payload['response_string'] ="Invalid activation code";
                 $payload['command_status'] = config('app.responseCodes')['command_failed'];
             }
+        }else{
+            $payload['response_status'] =config('app.responseCodes')['profile_not_activated'];
+            $payload['response_string'] ="You must provide both activation code and mobile number";
+            $payload['command_status'] = config('app.responseCodes')['command_failed'];
         }
         return $payload;
     }

@@ -244,6 +244,8 @@ return [
         'customer_profile_not_updated' =>106,//customer details updated successfully
         'activation_code_updated'=>107,//customer activation code updated successfully
         'activation_code_not updated'=>108,//customer activation code not updated
+        'profile_activated'=>109,//profile activation successful
+        'profile_not_activated'=>110,//profile activation failed
         'loan_pending' => 200,//A new loan pending approval,
         'loan_approved'=>201,//A loan approved successfully
         'loan_rejected'=>202,//A loan approval rejected

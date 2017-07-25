@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Services;
 
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
-
+use App\Mail\AppEmail;
 use App\Http\Models\Message;
 use Illuminate\Http\Request;
 use Session;
@@ -147,10 +147,6 @@ class MessagesController extends Controller
     
     public function sendQueuedMessages()
     {
-        \Mail::send('welcome', [], function ($message){
-            
-        $message->to('tommwenda@gmail.com')->subject('Expertphp.in - Testing mail');
-    });exit;
         $app = \App::getFacadeRoot();
         $messagingService = $app->make('Message');
         $messagingService->sendMessages();
