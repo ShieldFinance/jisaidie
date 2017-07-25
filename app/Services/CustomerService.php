@@ -10,6 +10,7 @@ use App\Transformers\CustomerTransformer;
 use Chrisbjr\ApiGuard\Http\Controllers\ApiGuardController;
 use App\Http\Models\Customer;
 use App\Http\Models\Loan;
+use App\Http\Models\CustomerDevice;
 use App\Setting;
 use App\Http\Controllers\Services\ResponseTemplatesController;
 class CustomerService extends ApiGuardController{
@@ -154,9 +155,23 @@ class CustomerService extends ApiGuardController{
         } catch (Exception $ex) {
             $payload['response_string'] ="Error updating customer";
             $payload['command_status'] = config('app.responseCodes')['command_failed'];
-            $payload['response_status'] =config('app.responseCodes')['customer_profile_not_updated'];;
+            $payload['response_status'] =config('app.responseCodes')['customer_profile_not_updated'];
         }
         return $payload;
+    }
+    public function update_device_token($payload){
+        $response = array();
+        $responseStatus = config('app.responseCodes')['command_failed'];
+        if(isset($payload['registration_token']) && isset($payload['device_id']) && isset($payload['mobile_number'])){
+            $customer = Customer::where('mobile_number',$payload['mobile_number'])->first();
+            $device = CustomerDevice::where([
+                ['device_id','=',$payload['device_id']],
+                ['customer_id','=',$customer->id]
+            ])->update(['registration_token'=>$payload['registration_token']]);
+            $response['response_status'] =  config('app.responseCodes')['command_failed'];
+            $payload['command_status'] = config('app.responseCodes')['command_failed'];
+        }
+        return $response;
     }
     public function update_activation_code($payload){
         if(isset($payload['activation_code']) && isset($payload['mobile_number'])){

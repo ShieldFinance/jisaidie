@@ -15,6 +15,7 @@ class CreateCustomerDevicesTable extends Migration
         Schema::create('customer_devices', function(Blueprint $table) {
             $table->increments('id');
             $table->string('device_id');
+            $table->text('registration_token')->nullable();
             $table->string('customer_id');
             $table->timestamps();
         });
