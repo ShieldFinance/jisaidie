@@ -18,6 +18,9 @@ use App\Http\Models\Message;
 class CustomerService extends ApiGuardController{
    
     public function  create_customer_profile($payload){
+        $responseString = '';
+        $responseStatus = config('app.responseCodes')['no_response'];
+        $commandStatus = config('app.responseCodes')['command_failed'];
         try{
         
         if(isset($payload['mobile_number']) && isset($payload['device_id'])){
@@ -48,45 +51,25 @@ class CustomerService extends ApiGuardController{
                 $device = new \App\Http\Models\CustomerDevice(['device_id'=>$payload['device_id'],'customer_id'=>$newCustomer->id]);
                 $device->save();
                 $payload['customer'] =  $this->response->withItem($newCustomer, new CustomerTransformer());
-                $payload['response_status'] =  config('app.responseCodes')['new_device_new_msisdn'];
-                $payload['response_string'] = "User created successfully";
+                $responseStatus =  config('app.responseCodes')['new_device_new_msisdn'];
+                $responseString = "User created successfully";
                 $payload['send_notification'] = true;
                 $payload['send_now']=true;
-                $payload['command_status'] = config('app.responseCodes')['command_successful'];
+                $commandStatus = config('app.responseCodes')['command_successful'];
             }elseif(count($customer) && count($device)==0 and $payload['device_id']){
                 //add new device
                 $newDevice = new \App\Http\Models\CustomerDevice(['device_id'=>$payload['device_id'],'customer_id'=>$customer->id]);
                 $newDevice->save();
                 $payload['customer'] =  $this->response->withItem($customer, new CustomerTransformer());
-                $payload['response_status'] =config('app.responseCodes')['existing_msisdn_new_device'];
-                $payload['response_string'] = "User device added successfully";
-                $payload['command_status'] = config('app.responseCodes')['command_successful'];
-            }elseif(!count($customer) && count($device)){
-                //add new customer and send notification
-                $attributes = [
-                    'mobile_number'=>$payload['mobile_number'],
-                    'id_number'=>'',
-                    'last_name'=>'',
-                    'other_name'=>'',
-                    'surname'=>'',
-                    'email'=>'',
-                    'status'=>config('app.customerStatus')['new'],
-                    'activation_code'=>$activation_code];
-                $newCustomer = new Customer($attributes);
-                $newCustomer->status = config('app.customerStatus')['new'];
-                $newCustomer->save();
-                $newDevice = new \App\Http\Models\CustomerDevice(['device_id'=>$payload['device_id'],'customer_id'=>$newCustomer->id]);
-                $newDevice->save();
-                $payload['send_notification'] = true;
-                $payload['send_now']=true;
-                $payload['response_status'] =config('app.responseCodes')['existing_device_new_msisdn'];
-                $payload['command_status'] = config('app.responseCodes')['command_successful'];
-                $payload['customer'] =  $this->response->withItem($newCustomer, new CustomerTransformer());
+                $responseStatus =config('app.responseCodes')['existing_msisdn_new_device'];
+                $responseString = "User device added successfully";
+                $commandStatus = config('app.responseCodes')['command_successful'];
             }elseif($customer and count($device)){
                 $payload['send_notification'] = false;
                 $payload['customer'] =  $this->response->withItem($customer, new CustomerTransformer());
-                $payload['response_status'] =config('app.responseCodes')['existing_msisdn_existing_device'];
-                $payload['command_status'] = config('app.responseCodes')['command_successful'];
+                $responseStatus =config('app.responseCodes')['existing_msisdn_existing_device'];
+                $commandStatus = config('app.responseCodes')['command_successful'];
+                $responseString = "Existing msisdn existing device";
             }
             elseif(count($device) and !count($customer)){
                 $attributes = [
@@ -103,25 +86,29 @@ class CustomerService extends ApiGuardController{
                 $newCustomer->save();
                 $payload['send_notification'] = true;
                 $payload['customer'] =  $this->response->withItem($newCustomer, new CustomerTransformer());
-                $payload['response_status'] =config('app.responseCodes')['existing_device_new_msisdn'];
-                $payload['command_status'] = config('app.responseCodes')['command_successful'];
+                $responseStatus =config('app.responseCodes')['existing_device_new_msisdn'];
+                $commandStatus = config('app.responseCodes')['command_successful'];
+                $responseString = "Existing device new msisdn";
             }
             else{
-                $payload['response_status'] ='99';
-                $payload['response_string'] = "Missing parameters";
-                $payload['command_status'] = config('app.responseCodes')['command_failed'];
+                $responseStatus = config('app.responseCodes')['command_failed'];
+                $responseString = "Missing parameters";
+                $commandStatus = config('app.responseCodes')['command_failed'];
             }
         }else{
             $payload['response_status'] ='99';
-            $payload['response_string'] = "You must provide both device id and phone number";
+            $responseString = "You must provide both device id and phone number";
             $payload['command_status'] = config('app.responseCodes')['command_failed'];
         }
       
     }catch(Exception $ex){
-        $payload['response_string'] ="Error creating user";
-        $payload['response_status'] ='99';
-        $payload['command_status'] = config('app.responseCodes')['command_failed'];
+        $responseString = "Error creating user";
+        $responseStatus =config('app.responseCodes')['command_failed'];
+        $commandStatus = config('app.responseCodes')['command_failed'];
     }
+    $payload['response_string'] = $responseString;
+    $payload['response_status'] = $responseStatus;
+    $payload['command_status'] = $commandStatus;
     return $payload;
     }
     
