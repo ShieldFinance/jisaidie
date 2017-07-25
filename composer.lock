@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "1b47caedff85a107c036374e705a4934",
+    "content-hash": "616191ebebe286a52f2d7791cc3d6392",
     "packages": [
         {
             "name": "appzcoder/crud-generator",
@@ -262,6 +262,57 @@
                 "string"
             ],
             "time": "2015-11-06T14:35:42+00:00"
+        },
+        {
+            "name": "edujugon/push-notification",
+            "version": "v2.1.7",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Edujugon/PushNotification.git",
+                "reference": "c2c4ac2fe1f52a5504ec8afd6bf51e1580b64472"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Edujugon/PushNotification/zipball/c2c4ac2fe1f52a5504ec8afd6bf51e1580b64472",
+                "reference": "c2c4ac2fe1f52a5504ec8afd6bf51e1580b64472",
+                "shasum": ""
+            },
+            "require": {
+                "guzzlehttp/guzzle": "^6.2",
+                "illuminate/support": "^5.2",
+                "php": ">=5.6.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "4.0.*"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Edujugon\\PushNotification\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Eduardo Marcos",
+                    "email": "edujugon@gmail.com"
+                }
+            ],
+            "description": "Laravel 5 Package to send push notifications to Android and IOS devices. (GCM,FCM,APN)",
+            "keywords": [
+                "FCM",
+                "apn",
+                "gcm",
+                "high",
+                "laravel",
+                "notification",
+                "priority",
+                "push"
+            ],
+            "time": "2017-03-01T07:52:01+00:00"
         },
         {
             "name": "ellipsesynergie/api-response",

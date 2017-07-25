@@ -7,12 +7,14 @@ namespace App\Services;
  */
 use Illuminate\Support\Facades\Schema;
 use App\Transformers\CustomerTransformer;
+use App\Transformers\MessageTransformer;
 use Chrisbjr\ApiGuard\Http\Controllers\ApiGuardController;
 use App\Http\Models\Customer;
 use App\Http\Models\Loan;
 use App\Http\Models\CustomerDevice;
 use App\Setting;
 use App\Http\Controllers\Services\ResponseTemplatesController;
+use App\Http\Models\Message;
 class CustomerService extends ApiGuardController{
    
     public function  create_customer_profile($payload){
@@ -281,6 +283,32 @@ class CustomerService extends ApiGuardController{
         $response['response_string'] = $responseString;
         $response['response_status'] = $responseStatus;
         $response['command_status'] = $commandStatus;
+        return $response;
+    }
+    
+    public function fetch_messages($payload)
+    {
+        $response = array();
+        $responseString = '';
+        $responseStatus = '';
+        $commandStatus = config('app.responseCodes')['no_response'];
+        $commandStatus = config('app.responseCodes')['command_failed'];
+        if(isset($payload['mobile_number'])){
+            $limit = 1000;
+            if(isset($payload['limit'])){
+                $limit = int($payload['limit']);
+            }
+            $where = array();
+            $where[]=array('recipient','=',$payload['mobile_number']);
+            if(isset($payload['type'])){
+                $where[]=array('type','=',$payload['type']);
+            }
+            
+            $messages = Message::where($where)->limit($limit)->get();
+            if(count($messages)){
+                $response['messages'] = $this->response->withCollection($messages, new MessageTransformer());
+            }
+        }
         return $response;
     }
     

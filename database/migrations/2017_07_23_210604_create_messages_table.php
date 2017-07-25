@@ -21,6 +21,7 @@ class CreateMessagesTable extends Migration
             $table->string('status');
             $table->integer('attempts');
             $table->integer('service_id');
+            $table->integer('is_read')->default(0);
             $table->timestamps();
         });
     }

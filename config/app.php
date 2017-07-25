@@ -162,7 +162,8 @@ return [
         Illuminate\Translation\TranslationServiceProvider::class,
         Illuminate\Validation\ValidationServiceProvider::class,
         Illuminate\View\ViewServiceProvider::class,
-		Chrisbjr\ApiGuard\Providers\ApiGuardServiceProvider::class,
+        Chrisbjr\ApiGuard\Providers\ApiGuardServiceProvider::class,
+        Edujugon\PushNotification\Providers\PushNotificationServiceProvider::class,
 
         /*
          * Package Service Providers...
@@ -233,6 +234,7 @@ return [
         'View' => Illuminate\Support\Facades\View::class,
         'Form' => Collective\Html\FormFacade::class,
         'HTML' => Collective\Html\HtmlFacade::class,
+        'PushNotification' => Edujugon\PushNotification\Facades\PushNotification::class,
     ],
     'responseCodes' =>[
         'new_device_new_msisdn' => 100,//new device new mobile number

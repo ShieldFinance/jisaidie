@@ -12,6 +12,9 @@ use App\Helpers\AfricasTalkingGateway;
 use App\Http\Models\Message;
 use App\Setting;
 use App\Mail\AppEmail;
+use Edujugon\PushNotification\PushNotification;
+use App\Http\Models\CustomerDevice;
+use App\Http\Models\Customer;
 class MessageService {
     public $messageTypes = array('sms','email','inapp');
     public function sendMessages() {
@@ -97,6 +100,38 @@ class MessageService {
     public function sendEMAIL($payload) {
        \Mail::to($payload['recepient'])->send(new AppEmail($payload['message'],$payload['subject']));
        return array('status'=>1,'attempts'=>1);
+    }
+    
+    public function sendINAPP($payload){
+        $data = $this->sendANDROID($payload);
+        //$this->sendIOS($payload); Not implemented
+        return $data;
+    }
+    
+    public function sendANDROID($payload){
+        $data = array();
+        $push = new PushNotification('fcm');
+        $customer = Customer::where('mobile_number',$payload['recepient'])->first();
+        $device = CustomerDevice::where('customer_id',$customer->id)
+        ->orderBy('id','desc')
+        ->first();
+        $deviceTokens =array($device->registration_token);
+        $push->setMessage([
+            'notification' => [
+                    'title'=>$payload['subject'],
+                    'body'=>$payload['message'],
+                    'sound' => 'default'
+                    ]
+            ])
+            ->setDevicesToken($deviceTokens);
+        $response = $push->send()->getFeedback();
+        echo "<pre>";print_r($response);exit;
+        $data['status'] = $response->success?'Success':'pending';
+        if($response->failure){
+            $data['status']='failed';
+        }
+        $data['attempts']=1;
+        return $data;
     }
 
 }
