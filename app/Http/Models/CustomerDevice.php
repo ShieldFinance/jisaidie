@@ -27,5 +27,8 @@ class CustomerDevice extends Model
      */
     protected $fillable = ['device_id', 'customer_id'];
 
-    
+    public function customer()
+    {
+	return $this->belongsTo('App\Http\Models\Customer');
+    }
 }

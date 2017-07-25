@@ -30,14 +30,14 @@
                             <table class="table table-borderless">
                                 <thead>
                                     <tr>
-                                        <th>ID</th><th>Device Id</th><th>Customer Id Number</th><th>Actions</th>
+                                        <th>ID</th><th>Device Id</th><th>Mobile Number</th><th>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                 @foreach($customerdevice as $item)
                                     <tr>
                                         <td>{{ $item->id }}</td>
-                                        <td>{{ $item->device_id }}</td><td>{{ $item->customer_id_number }}</td>
+                                        <td>{{ $item->device_id }}</td><td>{{ $item->customer->mobile_number }}</td>
                                         <td>
                                             <a href="{{ url('/admin/customer-device/' . $item->id) }}" title="View CustomerDevice"><button class="btn btn-info btn-xs"><i class="fa fa-eye" aria-hidden="true"></i> View</button></a>
                                             <a href="{{ url('/admin/customer-device/' . $item->id . '/edit') }}" title="Edit CustomerDevice"><button class="btn btn-primary btn-xs"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</button></a>

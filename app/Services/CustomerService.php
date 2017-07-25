@@ -138,7 +138,7 @@ class CustomerService extends ApiGuardController{
                 if(isset($payload['device_id'])){
                     $device = \App\Http\Models\CustomerDevice::where("device_id", $payload['device_id'])->first();
                     if(!$device){
-                        $newDevice = new \App\Http\Models\CustomerDevice(['device_id'=>$payload['device_id'],'customer_id_number'=>$customer->id_number]);
+                        $newDevice = new \App\Http\Models\CustomerDevice(['device_id'=>$payload['device_id'],'customer_id'=>$customer->id_number]);
                         $newDevice->save(); 
                     }
                 }

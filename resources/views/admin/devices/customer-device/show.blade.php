@@ -33,7 +33,7 @@
                                     <tr>
                                         <th>ID</th><td>{{ $customerdevice->id }}</td>
                                     </tr>
-                                    <tr><th> Device Id </th><td> {{ $customerdevice->device_id }} </td></tr><tr><th> Customer Id Number </th><td> {{ $customerdevice->customer_id_number }} </td></tr>
+                                    <tr><th> Device Id </th><td> {{ $customerdevice->device_id }} </td></tr><tr><th> Customer Id Number </th><td> {{ $customerdevice->customer_id }} </td></tr>
                                 </tbody>
                             </table>
                         </div>

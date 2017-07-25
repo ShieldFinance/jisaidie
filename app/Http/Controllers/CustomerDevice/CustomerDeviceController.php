@@ -23,7 +23,7 @@ class CustomerDeviceController extends Controller
 
         if (!empty($keyword)) {
             $customerdevice = CustomerDevice::where('device_id', 'LIKE', "%$keyword%")
-				->orWhere('customer_id_number', 'LIKE', "%$keyword%")
+				->orWhere('customer_id', 'LIKE', "%$keyword%")
 				->paginate($perPage);
         } else {
             $customerdevice = CustomerDevice::paginate($perPage);
@@ -53,7 +53,7 @@ class CustomerDeviceController extends Controller
     {
         $this->validate($request, [
 			'device_id' => 'required',
-			'customer_id_number' => 'required'
+			'customer_id' => 'required'
 		]);
         $requestData = $request->all();
         
@@ -104,7 +104,7 @@ class CustomerDeviceController extends Controller
     {
         $this->validate($request, [
 			'device_id' => 'required',
-			'customer_id_number' => 'required'
+			'customer_id' => 'required'
 		]);
         $requestData = $request->all();
         

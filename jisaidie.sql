@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Jul 24, 2017 at 11:30 AM
+-- Generation Time: Jul 25, 2017 at 03:41 AM
 -- Server version: 5.6.33
 -- PHP Version: 5.6.26
 
@@ -43,7 +43,7 @@ CREATE TABLE `api_keys` (
 --
 
 INSERT INTO `api_keys` (`id`, `apikeyable_id`, `apikeyable_type`, `key`, `last_ip_address`, `last_used_at`, `created_at`, `updated_at`, `deleted_at`) VALUES
-(1, NULL, NULL, 'dcae6a94f50c04358768fec139d55420ea17c3db', '127.0.0.1', '2017-07-24 18:29:41', '2017-07-22 08:22:53', '2017-07-24 15:29:41', NULL);
+(1, NULL, NULL, 'dcae6a94f50c04358768fec139d55420ea17c3db', '127.0.0.1', '2017-07-25 10:30:46', '2017-07-22 08:22:53', '2017-07-25 07:30:46', NULL);
 
 -- --------------------------------------------------------
 
@@ -75,9 +75,9 @@ CREATE TABLE `customers` (
 --
 
 INSERT INTO `customers` (`id`, `surname`, `other_name`, `last_name`, `mobile_number`, `employee_number`, `id_number`, `net_salary`, `email`, `is_checkoff`, `status`, `activation_code`, `organization_id`, `withholding_balance`, `created_at`, `updated_at`) VALUES
-(1, 'John', 'Mwenda', 'Rimberia', '254723383856', NULL, '25025368', '0', '', 0, 1, '', NULL, '4470', '2017-07-22 11:27:25', '2017-07-23 16:16:13'),
+(1, 'John', 'Mwenda', 'Rimberia', '254723383455', NULL, '25025368', '0', '', 0, 1, '', NULL, '4470', '2017-07-22 11:27:25', '2017-07-24 20:06:59'),
 (2, 'Jane', 'Doe', 'Rimberia', '254723383456', NULL, '25025369', '0', '', 0, 1, '', NULL, '800', '2017-07-23 11:40:25', '2017-07-23 15:54:41'),
-(5, '', '', '', '254723383457', NULL, '', '0', '', 0, 0, 'kjkjkjkj', NULL, '0', '2017-07-24 15:29:41', '2017-07-24 15:29:41');
+(19, 'Rimberia', '', '', '254723383855', NULL, '25025368', '0', '', 0, 0, 'kjkjkjkj', NULL, '0', '2017-07-25 07:27:46', '2017-07-25 07:30:46');
 
 -- --------------------------------------------------------
 
@@ -88,7 +88,7 @@ INSERT INTO `customers` (`id`, `surname`, `other_name`, `last_name`, `mobile_num
 CREATE TABLE `customer_devices` (
   `id` int(10) UNSIGNED NOT NULL,
   `device_id` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `customer_id_number` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `customer_id` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -97,8 +97,8 @@ CREATE TABLE `customer_devices` (
 -- Dumping data for table `customer_devices`
 --
 
-INSERT INTO `customer_devices` (`id`, `device_id`, `customer_id_number`, `created_at`, `updated_at`) VALUES
-(4, '555557', '25025368', '2017-07-22 11:34:51', '2017-07-22 11:34:51');
+INSERT INTO `customer_devices` (`id`, `device_id`, `customer_id`, `created_at`, `updated_at`) VALUES
+(13, '12345', '19', '2017-07-25 07:27:46', '2017-07-25 07:27:46');
 
 -- --------------------------------------------------------
 
@@ -160,16 +160,23 @@ CREATE TABLE `messages` (
 --
 
 INSERT INTO `messages` (`id`, `subject`, `message`, `recipient`, `type`, `status`, `attempts`, `service_id`, `created_at`, `updated_at`) VALUES
-(1, 'Loan application received', 'Hi [first_name], Your loan application has been received and is being processed.', 'test@example.com', 'email', 'pending', 0, 6, '2017-07-23 19:01:05', '2017-07-23 19:01:05'),
+(1, 'Loan application received', 'Hi [first_name], Your loan application has been received and is being processed.', 'tommwenda@gmail.com', 'email', 'pending', 0, 6, '2017-07-23 19:01:05', '2017-07-23 19:01:05'),
 (2, 'Loan application received', 'Hi, A new loan application has been received and awaits your action. <br>\r\n<h3>Details</h3>\r\n<strong>Name:</strong>[customer_name]<br>\r\n<strong>Mobile Number:</strong>[mobile_number]<br>\r\n<strong>Amount:</strong>[amount]<br>', 'test@example.com', 'email', 'pending', 0, 6, '2017-07-23 19:01:05', '2017-07-23 19:01:05'),
-(3, 'Loan application received', 'Hi [first_name], Your loan application has been received and is being processed.', '254723383856', 'sms', 'pending', 0, 6, '2017-07-23 19:12:52', '2017-07-23 19:12:52'),
+(3, 'Loan application received', 'Hi [first_name], Your loan application has been received and is being processed.', '254723383855', 'sms', 'Success', 1, 6, '2017-07-23 19:12:52', '2017-07-24 19:18:12'),
 (4, 'Loan application received', 'Hi, A new loan application has been received and awaits your action. <br>\r\n<h3>Details</h3>\r\n<strong>Name:</strong>1500<br>\r\n<strong>Mobile Number:</strong>254723383856<br>\r\n<strong>Amount:</strong>1500<br>', 'test@example.com', 'email', 'pending', 0, 6, '2017-07-23 19:12:52', '2017-07-23 19:12:52'),
-(5, 'Loan application received', 'Hi [first_name], Your loan application has been received and is being processed.', '254723383856', 'sms', 'pending', 0, 6, '2017-07-23 19:15:38', '2017-07-23 19:15:38'),
+(5, 'Loan application received', 'Hi Tom, Your loan application has been received and is being processed.', '254723383855', 'sms', 'Success', 0, 6, '2017-07-23 19:15:38', '2017-07-24 19:01:05'),
 (6, 'Loan application received', 'Hi, A new loan application has been received and awaits your action. <br>\r\n<h3>Details</h3>\r\n<strong>Name:</strong>John<br>\r\n<strong>Mobile Number:</strong>254723383856<br>\r\n<strong>Amount:</strong>1500<br>', 'test@example.com', 'email', 'pending', 0, 6, '2017-07-23 19:15:38', '2017-07-23 19:15:38'),
-(7, 'Loan application received', 'Hi [first_name], Your loan application has been received and is being processed.', '254723383856', 'sms', 'pending', 0, 6, '2017-07-23 19:18:10', '2017-07-23 19:18:10'),
+(7, 'Loan application received', 'Hi [first_name], Your loan application has been received and is being processed.', '254723383855', 'sms', 'Success', 1, 6, '2017-07-23 19:18:10', '2017-07-24 19:18:13'),
 (8, 'Loan application received', 'Hi, A new loan application has been received and awaits your action. <br>\r\n<h3>Details</h3>\r\n<strong>Name:</strong>John Mwenda Rimberia<br>\r\n<strong>Mobile Number:</strong>254723383856<br>\r\n<strong>Amount:</strong>1500<br>', 'test@example.com', 'email', 'pending', 0, 6, '2017-07-23 19:18:10', '2017-07-23 19:18:10'),
-(9, 'Loan application received', 'Hi John, Your loan application has been received and is being processed.', '254723383856', 'sms', 'pending', 0, 6, '2017-07-23 19:21:42', '2017-07-23 19:21:42'),
-(10, 'Loan application received', 'Hi, A new loan application has been received and awaits your action. <br>\r\n<h3>Details</h3>\r\n<strong>Name:</strong>John Mwenda Rimberia<br>\r\n<strong>Mobile Number:</strong>254723383856<br>\r\n<strong>Amount:</strong>1500<br>', 'test@example.com', 'email', 'pending', 0, 6, '2017-07-23 19:21:42', '2017-07-23 19:21:42');
+(9, 'Loan application received', 'Hi John, Your loan application has been received and is being processed.', '254723383855', 'sms', 'pending', 0, 6, '2017-07-23 19:21:42', '2017-07-23 19:21:42'),
+(10, 'Loan application received', 'Hi, A new loan application has been received and awaits your action. <br>\r\n<h3>Details</h3>\r\n<strong>Name:</strong>John Mwenda Rimberia<br>\r\n<strong>Mobile Number:</strong>254723383856<br>\r\n<strong>Amount:</strong>1500<br>', 'test@example.com', 'email', 'pending', 0, 6, '2017-07-23 19:21:42', '2017-07-23 19:21:42'),
+(11, 'New Activation code', 'Hi, Please use this code to activate your account code [activation_code]', '254723383855', 'sms', 'Success', 0, 1, '2017-07-25 07:04:58', '2017-07-25 07:04:58'),
+(12, 'New Activation code', 'Hi, [customer_name], Please use this code to activate your account code [code]', '254723383855', 'sms', 'Success', 0, 1, '2017-07-25 07:13:13', '2017-07-25 07:13:13'),
+(13, 'New Activation code', 'Hi, [customer_name], Please use this code to activate your account code [code]', '254723383855', 'sms', 'Success', 0, 1, '2017-07-25 07:21:58', '2017-07-25 07:21:58'),
+(14, 'New Activation code', 'Hi, [customer_name], Please use this code to activate your account code [code]', '254723383855', 'sms', 'Success', 0, 1, '2017-07-25 07:23:53', '2017-07-25 07:23:53'),
+(15, 'New Activation code', 'Hi, [customer_name], Please use this code to activate your account code [code]', '254723383855', 'sms', 'Success', 1, 1, '2017-07-25 07:25:25', '2017-07-25 07:25:27'),
+(16, 'New Activation code', 'Hi,Please use this code to activate your account code [kjkjkjkj]', '254723383855', 'sms', 'Success', 1, 1, '2017-07-25 07:26:54', '2017-07-25 07:26:56'),
+(17, 'New Activation code', 'Hi,Please use this code to activate your account code kjkjkjkj', '254723383855', 'sms', 'Success', 1, 1, '2017-07-25 07:27:46', '2017-07-25 07:27:48');
 
 -- --------------------------------------------------------
 
@@ -316,7 +323,8 @@ CREATE TABLE `response_templates` (
 
 INSERT INTO `response_templates` (`id`, `name`, `subject`, `message`, `type`, `service_id`, `description`, `status`, `created_at`, `updated_at`) VALUES
 (1, 'Loan application received', 'Loan application received', 'Hi [first_name], Your loan application has been received and is being processed.', 'sms', 6, 'Text sent to customer when loan application is received', 1, '2017-07-23 17:28:25', '2017-07-23 19:04:25'),
-(2, 'Loan application received - [mobile_number]', 'Loan application received', 'Hi, A new loan application has been received and awaits your action. <br>\r\n<h3>Details</h3>\r\n<strong>Name:</strong>[customer_name]<br>\r\n<strong>Mobile Number:</strong>[mobile_number]<br>\r\n<strong>Amount:</strong>[amount]<br>', 'email', 6, 'Alert admin of a new loan application', 1, '2017-07-23 17:31:48', '2017-07-23 19:21:10');
+(2, 'Loan application received - [mobile_number]', 'Loan application received', 'Hi, A new loan application has been received and awaits your action. <br>\r\n<h3>Details</h3>\r\n<strong>Name:</strong>[customer_name]<br>\r\n<strong>Mobile Number:</strong>[mobile_number]<br>\r\n<strong>Amount:</strong>[amount]<br>', 'email', 6, 'Alert admin of a new loan application', 1, '2017-07-23 17:31:48', '2017-07-23 19:21:10'),
+(3, 'Send Customer Activation Code', 'New Activation code', 'Hi,Please use this code to activate your account code: [activation_code]', 'sms', 1, 'send activation code to customer', 1, '2017-07-24 20:20:08', '2017-07-25 06:14:34');
 
 -- --------------------------------------------------------
 
@@ -396,7 +404,8 @@ INSERT INTO `services` (`id`, `name`, `product`, `description`, `created_at`, `u
 (8, 'ApproveLoan', 'Loan', 'approve a loan', '2017-07-22 19:41:47', '2017-07-22 19:41:47'),
 (9, 'DisburseLoan', 'Loan', 'Sends funds to client', '2017-07-22 19:43:43', '2017-07-22 19:43:43'),
 (10, 'RejectLoanApplication', 'Loan', 'Reject Loan application', '2017-07-22 19:44:24', '2017-07-22 19:44:24'),
-(11, 'RepayLoan', 'Loan', 'Repay a loan', '2017-07-23 10:02:13', '2017-07-23 10:02:13');
+(11, 'RepayLoan', 'Loan', 'Repay a loan', '2017-07-23 10:02:13', '2017-07-23 10:02:13'),
+(12, 'FetchCustomerLoanStatement', 'Customer', 'Fetch customer loan statements', '2017-07-24 16:13:06', '2017-07-24 16:15:30');
 
 -- --------------------------------------------------------
 
@@ -435,7 +444,9 @@ INSERT INTO `service_commands` (`id`, `processing_function`, `service_id`, `leve
 (15, 'send_funds', 9, 0, 'Send funds to customer', '2017-07-22 20:10:06', '2017-07-23 11:12:01'),
 (16, 'send_notification', 9, 2, 'Send notification to parties', '2017-07-22 20:10:35', '2017-07-23 11:11:51'),
 (17, 'offset_loan', 11, 0, 'Offset a loan with a given amount', '2017-07-23 10:03:16', '2017-07-23 10:03:16'),
-(18, 'send_notification', 11, 1, 'send notification to customer about loan repayment', '2017-07-23 10:03:49', '2017-07-23 10:03:49');
+(18, 'send_notification', 11, 1, 'send notification to customer about loan repayment', '2017-07-23 10:03:49', '2017-07-23 10:03:49'),
+(19, 'fetch_customer_statement', 12, 0, 'fetch customer statement', '2017-07-24 16:14:03', '2017-07-24 16:14:03'),
+(20, 'send_notification', 5, 1, 'Send activation code to customer', '2017-07-24 20:02:09', '2017-07-24 20:02:09');
 
 -- --------------------------------------------------------
 
@@ -458,14 +469,16 @@ CREATE TABLE `settings` (
 
 INSERT INTO `settings` (`id`, `setting_name`, `setting_value`, `setting_description`, `created_at`, `updated_at`) VALUES
 (1, 'site_name', 'Jisaidie', 'The site name', '2017-07-21 19:17:50', '2017-07-21 19:19:10'),
-(2, 'prsp_sender_id', 'digi_universe', 'The signature used to send out messages', '2017-07-21 19:19:39', '2017-07-21 19:20:33'),
-(3, 'prsp_username', 'Jisaidie', 'The user name for using prsp services', '2017-07-21 19:21:07', '2017-07-21 19:21:07'),
-(4, 'prsp_api_key', 'kjsafgjhdfgj8723rjsfglt73i6r2893', 'The PRSP key', '2017-07-21 19:21:35', '2017-07-21 19:21:35'),
+(2, 'prsp_sender_id', 'D_UNIVERSE', 'The signature used to send out messages', '2017-07-21 19:19:39', '2017-07-24 19:00:19'),
+(3, 'prsp_username', 'digiuniverse', 'The user name for using prsp services', '2017-07-21 19:21:07', '2017-07-24 19:00:35'),
+(4, 'prsp_api_key', 'a9dcb541b28e868c1037ca2a0f4afdf8e18c4fcf624c41851617819ee643c18d', 'The PRSP key', '2017-07-21 19:21:35', '2017-07-24 19:00:49'),
 (5, 'nco_processing_fee', '10', 'The processing fee for non-check-off loans', '2017-07-21 19:22:12', '2017-07-21 19:22:12'),
 (6, 'minimum_loan', '500', 'Minimum loan applicable', '2017-07-22 17:30:27', '2017-07-22 17:30:27'),
 (7, 'maximum_loan', '50000', 'Maximum loan applicable', '2017-07-22 17:30:57', '2017-07-22 17:30:57'),
 (8, 'co_processing_fee', '8', 'loan fee for check off loans', '2017-07-22 19:59:51', '2017-07-22 19:59:51'),
-(9, 'new_loan_application_recipients', 'test@example.com', 'Who should receive new loan applications alert on email', '2017-07-23 17:35:11', '2017-07-23 17:35:11');
+(9, 'new_loan_application_recipients', 'test@example.com', 'Who should receive new loan applications alert on email', '2017-07-23 17:35:11', '2017-07-23 17:35:11'),
+(10, 'loan_interest_rate', '7.5', 'loan interest per month', '2017-07-24 17:45:55', '2017-07-24 17:45:55'),
+(11, 'collection_fees', '15', 'Collection fees in percentage', '2017-07-24 17:46:36', '2017-07-24 17:46:36');
 
 -- --------------------------------------------------------
 
@@ -692,7 +705,53 @@ INSERT INTO `transactions` (`id`, `service_id`, `request`, `response`, `status`,
 (199, '1', '{"action":"CreateCustomer","request":{"surname":"Martha","last_name":"Kinyua","other_name":"Kinyua","email ":"test3@gmail.com","mobile_number":"254723383457","device_id":5555576,"activation_code":"kjkjkjkj"}}', NULL, 'pending', '0', '0', NULL, '2017-07-24 15:21:38', '2017-07-24 15:21:38'),
 (200, '1', '{"action":"CreateCustomer","request":{"surname":"Martha","last_name":"Kinyua","other_name":"Kinyua","email ":"test3@gmail.com","mobile_number":"254723383457","device_id":5555576,"activation_code":"kjkjkjkj"}}', NULL, 'pending', '0', '0', NULL, '2017-07-24 15:21:51', '2017-07-24 15:21:51'),
 (201, '1', '{"action":"CreateCustomer","request":{"surname":"Martha","last_name":"Kinyua","other_name":"Kinyua","email ":"test3@gmail.com","mobile_number":"254723383457","device_id":5555576,"activation_code":"kjkjkjkj"}}', NULL, 'pending', '0', '0', NULL, '2017-07-24 15:23:38', '2017-07-24 15:23:38'),
-(202, '1', '{"action":"CreateCustomer","request":{"surname":"Martha","last_name":"Kinyua","other_name":"Kinyua","email ":"test3@gmail.com","mobile_number":"254723383457","device_id":5555576,"activation_code":"kjkjkjkj"}}', NULL, 'pending', '0', '0', NULL, '2017-07-24 15:29:41', '2017-07-24 15:29:41');
+(202, '1', '{"action":"CreateCustomer","request":{"surname":"Martha","last_name":"Kinyua","other_name":"Kinyua","email ":"test3@gmail.com","mobile_number":"254723383457","device_id":5555576,"activation_code":"kjkjkjkj"}}', NULL, 'pending', '0', '0', NULL, '2017-07-24 15:29:41', '2017-07-24 15:29:41'),
+(203, '12', '{"action":"FetchCustomerLoanStatement","request":null}', NULL, 'pending', '0', '0', NULL, '2017-07-24 17:01:19', '2017-07-24 17:01:19'),
+(204, '12', '{"action":"FetchCustomerLoanStatement","request":null}', NULL, 'pending', '0', '0', NULL, '2017-07-24 17:02:06', '2017-07-24 17:02:06'),
+(205, '12', '{"action":"FetchCustomerLoanStatement","request":null}', NULL, 'pending', '0', '0', NULL, '2017-07-24 17:03:55', '2017-07-24 17:03:55'),
+(206, '12', '{"action":"FetchCustomerLoanStatement","request":{"mobile_number":"254723383457"}}', NULL, 'pending', '0', '0', NULL, '2017-07-24 17:05:19', '2017-07-24 17:05:19'),
+(207, '12', '{"action":"FetchCustomerLoanStatement","request":{"mobile_number":"254723383457"}}', NULL, 'pending', '0', '0', NULL, '2017-07-24 17:05:43', '2017-07-24 17:05:43'),
+(208, '12', '{"action":"FetchCustomerLoanStatement","request":{"mobile_number":"254723383457"}}', NULL, 'pending', '0', '0', NULL, '2017-07-24 17:10:22', '2017-07-24 17:10:22'),
+(209, '12', '{"action":"FetchCustomerLoanStatement","request":{"mobile_number":"254723383457"}}', NULL, 'pending', '0', '0', NULL, '2017-07-24 17:10:58', '2017-07-24 17:10:58'),
+(210, '12', '{"action":"FetchCustomerLoanStatement","request":{"mobile_number":"254723383457"}}', NULL, 'pending', '0', '0', NULL, '2017-07-24 17:11:17', '2017-07-24 17:11:17'),
+(211, '12', '{"action":"FetchCustomerLoanStatement","request":{"mobile_number":"254723383856"}}', NULL, 'pending', '0', '0', NULL, '2017-07-24 17:11:45', '2017-07-24 17:11:45'),
+(212, '12', '{"action":"FetchCustomerLoanStatement","request":{"mobile_number":"254723383856","date_from":"2017-07-22","date_to":"2017-07-22"}}', NULL, 'pending', '0', '0', NULL, '2017-07-24 17:27:47', '2017-07-24 17:27:47'),
+(213, '12', '{"action":"FetchCustomerLoanStatement","request":{"mobile_number":"254723383856","date_from":"2017-07-22","date_to":"2017-07-22"}}', NULL, 'pending', '0', '0', NULL, '2017-07-24 17:31:10', '2017-07-24 17:31:10'),
+(214, '12', '{"action":"FetchCustomerLoanStatement","request":{"mobile_number":"254723383856","date_from":"2017-07-22","date_to":"2017-07-22"}}', NULL, 'pending', '0', '0', NULL, '2017-07-24 17:33:52', '2017-07-24 17:33:52'),
+(215, '12', '{"action":"FetchCustomerLoanStatement","request":{"mobile_number":"254723383856","date_from":"2017-07-22","date_to":"2017-07-22"}}', NULL, 'pending', '0', '0', NULL, '2017-07-24 17:37:17', '2017-07-24 17:37:17'),
+(216, '12', '{"action":"FetchCustomerLoanStatement","request":{"mobile_number":"254723383856","date_from":"2017-07-22","date_to":"2017-07-22"}}', NULL, 'pending', '0', '0', NULL, '2017-07-24 17:39:28', '2017-07-24 17:39:28'),
+(217, '12', '{"action":"FetchCustomerLoanStatement","request":{"mobile_number":"254723383856","date_from":"2017-07-22","date_to":"2017-07-22"}}', NULL, 'pending', '0', '0', NULL, '2017-07-24 17:39:37', '2017-07-24 17:39:37'),
+(218, '12', '{"action":"FetchCustomerLoanStatement","request":{"mobile_number":"254723383856","date_from":"2017-07-23","date_to":"2017-07-23"}}', NULL, 'pending', '0', '0', NULL, '2017-07-24 17:40:07', '2017-07-24 17:40:07'),
+(219, '7', '{"action":"FetchScreens","request":null}', NULL, 'pending', '0', '0', NULL, '2017-07-24 18:05:56', '2017-07-24 18:05:56'),
+(220, '7', '{"action":"FetchScreens","request":null}', NULL, 'pending', '0', '0', NULL, '2017-07-24 18:07:31', '2017-07-24 18:07:31'),
+(221, '12', '{"action":"FetchCustomerLoanStatement","request":{"mobile_number":"254723383856","date_from":"2017-07-22","date_to":"2017-07-22"}}', NULL, 'pending', '0', '0', NULL, '2017-07-24 19:52:57', '2017-07-24 19:52:57'),
+(222, '5', '{"action":"ActivateCustomer","request":{"first_name":"John","middle_name":"Mwenda","surname":"Rimberia","email ":"test@gmail.com","mobile_number":"254723383855","activation_code":"555556y7","id_number":"25025368"}}', NULL, 'pending', '0', '0', NULL, '2017-07-24 20:06:59', '2017-07-24 20:06:59'),
+(223, '1', '{"action":"CreateCustomer","request":{"surname":"Martha","last_name":"Kinyua","other_name":"Kinyua","email ":"test3@gmail.com","mobile_number":"254723383855","device_id":5555576,"activation_code":"kjkjkjkj"}}', NULL, 'pending', '0', '0', NULL, '2017-07-24 20:12:08', '2017-07-24 20:12:08'),
+(224, '1', '{"action":"CreateCustomer","request":{"surname":"Martha","last_name":"Kinyua","other_name":"Kinyua","email ":"test3@gmail.com","mobile_number":"254723383855","device_id":5555576,"activation_code":"kjkjkjkj"}}', NULL, 'pending', '0', '0', NULL, '2017-07-24 20:14:56', '2017-07-24 20:14:56'),
+(225, '1', '{"action":"CreateCustomer","request":{"surname":"Martha","last_name":"Kinyua","other_name":"Kinyua","email ":"test3@gmail.com","mobile_number":"254723383855","device_id":5555576,"activation_code":"kjkjkjkj"}}', NULL, 'pending', '0', '0', NULL, '2017-07-24 20:15:18', '2017-07-24 20:15:18'),
+(226, '1', '{"action":"CreateCustomer","request":{"surname":"Martha","last_name":"Kinyua","other_name":"Kinyua","email ":"test3@gmail.com","mobile_number":"254723383855","device_id":5555576,"activation_code":"kjkjkjkj"}}', NULL, 'pending', '0', '0', NULL, '2017-07-25 05:56:46', '2017-07-25 05:56:46'),
+(227, '1', '{"action":"CreateCustomer","request":{"surname":"Martha","last_name":"Kinyua","other_name":"Kinyua","email ":"test3@gmail.com","mobile_number":"254723383855","device_id":5555576,"activation_code":"kjkjkjkj"}}', NULL, 'pending', '0', '0', NULL, '2017-07-25 05:57:44', '2017-07-25 05:57:44'),
+(228, '1', '{"action":"CreateCustomer","request":{"surname":"Martha","last_name":"Kinyua","other_name":"Kinyua","email ":"test3@gmail.com","mobile_number":"254723383855","device_id":12345,"activation_code":"kjkjkjkj"}}', NULL, 'pending', '0', '0', NULL, '2017-07-25 05:59:12', '2017-07-25 05:59:12'),
+(229, '12', '{"action":"FetchCustomerLoanStatement","request":{"mobile_number":"254723383856","date_from":"2017-07-22","date_to":"2017-07-22"}}', NULL, 'pending', '0', '0', NULL, '2017-07-25 06:11:21', '2017-07-25 06:11:21'),
+(230, '12', '{"action":"FetchCustomerLoanStatement","request":{"mobile_number":"254723383856","date_from":"2017-07-22","date_to":"2017-07-22"}}', NULL, 'pending', '0', '0', NULL, '2017-07-25 06:12:21', '2017-07-25 06:12:21'),
+(231, '12', '{"action":"FetchCustomerLoanStatement","request":{"mobile_number":"254723383856","date_from":"2017-07-22","date_to":"2017-07-22"}}', NULL, 'pending', '0', '0', NULL, '2017-07-25 06:28:40', '2017-07-25 06:28:40'),
+(232, '1', '{"action":"CreateCustomer","request":{"surname":"Martha","last_name":"Kinyua","other_name":"Kinyua","email ":"test3@gmail.com","mobile_number":"254723383855","device_id":12345,"activation_code":"kjkjkjkj"}}', NULL, 'pending', '0', '0', NULL, '2017-07-25 06:29:14', '2017-07-25 06:29:14'),
+(233, '1', '{"action":"CreateCustomer","request":{"surname":"Martha","last_name":"Kinyua","other_name":"Kinyua","email ":"test3@gmail.com","mobile_number":"254723383855","device_id":12345,"activation_code":"kjkjkjkj"}}', NULL, 'pending', '0', '0', NULL, '2017-07-25 06:31:34', '2017-07-25 06:31:34'),
+(234, '1', '{"action":"CreateCustomer","request":{"surname":"Martha","last_name":"Kinyua","other_name":"Kinyua","email ":"test3@gmail.com","mobile_number":"254723383855","device_id":12345,"activation_code":"kjkjkjkj"}}', NULL, 'pending', '0', '0', NULL, '2017-07-25 06:59:41', '2017-07-25 06:59:41'),
+(235, '1', '{"action":"CreateCustomer","request":{"surname":"Martha","last_name":"Kinyua","other_name":"Kinyua","email ":"test3@gmail.com","mobile_number":"254723383855","device_id":12345,"activation_code":"kjkjkjkj"}}', NULL, 'pending', '0', '0', NULL, '2017-07-25 07:00:13', '2017-07-25 07:00:13'),
+(236, '1', '{"action":"CreateCustomer","request":{"surname":"Martha","last_name":"Kinyua","other_name":"Kinyua","email ":"test3@gmail.com","mobile_number":"254723383855","device_id":12345,"activation_code":"kjkjkjkj"}}', NULL, 'pending', '0', '0', NULL, '2017-07-25 07:00:59', '2017-07-25 07:00:59'),
+(237, '1', '{"action":"CreateCustomer","request":{"surname":"Martha","last_name":"Kinyua","other_name":"Kinyua","email ":"test3@gmail.com","mobile_number":"254723383855","device_id":12345,"activation_code":"kjkjkjkj"}}', NULL, 'pending', '0', '0', NULL, '2017-07-25 07:04:58', '2017-07-25 07:04:58'),
+(238, '1', '{"action":"CreateCustomer","request":{"surname":"Martha","last_name":"Kinyua","other_name":"Kinyua","email ":"test3@gmail.com","mobile_number":"254723383855","device_id":12345,"activation_code":"kjkjkjkj"}}', NULL, 'pending', '0', '0', NULL, '2017-07-25 07:10:10', '2017-07-25 07:10:10'),
+(239, '1', '{"action":"CreateCustomer","request":{"surname":"Martha","last_name":"Kinyua","other_name":"Kinyua","email ":"test3@gmail.com","mobile_number":"254723383855","device_id":12345,"activation_code":"kjkjkjkj"}}', NULL, 'pending', '0', '0', NULL, '2017-07-25 07:11:46', '2017-07-25 07:11:46'),
+(240, '1', '{"action":"CreateCustomer","request":{"surname":"Martha","last_name":"Kinyua","other_name":"Kinyua","email ":"test3@gmail.com","mobile_number":"254723383855","device_id":12345,"activation_code":"kjkjkjkj"}}', NULL, 'pending', '0', '0', NULL, '2017-07-25 07:12:32', '2017-07-25 07:12:32'),
+(241, '1', '{"action":"CreateCustomer","request":{"surname":"Martha","last_name":"Kinyua","other_name":"Kinyua","email ":"test3@gmail.com","mobile_number":"254723383855","device_id":12345,"activation_code":"kjkjkjkj"}}', NULL, 'pending', '0', '0', NULL, '2017-07-25 07:13:12', '2017-07-25 07:13:12'),
+(242, '1', '{"action":"CreateCustomer","request":{"surname":"Martha","last_name":"Kinyua","other_name":"Kinyua","email ":"test3@gmail.com","mobile_number":"254723383855","device_id":12345,"activation_code":"kjkjkjkj"}}', NULL, 'pending', '0', '0', NULL, '2017-07-25 07:21:57', '2017-07-25 07:21:57'),
+(243, '1', '{"action":"CreateCustomer","request":{"surname":"Martha","last_name":"Kinyua","other_name":"Kinyua","email ":"test3@gmail.com","mobile_number":"254723383855","device_id":12345,"activation_code":"kjkjkjkj"}}', NULL, 'pending', '0', '0', NULL, '2017-07-25 07:23:53', '2017-07-25 07:23:53'),
+(244, '1', '{"action":"CreateCustomer","request":{"surname":"Martha","last_name":"Kinyua","other_name":"Kinyua","email ":"test3@gmail.com","mobile_number":"254723383855","device_id":12345,"activation_code":"kjkjkjkj"}}', NULL, 'pending', '0', '0', NULL, '2017-07-25 07:25:24', '2017-07-25 07:25:24'),
+(245, '1', '{"action":"CreateCustomer","request":{"surname":"Martha","last_name":"Kinyua","other_name":"Kinyua","email ":"test3@gmail.com","mobile_number":"254723383855","device_id":12345,"activation_code":"kjkjkjkj"}}', NULL, 'pending', '0', '0', NULL, '2017-07-25 07:26:54', '2017-07-25 07:26:54'),
+(246, '1', '{"action":"CreateCustomer","request":{"surname":"Martha","last_name":"Kinyua","other_name":"Kinyua","email ":"test3@gmail.com","mobile_number":"254723383855","device_id":12345,"activation_code":"kjkjkjkj"}}', NULL, 'pending', '0', '0', NULL, '2017-07-25 07:27:46', '2017-07-25 07:27:46'),
+(247, '1', '{"action":"CreateCustomer","request":{"surname":"Martha","last_name":"Kinyua","other_name":"Kinyua","email ":"test3@gmail.com","mobile_number":"254723383855","device_id":12345,"activation_code":"kjkjkjkj"}}', NULL, 'pending', '0', '0', NULL, '2017-07-25 07:28:21', '2017-07-25 07:28:21'),
+(248, '2', '{"action":"UpdateCustomerProfile","request":{"first_name":"John","middle_name":"Another","surname":"Rimberia","email ":"test@gmail.com","mobile_number":"254723383855","id_number":"25025368"}}', NULL, 'pending', '0', '0', NULL, '2017-07-25 07:30:46', '2017-07-25 07:30:46');
 
 -- --------------------------------------------------------
 
@@ -861,12 +920,12 @@ ALTER TABLE `api_keys`
 -- AUTO_INCREMENT for table `customers`
 --
 ALTER TABLE `customers`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
 --
 -- AUTO_INCREMENT for table `customer_devices`
 --
 ALTER TABLE `customer_devices`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 --
 -- AUTO_INCREMENT for table `loans`
 --
@@ -876,7 +935,7 @@ ALTER TABLE `loans`
 -- AUTO_INCREMENT for table `messages`
 --
 ALTER TABLE `messages`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 --
 -- AUTO_INCREMENT for table `migrations`
 --
@@ -901,7 +960,7 @@ ALTER TABLE `permissions`
 -- AUTO_INCREMENT for table `response_templates`
 --
 ALTER TABLE `response_templates`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 --
 -- AUTO_INCREMENT for table `roles`
 --
@@ -916,22 +975,22 @@ ALTER TABLE `screens`
 -- AUTO_INCREMENT for table `services`
 --
 ALTER TABLE `services`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 --
 -- AUTO_INCREMENT for table `service_commands`
 --
 ALTER TABLE `service_commands`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
 --
 -- AUTO_INCREMENT for table `settings`
 --
 ALTER TABLE `settings`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 --
 -- AUTO_INCREMENT for table `transactions`
 --
 ALTER TABLE `transactions`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=203;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=249;
 --
 -- AUTO_INCREMENT for table `users`
 --

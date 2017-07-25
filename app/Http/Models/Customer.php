@@ -44,6 +44,11 @@ class Customer extends Model
     public function getLoanStatement($params){
         //$loans = Loan::
     }
+    
+    public function devices()
+    {
+        return $this->hasMany('App\Http\Models\CustomerDevice');
+    }
    
 	
 }
