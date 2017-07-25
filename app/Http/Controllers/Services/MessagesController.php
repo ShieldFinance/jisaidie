@@ -147,6 +147,10 @@ class MessagesController extends Controller
     
     public function sendQueuedMessages()
     {
+        \Mail::send('welcome', [], function ($message){
+            
+        $message->to('tommwenda@gmail.com')->subject('Expertphp.in - Testing mail');
+    });exit;
         $app = \App::getFacadeRoot();
         $messagingService = $app->make('Message');
         $messagingService->sendMessages();
