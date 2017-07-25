@@ -176,22 +176,38 @@ class CustomerService extends ApiGuardController{
         return $response;
     }
     public function update_activation_code($payload){
+        $responseString = '';
+        $responseStatus = config('app.responseCodes')['no_response'];
+        $commandStatus = config('app.responseCodes')['command_failed'];
+        $responseProcessor = new ResponseTemplatesController();
+        $response = array();
         if(isset($payload['activation_code']) && isset($payload['mobile_number'])){
             $customer = Customer::where('mobile_number',$payload['mobile_number'])->first();
             if($customer){
+                $payload['subject_placeholders'] = array();
+                $payload['message_placeholders'] = array();
                 $customer->activation_code = $payload['activation_code'];
                 $customer->status = config('app.customerStatus')['activation_code'];
                 $customer->save();
-                $payload['response_status'] =config('app.responseCodes')['activation_code_updated'];
-                $payload['response_string'] ="Activation Code Added";
+                $responseStatus =config('app.responseCodes')['activation_code_updated'];
+                $responseString ="Activation Code Added";
                 $payload['customer']=$this->response->withItem($customer, new CustomerTransformer());
-                $payload['command_status'] = config('app.responseCodes')['command_successful'];
+                $commandStatus = config('app.responseCodes')['command_successful'];
+                $payload['send_notification'] = true;
+                $payload['send_now']=true;
+                $payload['message_type'] = 'inapp';
+                $payload['msisdn'] = $customer->mobile_number;
+                $payload['message_placeholders']['[activation_code]']=$payload['activation_code'];
+                $payload['message_placeholders']['[customer_name]']=$customer->surname;
             }else{
-                $payload['response_status'] =config('app.responseCodes')['activation_code_not_updated'];
-                $payload['response_string'] ="Customer not found";
-                $payload['command_status'] = config('app.responseCodes')['command_failed'];
+                $responseStatus =config('app.responseCodes')['activation_code_not_updated'];
+                $responseString ="Customer not found";
+                $commandStatus = config('app.responseCodes')['command_failed'];
             }
         }
+        $payload['command_status'] = $commandStatus;
+        $payload['response_status'] = $responseStatus;
+        $payload['response_string'] = $responseString;
         return $payload;
     }
     public function activate_customer($payload){
@@ -245,7 +261,7 @@ class CustomerService extends ApiGuardController{
         if(isset($payload['mobile_number'])){
             $limit = 10;
             if(isset($payload['limit'])){
-                $limit = int($payload['limit']);
+                $limit = (int)$payload['limit'];
             }
             $customer = Customer::where('mobile_number',$payload['mobile_number'])->first();
             if($customer){
@@ -296,7 +312,7 @@ class CustomerService extends ApiGuardController{
         if(isset($payload['mobile_number'])){
             $limit = 1000;
             if(isset($payload['limit'])){
-                $limit = int($payload['limit']);
+                $limit = (int)$payload['limit'];
             }
             $where = array();
             $where[]=array('recipient','=',$payload['mobile_number']);

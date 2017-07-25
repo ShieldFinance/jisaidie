@@ -20,7 +20,7 @@ class MessageService {
     public function sendMessages() {
         $messages = Message::where([
                     ['status', '=', 'pending'],
-                ])->limit(2)->get();
+                ])->limit(1)->get();
         if (count($messages)) {
             foreach ($messages as $message) {
                 $type = strtoupper($message->type);
@@ -115,6 +115,7 @@ class MessageService {
         $device = CustomerDevice::where('customer_id',$customer->id)
         ->orderBy('id','desc')
         ->first();
+        
         $deviceTokens =array($device->registration_token);
         $push->setMessage([
             'notification' => [
