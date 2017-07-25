@@ -15,6 +15,10 @@ class CustomerTransformer extends TransformerAbstract
             'status'         => $customer->status,
             'activation_code' =>$customer->activation_code,
             'mobile_number'=>$customer->mobile_number,
+            'dob' => $customer->dob,
+            'email'=>$customer->email,
+            'gender' => $customer->gender,
+            'id_number' =>$customer->id_number,
             'created_at' => $customer->created_at,
             'updated_at' => $customer->updated_at,
         ];

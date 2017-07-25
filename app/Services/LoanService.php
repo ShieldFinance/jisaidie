@@ -89,24 +89,19 @@ class LoanService{
         $commandStatus = config('app.responseCodes')['no_response'];
         $commandStatus = config('app.responseCodes')['command_failed'];
         if(isset($payload['loan_id'])){
-            if(isset($payload['amount_approved'])){
-                $loan = Loan::where('id', $payload['loan_id'])->first();
-                if($loan && $loan->status==config('app.responseCodes')['loan_pending']){
-                    $loan->status = config('app.responseCodes')['loan_approved'];
-                    $loan->amount_processed = floatval($payload['amount_approved']);
-                    $loan->save();
-                    $responseString = 'Loan approved';
-                    $responseStatus = config('app.responseCodes')['command_successful'];
-                    $commandStatus = config('app.responseCodes')['command_successful'];
-                }else{
-                    $responseString = 'Loan cannot be approved';
-                    $responseStatus = config('app.responseCodes')['command_successful'];
-                    $commandStatus = config('app.responseCodes')['command_failed'];
-                }
+            $loan = Loan::where('id', $payload['loan_id'])->first();
+            if($loan && $loan->status==config('app.responseCodes')['loan_pending']){
+                $loan->status = config('app.responseCodes')['loan_approved'];
+                $loan->save();
+                $responseString = 'Loan approved';
+                $responseStatus = config('app.responseCodes')['command_successful'];
+                $commandStatus = config('app.responseCodes')['command_successful'];
             }else{
+                $responseString = 'Loan cannot be approved';
+                $responseStatus = config('app.responseCodes')['command_successful'];
                 $commandStatus = config('app.responseCodes')['command_failed'];
-                $responseString = 'amount approved not specified';
             }
+            
         }
         $payload['response_string'] = $responseString;
         $payload['response_status'] = $responseStatus;
@@ -170,6 +165,8 @@ class LoanService{
                 $responseStatus = config('app.responseCodes')['command_successful'];
                 $commandStatus = config('app.responseCodes')['command_successful'];
                 $payload['send_notification'] = true;
+                $payload['mobile_number'] = $loan->customer->mobile_number;
+                $payload['email'] = $loan->customer->email;
             }else{
                 $responseString = 'Loan not sent to customer';
                 $responseStatus = config('app.responseCodes')['command_failed'];
@@ -362,10 +359,17 @@ class LoanService{
         if($loan->customer->organization_id){
             $charges = 'co_processing_fee';
         }
-        $daysInMonth = 30;
         $fees = floatval($this->setting->where('setting_name',$charges)->first()->setting_value);
+        $fixedCost =  	floatval($this->setting->where('setting_name','fixed_loan_cost')->first()->setting_value);
+        $interest =  	floatval($this->setting->where('setting_name','loan_interest_rate')->first()->setting_value);
+        $dailyInterest = ($interest/3000);
+        $interestAndLoan = $dailyInterest * $loan->amount_requested;
+        $feesAndLoan = ($fees/100)*$loan->amount_requested;
+        $processedAmount = $loan->amount_requested +$feesAndLoan;
+        $loan->daily_interest = $interestAndLoan;
+        $loan->amount_processed = $processedAmount;
         $loan->fees = $fees;
-        $loan->total = $loan->amount_processed+$fees;
+        $loan->total = $interestAndLoan + $processedAmount;
         $loan->save();
         return $loan;
     }

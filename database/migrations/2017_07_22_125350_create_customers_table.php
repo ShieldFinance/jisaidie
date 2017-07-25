@@ -18,6 +18,7 @@ class CreateCustomersTable extends Migration
             $table->string('last_name');
             $table->string('other_name');
             $table->string('gender');
+            $table->string('dob');
             $table->integer('mobile_number')->unsigned();
             $table->string('employee_number');
             $table->text('id_number');
