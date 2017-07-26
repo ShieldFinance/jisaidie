@@ -273,8 +273,9 @@ class CustomerService extends ApiGuardController{
                     foreach($loans as $loan){
                         $loanSummary['total_paid']+=$loan->paid;
                         $loan->sent_at = Carbon::parse($loan->date_disbursed)->format('m d, Y');
+                        $loan->balance = $loan->total-$loan->paid;
                         if($loan->status==config('app.loanStatus')['disbursed'] || $loan->status==config('app.loanStatus')['locked']|| $loan->status==config('app.loanStatus')['paid']){
-                            $loanSummary['total_disbursed']+=$loan->amount_processed;
+                             $loanSummary['total_disbursed']+=$loan->amount_processed;
                         }
                         $loan->amount_requested=number_format($loan->amount_requested,0,'.',',');
                         $loan->total=number_format($loan->total,0,'.',',');
