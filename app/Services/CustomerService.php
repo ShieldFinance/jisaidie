@@ -330,7 +330,7 @@ class CustomerService extends ApiGuardController{
             
             $messages = Message::where($where)->limit($limit)->get();
             if(count($messages)){
-                $response['messages'] = $this->response->withCollection($messages, new MessageTransformer());
+                $response['messages'] = $messages;//$this->response->withCollection($messages, new MessageTransformer());
             }
         }
         return $response;
