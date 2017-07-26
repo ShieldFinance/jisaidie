@@ -272,7 +272,7 @@ class CustomerService extends ApiGuardController{
                 if(count($loans)){
                     foreach($loans as $loan){
                         $loanSummary['total_paid']+=$loan->paid;
-                        $loan->sent_at = Carbon::parse($loan->date_disbursed)->format('m d, Y');
+                        $loan->sent_at = Carbon::parse($loan->date_disbursed)->format('F d, Y');
                         $loan->balance = $loan->total-$loan->paid;
                         if($loan->status==config('app.loanStatus')['disbursed'] || $loan->status==config('app.loanStatus')['locked']|| $loan->status==config('app.loanStatus')['paid']){
                              $loanSummary['total_disbursed']+=$loan->amount_processed;
@@ -339,7 +339,7 @@ class CustomerService extends ApiGuardController{
             $messages = Message::where($where)->orderBy("id","desc")->limit($limit)->get();
             if(count($messages)){
                 foreach($messages as $message){
-                    $message->sent_at = $message->updated_at->format('m d, Y');
+                    $message->sent_at = $message->updated_at->format('F d, Y');
                 }
                 $response['messages'] = $messages;//$this->response->withCollection($messages, new MessageTransformer());
             $responseString = '0k';
