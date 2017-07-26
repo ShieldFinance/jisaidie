@@ -20,10 +20,16 @@ class CreateLoansTable extends Migration
             $table->double('daily_interest');
             $table->double('fees');
             $table->double('total');
-            $table->string('transaction_ref');
+            $table->text('reason');
+            $table->string('transaction_ref')->default('');
+            $table->double('transaction_fee');
             $table->double('paid');
             $table->string('invoiced');
             $table->integer('status');
+            $table->string('type');
+            $table->text('purpose');
+            $table->text('payment_status');
+            $table->text('payment_response');
             $table->double('net_salary');
             $table->string('date_disbursed');
             $table->integer('deleted');

@@ -274,5 +274,13 @@ return [
         'one_time_pin'=>5,//User has not changed pin, cannot borrow
         'activation_code'=>6,//User has been sent activation code
     ],
+    'loanStatus' =>[
+        'pending' => 0,//New loan pending approval
+        'approved' => 1,//approved (for checkoff loans)
+        'rejected' => 2,//rejected (for checkoff loans)
+        'disbursed' => 3,//sent to customer
+        'locked'=>4,//submitted to crb
+        'paid'=>5//loan paid
+    ],
 
 ];

@@ -27,7 +27,8 @@ class Loan extends Model
         'transaction_ref'=>'',
         'paid'=>0,
         'invoiced'=>'0',
-        'deleted'=>0
+        'deleted'=>0,
+        'transaction_fee'=>0,
     ];
 
     /**

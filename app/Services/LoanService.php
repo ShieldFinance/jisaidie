@@ -42,8 +42,11 @@ class LoanService{
                     $loan = new Loan();
                     $loan->amount_requested = $payload['amount'];
                     $loan->customer_id = $customer->id;
-                    $loan->status = config('app.responseCodes')['loan_pending'];
+                    $loan->type = isset($payload['type'])?$payload['type']:"co";
+                    $loan->purpose = isset($payload['purpose'])?$payload['purpose']:'';
+                    $loan->status = $loan->type=='nco'?config('app.loanStatus')['approved']:config('app.loanStatus')['pending'];
                     $loan->save();
+                    $payload['loan_id'] = $loan->id;
                     $payload['response_string'] = 'Loan Created';
                     $payload['response_status'] = config('app.responseCodes')['command_successful'];
                     $payload['command_status'] = config('app.responseCodes')['command_successful'];
@@ -52,7 +55,7 @@ class LoanService{
                     $payload['subject_placeholders'] = array();
                     $payload['message_placeholders'] = array();
                     $payload['subject_placeholders']['[mobile_number]'] = $payload['mobile_number'];
-                    $payload['message_placeholders']['[first_name]'] = $customer->first_name;
+                    $payload['message_placeholders']['[customer_name]'] = $customer->surname;
                     $payload['message_placeholders']['[amount]'] = $loan->amount_requested;
                     $customerName = $customer->first_name;
                     
@@ -90,8 +93,8 @@ class LoanService{
         $commandStatus = config('app.responseCodes')['command_failed'];
         if(isset($payload['loan_id'])){
             $loan = Loan::where('id', $payload['loan_id'])->first();
-            if($loan && $loan->status==config('app.responseCodes')['loan_pending']){
-                $loan->status = config('app.responseCodes')['loan_approved'];
+            if($loan && $loan->status==config('app.loanStatus')['pending']){
+                $loan->status = config('app.loanStatus')['approved'];
                 $loan->save();
                 $responseString = 'Loan approved';
                 $responseStatus = config('app.responseCodes')['command_successful'];
@@ -111,8 +114,8 @@ class LoanService{
     public function reverse_loan_disbursal($payload){
         if(isset($payload['loan_id'])){
             $loan = Loan::where('id', $payload['loan_id'])->first();
-            if($loan && $loan->status==config('app.responseCodes')['loan_disbursed']){
-                $loan->status = config('app.responseCodes')['loan_approved'];
+            if($loan && $loan->status==config('app.loanStatus')['disbursed']){
+                $loan->status = config('app.loanStatus')['approved'];
                 $loan->save();
                 $payload['response_string'] = 'Loan Disbursement reversed';
                 $payload['response_status'] = config('app.responseCodes')['command_successful'];
@@ -125,8 +128,8 @@ class LoanService{
     public function reject_loan_application($payload){
         if(isset($payload['loan_id'])){
             $loan = Loan::where('id', $payload['loan_id'])->first();
-            if($loan && $loan->status!=config('app.responseCodes')['loan_disbursed']){
-                $loan->status = config('app.responseCodes')['loan_rejected'];
+            if($loan && $loan->status!=config('app.loanStatus')['disbursed']){
+                $loan->status = config('app.loanStatus')['rejected'];
                 $loan->save();
                 $payload['response_string'] = 'Loan rejected';
                 $payload['response_status'] = config('app.responseCodes')['command_successful'];
@@ -152,13 +155,13 @@ class LoanService{
         $commandStatus = config('app.responseCodes')['command_failed'];
         $loan = Loan::where('id', $payload['loan_id'])->first();
         //avoid double disbursement
-        if($loan && $loan->status==config('app.responseCodes')['loan_approved']){
+        if($loan && $loan->status==config('app.loanStatus')['approved']){
             $loan = $this->applyCharges($loan);
             //api to send cash here 
             $apiResponse = true;
             if($apiResponse){
                 $now =Carbon::now()->toDateTimeString();
-                $loan->status= config('app.responseCodes')['loan_disbursed'];
+                $loan->status= config('app.loanStatus')['disbursed'];
                 $loan->date_disbursed = $now;
                 $loan->save();
                 $responseString = 'Loan sent to customer';
@@ -205,7 +208,7 @@ class LoanService{
                         $paymentReceived = 0;
                         foreach($customer->loans as $loan){
                             //only process disbursed loans
-                            if($loan->status!=config('app.responseCodes')['loan_disbursed']){
+                            if($loan->status!=config('app.loanStatus')['disbursed']){
                                 continue;
                             }
 
@@ -224,7 +227,7 @@ class LoanService{
                             if($amountToDeduct > 0){
                                 $loan->paid += $amountToDeduct;
                                 if($loan->paid >= $loan->total){
-                                    $loan->status= config('app.responseCodes')['loan_paid'];
+                                    $loan->status= config('app.loanStatus')['paid'];
                                 }
                                 if($loan->save()){
                                     $paymentReceived++;
@@ -322,7 +325,7 @@ class LoanService{
      */
     public function customerCanBorrow($customer){
         $response = array();
-        $response['can_borrow'] = false;
+        $response['can_borrow'] = true;
         $response['reason'] = '';
         //first let's check if customer is active
         if($customer->status==config('app.customerStatus')['active']){
@@ -337,8 +340,10 @@ class LoanService{
                 $loanPaid = 0;
                 $loanTotal=0;
                 foreach($customer->loans as $loan){
-                    $loanTotal += $loan->total;
-                    $loanPaid +=$loan->paid;
+                    if($loan->status== config('app.loanStatus')['disbursed'] || $loan->status==config('app.loanStatus')['locked']){
+                        $loanTotal += $loan->total;
+                        $loanPaid +=$loan->paid;
+                    }
                 }
                 $loanBalance=$loanTotal-$loanPaid;
                 if($loanBalance > 0){
@@ -346,7 +351,7 @@ class LoanService{
                     $response['reason'] = 'Outstanding balance';
                 }
                 //if there is a loan that is pending or waiting approval, cannot borrow
-                if($loan->status==config('app.responseCodes')['loan_pending'] || $loan->status==config('app.responseCodes')['loan_approved']){
+                if($loan->status==config('app.loanStatus')['pending'] || $loan->status==config('app.loanStatus')['approved']){
                     $response['can_borrow'] = false;
                     $response['reason'] = 'Existing Loan';
                 }
@@ -372,10 +377,11 @@ class LoanService{
         $interestAndLoan = $dailyInterest * $loan->amount_requested;
         $feesAndLoan = ($fees/100)*$loan->amount_requested;
         $processedAmount = $loan->amount_requested +$feesAndLoan;
+        $loanTotal = $interestAndLoan + $processedAmount;
         $loan->daily_interest = $interestAndLoan;
-        $loan->amount_processed = $processedAmount;
+        $loan->amount_processed = ceil($processedAmount);
         $loan->fees = $fees;
-        $loan->total = $interestAndLoan + $processedAmount;
+        $loan->total = ceil($loanTotal);
         $loan->save();
         return $loan;
     }
