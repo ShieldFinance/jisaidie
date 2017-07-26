@@ -173,19 +173,30 @@ class LoanService{
                 $responseString = 'Loan sent to customer';
                 $responseStatus = config('app.responseCodes')['command_successful'];
                 $commandStatus = config('app.responseCodes')['command_successful'];
+                $payload['message_placeholders'] = array();
+                $payload['message_placeholders']['[customer_name]'] = $loan->customer->surname;
                 $payload['send_notification'] = true;
+                $payload['send_now'] = true;
                 $payload['mobile_number'] = $loan->customer->mobile_number;
                 $payload['gateway'] =  'mpesa';
                 $payload['email'] = $loan->customer->email;
                 $app = \App::getFacadeRoot();
                 $paymentService = $app->make('Payment');
-                $payloadd['payment_response'] = $paymentService->sendMoney($payload);
+                $payload['payment_response'] = $paymentService->sendMoney($payload);
+                $loan->payment_response = json_encode($payload['payment_response']);
+                if($payload['payment_response']->status=='Queued'){
+                    $loan->payment_status = $payload['payment_response']->status;
+                    $loan->transaction_fee = $payload['payment_response']->transactionFee;
+                    $loan->transaction_ref  = $payload['payment_response']->transactionId;
+                    $loan->provider = $payload['payment_response']->provider;
+                    $loan->payment_response = json_encode($payload['payment_response']);  
+                }
+                $loan->save();
                 
             }else{
                 $responseString = 'Loan not sent to customer';
                 $responseStatus = config('app.responseCodes')['command_failed'];
                 $commandStatus = config('app.responseCodes')['command_failed'];
-                $payload['send_notification'] = true;
             }
         }else{
            $responseString = 'Loan does not exist or not approved';

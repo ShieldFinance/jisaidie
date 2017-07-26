@@ -30,6 +30,7 @@ class CreateLoansTable extends Migration
             $table->text('purpose');
             $table->text('payment_status');
             $table->text('payment_response');
+            $table->string('provider');
             $table->double('net_salary');
             $table->string('date_disbursed');
             $table->integer('deleted');

@@ -28,7 +28,7 @@ class PaymentService {
             $details['recepient'] = '254723383855';
             $details['amount'] = 50;
             $data = $this->$gatewayFunction($details);
-            var_dump($data);exit;
+            
         }
         return $data;
     }
@@ -48,12 +48,11 @@ class PaymentService {
         $recipients  = array($recipient1);
         $responses = $gateway->mobilePaymentB2CRequest($productName, $recipients);
         $response = $responses[0];
-        $return = array();
         if ($response->status == "Queued") {
-          $return['transaction_id']=$response->transactionId;
-          $return['raw_response']=$response->provider;
+        $return['transaction_id']=$response->transactionId;
+        $return['raw_response']=$response->provider;
       } 
-        return $return;
+        return $responses;
     }
 
 

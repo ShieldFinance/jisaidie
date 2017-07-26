@@ -35,7 +35,9 @@ class LoanController extends Controller
 				->orWhere('net_salary', 'LIKE', "%$keyword%")
 				->orWhere('date_disbursed', 'LIKE', "%$keyword%")
 				->orWhere('deleted', 'LIKE', "%$keyword%")
+                                ->orderBy('id','desc')
 				->paginate($perPage);
+            
         } else {
             $loan = Loan::paginate($perPage);
         }
