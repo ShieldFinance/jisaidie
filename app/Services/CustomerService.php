@@ -242,7 +242,7 @@ class CustomerService extends ApiGuardController{
         }
         return $payload;
     }
-    public function fetch_customer_statement($payload){
+    public function fetch_customer_statement($payload){ 
         $response = array();
         $loans = array();
         $where = [];
