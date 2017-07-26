@@ -331,15 +331,17 @@ class LoanService{
      */
     public function customerCanBorrow($customer){
         $response = array();
-        $response['can_borrow'] = true;
+        $response['can_borrow'] = false;
         $response['reason'] = '';
         //first let's check if customer is active
         if($customer->status==config('app.customerStatus')['active']){
             //if this customer belongs to an organization, check the status of the organization
-            if($customer->organization_id && $customer->organization->status==config('app.customerStatus')['active']){
+            if($customer->organization_id && $customer->organization->status!=config('app.customerStatus')['active']){
                 $response['can_borrow'] = false;
                 $response['reason'] = 'Organization disabled';
+                return $response;
             }
+            $response['can_borrow'] = true;
             //then let check if customer has pending loans
             if(count($customer->loans)){
                 $loanBalance= 0;
@@ -355,9 +357,10 @@ class LoanService{
                 if($loanBalance > 0){
                     $response['can_borrow'] = false;
                     $response['reason'] = 'Outstanding balance';
+                    return $response;
                 }
                 //if there is a loan that is pending or waiting approval, cannot borrow
-                if($loan->status==config('app.loanStatus')['pending'] || $loan->status==config('app.loanStatus')['approved']){
+                if($loan->status==config('app.loanStatus')['pending'] || $loan->status==config('app.loanStatus')['approved'] || $loan->status==config('app.loanStatus')['locked']){
                     $response['can_borrow'] = false;
                     $response['reason'] = 'Existing Loan';
                 }
