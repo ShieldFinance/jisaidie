@@ -36,6 +36,7 @@ class LoanService{
         }
         if(strlen($responseString)==0){
             $customer = Customer::where('mobile_number',$payload['mobile_number'])->first();
+            if($customer){
             $loanStatus = $this->customerCanBorrow($customer);
             if($loanStatus['can_borrow']){
                 if(isset($payload['amount']) && $payload['amount'] >= $minimumAmount && $payload['amount'] <=$maximumLoan){
@@ -70,6 +71,11 @@ class LoanService{
                 }
             }else{
                 $payload['response_string'] = 'Customer cannot borrow, '.$loanStatus['reason'];
+                $payload['response_status'] = config('app.responseCodes')['loan_rejected'];
+                $payload['command_status'] = config('app.responseCodes')['command_failed'];
+            }
+            }else{
+                 $payload['response_string'] = 'Customer does not exist';
                 $payload['response_status'] = config('app.responseCodes')['loan_rejected'];
                 $payload['command_status'] = config('app.responseCodes')['command_failed'];
             }
