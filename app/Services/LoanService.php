@@ -182,14 +182,13 @@ class LoanService{
                 $payload['email'] = $loan->customer->email;
                 $app = \App::getFacadeRoot();
                 $paymentService = $app->make('Payment');
-                $payload['payment_response'] = $paymentService->sendMoney($payload);
-                $loan->payment_response = json_encode($payload['payment_response']);
-                if($payload['payment_response']->status=='Queued'){
-                    $loan->payment_status = $payload['payment_response']->status;
-                    $loan->transaction_fee = $payload['payment_response']->transactionFee;
-                    $loan->transaction_ref  = $payload['payment_response']->transactionId;
-                    $loan->provider = $payload['payment_response']->provider;
-                    $loan->payment_response = json_encode($payload['payment_response']);  
+                $paymentResponse = $paymentService->sendMoney($payload);
+                $loan->payment_response = json_encode($paymentResponse);
+                if($paymentResponse[0]->status=='Queued'){
+                    $loan->payment_status = $paymentResponse[0]->status;
+                    $loan->transaction_fee = $paymentResponse[0]->transactionFee;
+                    $loan->transaction_ref  = $paymentResponse[0]->transactionId;
+                    $loan->provider = $paymentResponse[0]->provider;
                 }
                 $loan->save();
                 
