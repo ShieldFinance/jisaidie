@@ -175,7 +175,12 @@ class LoanService{
                 $commandStatus = config('app.responseCodes')['command_successful'];
                 $payload['send_notification'] = true;
                 $payload['mobile_number'] = $loan->customer->mobile_number;
+                $payload['gateway'] =  'mpesa';
                 $payload['email'] = $loan->customer->email;
+                $app = \App::getFacadeRoot();
+                $paymentService = $app->make('Payment');
+                $payloadd['payment_response'] = $paymentService->sendMoney($payload);
+                
             }else{
                 $responseString = 'Loan not sent to customer';
                 $responseStatus = config('app.responseCodes')['command_failed'];
