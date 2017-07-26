@@ -15,6 +15,7 @@ use App\Http\Models\CustomerDevice;
 use App\Setting;
 use App\Http\Controllers\Services\ResponseTemplatesController;
 use App\Http\Models\Message;
+use Carbon\Carbon;
 class CustomerService extends ApiGuardController{
    
     public function  create_customer_profile($payload){
@@ -271,15 +272,22 @@ class CustomerService extends ApiGuardController{
                 if(count($loans)){
                     foreach($loans as $loan){
                         $loanSummary['total_paid']+=$loan->paid;
-                        if($loan->status==config('app.responseCodes')['loan_disbursed']){
+                        $loan->sent_at = Carbon::parse($loan->date_disbursed)->format('m d, Y');
+                        if($loan->status==config('app.loanStatus')['disbursed'] || $loan->status==config('app.loanStatus')['locked']|| $loan->status==config('app.loanStatus')['paid']){
                             $loanSummary['total_disbursed']+=$loan->amount_processed;
                         }
+                        $loan->amount_requested=number_format($loan->amount_requested,0,'.',',');
+                        $loan->total=number_format($loan->total,0,'.',',');
                     }
+                    
                     $loanSummary['total_balance']=$loanSummary['total_disbursed']-$loanSummary['total_paid'];
                 }
                 
             }
         }
+        $loanSummary['total_disbursed'] = number_format($loanSummary['total_disbursed'],0,'.',',');
+        $loanSummary['total_paid']  = number_format($loanSummary['total_paid'],0,'.',',');
+        $loanSummary['total_balance'] = number_format($loanSummary['total_balance'],0,'.',',');
         $response['summary']=$loanSummary;
         $response['loans']=$loans;
         return $response;
@@ -313,9 +321,8 @@ class CustomerService extends ApiGuardController{
     public function fetch_messages($payload)
     {
         $response = array();
-        $responseString = '';
-        $responseStatus = '';
-        $commandStatus = config('app.responseCodes')['no_response'];
+        $responseString = '0k';
+        $responseStatus = config('app.responseCodes')['no_response'];
         $commandStatus = config('app.responseCodes')['command_failed'];
         if(isset($payload['mobile_number'])){
             $limit = 1000;
@@ -328,11 +335,25 @@ class CustomerService extends ApiGuardController{
                 $where[]=array('type','=',$payload['type']);
             }
             
-            $messages = Message::where($where)->limit($limit)->get();
+            $messages = Message::where($where)->orderBy("id","desc")->limit($limit)->get();
             if(count($messages)){
+                foreach($messages as $message){
+                    $message->sent_at = $message->updated_at->format('m d, Y');
+                }
                 $response['messages'] = $messages;//$this->response->withCollection($messages, new MessageTransformer());
+            $responseString = '0k';
+            $responseStatus =  config('app.responseCodes')['command_successful'];
+            $commandStatus =  config('app.responseCodes')['command_successful'];
+ 
+            }else{
+                $responseString = 'No messages';
+                $responseStatus =  config('app.responseCodes')['command_successful'];
+                $commandStatus =  config('app.responseCodes')['command_successful'];
             }
         }
+        $response['response_status'] = $responseStatus;
+        $response['response_string'] = $responseString;
+        $response['command_status'] = $commandStatus;
         return $response;
     }
     
