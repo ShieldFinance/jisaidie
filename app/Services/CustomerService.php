@@ -243,10 +243,15 @@ class CustomerService extends ApiGuardController{
         return $payload;
     }
     public function fetch_customer_statement($payload){
+        $response = array();
         $loans = array();
         $where = [];
+        $loanSummary = [];
+        $loanSummary['total_disbursed'] = 0;
+        $loanSummary['total_paid'] = 0;
+        $loanSummary['total_balance'] = 0;
         if(isset($payload['mobile_number'])){
-            $limit = 10;
+            $limit = 0;
             if(isset($payload['limit'])){
                 $limit = (int)$payload['limit'];
             }
@@ -258,10 +263,26 @@ class CustomerService extends ApiGuardController{
                    $loans =$loans->whereDate('created_at','>=',$payload['date_from']);
                     $loans =$loans->whereDate('created_at','<=',$payload['date_to']);
                 }
-                $loans = $loans->orderBy('id','desc')->limit($limit)->get();
+                $loans = $loans->orderBy('id','desc');
+                if($limit > 0){
+                    $loans = $loans->limit($limit);
+                }
+                $loans = $loans->get();
+                if(count($loans)){
+                    foreach($loans as $loan){
+                        $loanSummary['total_paid']+=$loan->paid;
+                        if($loan->status==config('app.responseCodes')['loan_disbursed']){
+                            $loanSummary['total_disbursed']+=$loan->amount_processed;
+                        }
+                    }
+                    $loanSummary['total_balance']=$loanSummary['total_disbursed']-$loanSummary['total_paid'];
+                }
+                
             }
         }
-        return $loans;
+        $response['summary']=$loanSummary;
+        $response['loans']=$loans;
+        return $response;
     }
     public function send_notification($payload){
         $responseString = '';
