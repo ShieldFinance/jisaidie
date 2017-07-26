@@ -336,5 +336,30 @@ class CustomerService extends ApiGuardController{
         return $response;
     }
     
+    public function check_customer_status($payload){
+        $app = \App::getFacadeRoot();
+        $loanService = $app->make('Loan');
+        $response = array();
+        $responseString = '';
+        $responseStatus = config('app.responseCodes')['no_response'];
+        $commandStatus = config('app.responseCodes')['command_failed'];
+        if(isset($payload['mobile_number'])){
+            $customer = new Customer();
+            $customer = $customer->getCustomerByKey('mobile_number',$payload['mobile_number']);
+            if($customer){
+                $canBorrow = $loanService->customerCanBorrow($customer);
+                $response['can_borrow'] = $canBorrow;
+                $response['profile_status'] = $customer->status;
+                $response['response_status']=config('app.responseCodes')['command_successful'];
+            }else{
+                $response['response_status']=config('app.responseCodes')['customer_does_not_exist'];
+                $response['command_status'] = config('app.responseCodes')['command_failed'];
+            }
+        }
+        $response['response_string'] = $responseString;
+        $response['response_status'] = $responseStatus;
+        $response['command_status'] = $commandStatus;
+        return $response;
+    }
 }
 

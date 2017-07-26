@@ -36,8 +36,8 @@ class LoanService{
         }
         if(strlen($responseString)==0){
             $customer = Customer::where('mobile_number',$payload['mobile_number'])->first();
-            $canBorrow = $this->customerCanBorrow($customer);
-            if($canBorrow){
+            $loanStatus = $this->customerCanBorrow($customer);
+            if($loanStatus['can_borrow']){
                 if(isset($payload['amount']) && $payload['amount'] >= $minimumAmount && $payload['amount'] <=$maximumLoan){
                     $loan = new Loan();
                     $loan->amount_requested = $payload['amount'];
@@ -66,8 +66,8 @@ class LoanService{
                     $payload['message_placeholders']['[mobile_number]'] = $payload['mobile_number'];
                 }
             }else{
-                $payload['response_string'] = 'Customer cannot borrow';
-                $payload['response_status'] = config('app.responseCodes')['loan_application_rejected'];
+                $payload['response_string'] = 'Customer cannot borrow, '.$loanStatus['reason'];
+                $payload['response_status'] = config('app.responseCodes')['loan_rejected'];
                 $payload['command_status'] = config('app.responseCodes')['command_failed'];
             }
         }else{
@@ -321,12 +321,15 @@ class LoanService{
      * @return boolean
      */
     public function customerCanBorrow($customer){
-        $canBorrow = false;
+        $response = array();
+        $response['can_borrow'] = false;
+        $response['reason'] = '';
         //first let's check if customer is active
         if($customer->status==config('app.customerStatus')['active']){
             //if this customer belongs to an organization, check the status of the organization
-            if($canBorrow && $customer->organization_id && $customer->organization->status==config('app.customerStatus')['active']){
-                $canBorrow = false;
+            if($customer->organization_id && $customer->organization->status==config('app.customerStatus')['active']){
+                $response['can_borrow'] = false;
+                $response['reason'] = 'Organization disabled';
             }
             //then let check if customer has pending loans
             if(count($customer->loans)){
@@ -338,20 +341,23 @@ class LoanService{
                     $loanPaid +=$loan->paid;
                 }
                 $loanBalance=$loanTotal-$loanPaid;
-                if($loanBalance<=0){
-                    $canBorrow=true;
+                if($loanBalance > 0){
+                    $response['can_borrow'] = false;
+                    $response['reason'] = 'Outstanding balance';
                 }
                 //if there is a loan that is pending or waiting approval, cannot borrow
                 if($loan->status==config('app.responseCodes')['loan_pending'] || $loan->status==config('app.responseCodes')['loan_approved']){
-                    $canBorrow = false;;
+                    $response['can_borrow'] = false;
+                    $response['reason'] = 'Existing Loan';
                 }
             }else{
                 //customer has no active loans
-                $canBorrow = true;
+                $response['can_borrow'] = true;
+                $response['reason'] = '';
             }
             
         }
-        return $canBorrow;
+        return $response;
     }
     public function applyCharges($loan){
         $fees = 0;

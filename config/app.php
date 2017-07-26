@@ -252,7 +252,6 @@ return [
         'loan_approved'=>201,//A loan approved successfully
         'loan_rejected'=>202,//A loan approval rejected
         'loan_disbursed'=>203,//A loan sent to customer
-        'loan_application_rejected'=>204,//Customer cannot borrow, contact customer care
         'loan_paid'=>205,
         'overpayment'=>206,
         'no_response'=>300,
