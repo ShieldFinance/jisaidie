@@ -17,11 +17,12 @@ use App\Http\Models\CustomerDevice;
 use App\Http\Models\Customer;
 class PaymentService {
     /**
-     * Send single message
+     * Send money to a single customer
      * @param type $payload
      */
     public function sendMoney($payload){
         $data = array();
+        return $data;
         if(isset($payload['amount']) && isset($payload['mobile_number'])){
            $gatewayFunction = 'send' . strtoupper($payload['gateway']);
             $details = array();

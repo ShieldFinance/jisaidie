@@ -348,6 +348,8 @@ class LoanService{
         $response = array();
         $response['can_borrow'] = false;
         $response['reason'] = '';
+        $response['can_borrow'] = true;
+        return $response;
         //first let's check if customer is active
         if($customer->status==config('app.customerStatus')['active']){
             //if this customer belongs to an organization, check the status of the organization
@@ -386,6 +388,7 @@ class LoanService{
             }
             
         }
+        
         return $response;
     }
     public function applyCharges($loan){
@@ -395,6 +398,7 @@ class LoanService{
             $charges = 'co_processing_fee';
         }
         $fees = floatval($this->setting->where('setting_name',$charges)->first()->setting_value);
+        var_dump($this->setting);exit;
         $fixedCost =  	floatval($this->setting->where('setting_name','fixed_loan_cost')->first()->setting_value);
         $interest =  	floatval($this->setting->where('setting_name','loan_interest_rate')->first()->setting_value);
         $dailyInterest = ($interest/3000);
