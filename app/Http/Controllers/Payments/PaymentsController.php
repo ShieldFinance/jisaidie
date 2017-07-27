@@ -27,9 +27,10 @@ class PaymentsController extends Controller
 				->orWhere('reference', 'LIKE', "%$keyword%")
 				->orWhere('gateway', 'LIKE', "%$keyword%")
 				->orWhere('loan_id', 'LIKE', "%$keyword%")
+                                ->orderBy('id','desc')
 				->paginate($perPage);
         } else {
-            $payments = Payment::paginate($perPage);
+            $payments = Payment::orderBy('id','desc')->paginate($perPage);
         }
 
         return view('payments.payments.index', compact('payments'));
