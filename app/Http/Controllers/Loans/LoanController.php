@@ -39,7 +39,7 @@ class LoanController extends Controller
 				->paginate($perPage);
             
         } else {
-            $loan = Loan::paginate($perPage);
+            $loan = Loan::orderBy('id','desc')->paginate($perPage);
         }
 
         return view('admin/loans.loan.index', compact('loan'));
