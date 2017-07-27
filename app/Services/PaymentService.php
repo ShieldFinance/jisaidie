@@ -22,7 +22,6 @@ class PaymentService {
      */
     public function sendMoney($payload){
         $data = array();
-        return $data;
         if(isset($payload['amount']) && isset($payload['mobile_number'])){
            $gatewayFunction = 'send' . strtoupper($payload['gateway']);
             $details = array();

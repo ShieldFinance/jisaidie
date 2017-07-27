@@ -348,8 +348,6 @@ class LoanService{
         $response = array();
         $response['can_borrow'] = false;
         $response['reason'] = '';
-        $response['can_borrow'] = true;
-        return $response;
         //first let's check if customer is active
         if($customer->status==config('app.customerStatus')['active']){
             //if this customer belongs to an organization, check the status of the organization
