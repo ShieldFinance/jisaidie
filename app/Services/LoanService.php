@@ -184,7 +184,7 @@ class LoanService{
                 $paymentService = $app->make('Payment');
                 $paymentResponse = $paymentService->sendMoney($payload);
                 $loan->payment_response = json_encode($paymentResponse);
-                if($paymentResponse[0]->status=='Queued'){
+                if(isset($paymentResponse[0]) && $paymentResponse[0]->status=='Queued'){
                     $loan->payment_status = $paymentResponse[0]->status;
                     $loan->transaction_fee = $paymentResponse[0]->transactionFee;
                     $loan->transaction_ref  = $paymentResponse[0]->transactionId;
@@ -398,7 +398,6 @@ class LoanService{
             $charges = 'co_processing_fee';
         }
         $fees = floatval($this->setting->where('setting_name',$charges)->first()->setting_value);
-        var_dump($loan);exit;
         $fixedCost =  	floatval($this->setting->where('setting_name','fixed_loan_cost')->first()->setting_value);
         $interest =  	floatval($this->setting->where('setting_name','loan_interest_rate')->first()->setting_value);
         $dailyInterest = ($interest/3000);
