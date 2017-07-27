@@ -398,7 +398,7 @@ class LoanService{
             $charges = 'co_processing_fee';
         }
         $fees = floatval($this->setting->where('setting_name',$charges)->first()->setting_value);
-        var_dump($this->setting);exit;
+        var_dump($loan);exit;
         $fixedCost =  	floatval($this->setting->where('setting_name','fixed_loan_cost')->first()->setting_value);
         $interest =  	floatval($this->setting->where('setting_name','loan_interest_rate')->first()->setting_value);
         $dailyInterest = ($interest/3000);
