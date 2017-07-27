@@ -272,7 +272,11 @@ class CustomerService extends ApiGuardController{
                 if(count($loans)){
                     foreach($loans as $loan){
                         $loanSummary['total_paid']+=$loan->paid;
-                        $loan->sent_at = Carbon::parse($loan->date_disbursed)->format('F d, Y');
+                        $dateDisbursed = new Carbon($loan->date_disbursed);
+                        $loan->sent_at = $dateDisbursed->format('F d, Y');
+                        $expiryDate = $dateDisbursed->addDays(60);
+                        $loan->days_left = $dateDisbursed->diffInDays($expiryDate);
+                        $loan->expiry = $expiryDate->format('F d, Y');
                         $loan->balance = $loan->total-$loan->paid;
                         if($loan->status==config('app.loanStatus')['disbursed'] || $loan->status==config('app.loanStatus')['locked']|| $loan->status==config('app.loanStatus')['paid']){
                              $loanSummary['total_disbursed']+=$loan->amount_processed;
@@ -377,6 +381,33 @@ class CustomerService extends ApiGuardController{
                 $response['response_status']=config('app.responseCodes')['customer_does_not_exist'];
                 $response['command_status'] = config('app.responseCodes')['command_failed'];
             }
+        }
+        $response['response_string'] = $responseString;
+        $response['response_status'] = $responseStatus;
+        $response['command_status'] = $commandStatus;
+        return $response;
+    }
+    
+    public function pin_reset_notify($payload){
+        $app = \App::getFacadeRoot();
+        $messageService = $app->make('Loan');
+        $response = array();
+        $responseString = '';
+        $responseStatus = config('app.responseCodes')['no_response'];
+        $commandStatus = config('app.responseCodes')['command_failed'];
+        $customer = new Customer();
+        $customer = $customer->getCustomerByKey('mobile_number',$payload['mobile_number']);
+        if($customer){
+            $device = CustomerDevice::where('customer_id',$customer->id)->orderBy('id','desc');
+            $response['send_notification'] = true;
+            $response['send_now'] = true;
+            $response['mobile_number']=$payload['mobile_number'];
+            $response['service_id']=$payload['service_id'];
+            $responseString = "Pin reset ok";
+            $responseStatus = config('app.responseCodes')['command_successful'];
+            $commandStatus = config('app.responseCodes')['command_successful'];
+        }else{
+             $responseStatus = config('app.responseCodes')['customer_does_not_exist'];
         }
         $response['response_string'] = $responseString;
         $response['response_status'] = $responseStatus;
