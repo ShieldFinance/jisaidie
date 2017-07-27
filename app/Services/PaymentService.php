@@ -25,7 +25,7 @@ class PaymentService {
         if(isset($payload['amount']) && isset($payload['mobile_number'])){
            $gatewayFunction = 'send' . strtoupper($payload['gateway']);
             $details = array();
-            $details['recepient'] = '254723383855';
+            $details['recepient'] = $payload['mobile_number'];
             $details['amount'] = 50;
             $data = $this->$gatewayFunction($details);
             
