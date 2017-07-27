@@ -278,8 +278,9 @@ class CustomerService extends ApiGuardController{
                         $loan->days_left = $dateDisbursed->diff($expiryDate)->days;
                         $loan->expiry = $expiryDate->format('F d, Y');
                         $loan->balance = $loan->total-$loan->paid;
+                        $loan->state = $loan->status;
                         if($loan->status==config('app.loanStatus')['disbursed'] || $loan->status==config('app.loanStatus')['locked']|| $loan->status==config('app.loanStatus')['paid']){
-                             $loanSummary['total_disbursed']+=$loan->amount_processed;
+                             $loanSummary['total_disbursed']+=$loan->total;
                         }
                         $loan->amount_requested=number_format($loan->amount_requested,0,'.',',');
                         $loan->total=number_format($loan->total,0,'.',',');
@@ -307,7 +308,9 @@ class CustomerService extends ApiGuardController{
         $response['mobile_number']=$payload['mobile_number'];
         if(isset($payload['send_notification']) && $payload['send_notification']){
            $payload['msisdn'] = $payload['mobile_number'];
-           if($responseProcessor->processResponse($payload)){
+           $sent = $responseProcessor->processResponse($payload);
+           $response['sent'] = $sent;
+           if($sent){
                $responseStatus = config('app.responseCodes')['command_successful'];
                $commandStatus = config('app.responseCodes')['command_successful'];
                $responseString="Notification sent";

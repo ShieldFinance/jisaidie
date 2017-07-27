@@ -30,28 +30,43 @@
                             <table class="table table-borderless">
                                 <thead>
                                     <tr>
-                                        <th>ID</th><th>Surname</th><th>Last name</th><th>Other Name</th><th>Actions</th>
+                                        <th>ID</th><th>Mobile Number</th><th>Surname</th><th>Last name</th><th>Other Name</th><th>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                 @foreach($customers as $item)
                                     <tr>
                                         <td>{{ $item->id }}</td>
+                                         <td>{{ $item->mobile_number }}</td>
                                         <td>{{ $item->surname }}</td><td>{{ $item->last_name }}</td><td>{{ $item->other_name }}</td>
                                         <td>
                                             <a href="{{ url('/admin/customers/' . $item->id) }}" title="View Customer"><button class="btn btn-info btn-xs"><i class="fa fa-eye" aria-hidden="true"></i> View</button></a>
                                             <a href="{{ url('/admin/customers/' . $item->id . '/edit') }}" title="Edit Customer"><button class="btn btn-primary btn-xs"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</button></a>
                                             {!! Form::open([
-                                                'method'=>'DELETE',
+                                                'method'=>'POST',
                                                 'url' => ['/admin/customers', $item->id],
                                                 'style' => 'display:inline'
                                             ]) !!}
                                                 {!! Form::button('<i class="fa fa-trash-o" aria-hidden="true"></i> Delete', array(
                                                         'type' => 'submit',
-                                                        'class' => 'btn btn-danger btn-xs',
+                                                        'class' => 'btn hide btn-danger btn-xs',
                                                         'title' => 'Delete Customer',
                                                         'onclick'=>'return confirm("Confirm delete?")'
                                                 )) !!}
+                                                 {!! Form::close() !!}
+                                                   {!! Form::open([
+                                                'method'=>'POST',
+                                                'url' => ['admin/customers/reset_pin'],
+                                                'style' => 'display:inline'
+                                            ]) !!}
+                                                 {!! Form::button('<i class="fa fa-refresh-o" aria-hidden="true"></i> Reset Pin', array(
+                                                        'type' => 'submit',
+                                                        'class' => 'btn  btn-primary btn-xs',
+                                                        'title' => 'Reset Pin',
+                                                        'onclick'=>'return confirm("Confirm reset pin?")'
+                                                )) !!}
+                                                <input name="_method" type="hidden" value="POST">
+                                                <input type="hidden" name="customer_id" value="{{ $item->id }}">
                                             {!! Form::close() !!}
                                         </td>
                                     </tr>
