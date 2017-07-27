@@ -54,6 +54,11 @@ class PaymentService {
       } 
         return $responses;
     }
+    
+    public function receivePayment($payload){
+        
+    }
+            
 
 
 }
