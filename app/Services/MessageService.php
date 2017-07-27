@@ -41,6 +41,7 @@ class MessageService {
      * @param type $payload
      */
     public function sendMessage($payload){
+        $sent = false;
         if(isset($payload['message_id'])){
             $message = Message::find($payload['message_id']);
             if($message){
@@ -52,10 +53,14 @@ class MessageService {
                 $data = $this->$messageFunction($details);
                 $message->status = $data['status'];
                 $message->attempts += $data['attempts'];
+                if($data['status']=='Success'){
+                    $sent = true;
+                }
                 $message->save();
             }
             
         }
+        return $sent;
     }
    
     public function sendSMS($payload) {

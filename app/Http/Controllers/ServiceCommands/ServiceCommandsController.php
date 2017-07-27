@@ -20,7 +20,7 @@ class ServiceCommandsController extends Controller
     {
         $keyword = $request->get('search');
         $perPage = 25;
-
+        var_dump($request->get('service'));exit;
         if (!empty($keyword)) { 
             $servicecommands = ServiceCommand::where('processing_function', 'LIKE', "%$keyword%")
 				->orWhere('service_id', 'LIKE', "%$keyword%")

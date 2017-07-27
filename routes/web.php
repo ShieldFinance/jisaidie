@@ -24,7 +24,7 @@ Route::resource('admin/permissions', 'Admin\PermissionsController');
 Route::resource('admin/users', 'Admin\UsersController');
 Route::get('admin/generator', ['uses' => '\Appzcoder\LaravelAdmin\Controllers\ProcessController@getGenerator']);
 Route::post('admin/generator', ['uses' => '\Appzcoder\LaravelAdmin\Controllers\ProcessController@postGenerator']);
-
+Route::post('admin/customers/reset_pin', 'Customers\\CustomersController@resetPin');
 Route::resource('admin/settings', 'Setting\\SettingsController');
 Route::resource('admin/services', 'Services\\ServicesController');
 Route::resource('admin/service-commands', 'ServiceCommands\\ServiceCommandsController');
