@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Payments;
 
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
-
+use App\Http\Controllers\ServiceProcessor;
 use App\Http\Models\Payment;
 use Illuminate\Http\Request;
 use Session;
@@ -140,5 +140,34 @@ class PaymentsController extends Controller
         Session::flash('flash_message', 'Payment deleted!');
 
         return redirect('admin/payments');
+    }
+    
+    public function receivePayment(Request $request){
+        $data  = json_decode(file_get_contents('php://input'), true);
+        $mobileNumber = $data['source'];
+         
+        $values = explode(' ',$data['value']);
+        $providerFees = explode(' ', $data['providerFee']);
+        if(isset($data['clientAccount']) && strlen($data['clientAccount'])){
+            $mobileNumber = $data['clientAccount'];
+        }
+        
+        $mobileNumber = str_replace('+','',$mobileNumber);
+        $payment = new Payment();
+        $payment->currency=$values[0];
+        $payment->amount=$values[1];
+        $payment->reference=$data['transactionId'];
+        $payment->provider_reference=$data['providerRefId'];
+        $payment->provider_fee = $providerFees[1];
+        $payment->transaction_date = $data['transactionDate'];
+        $payment->mobile_number = $mobileNumber;
+        $payment->type = "credit";
+        $payment->save();
+        $details = array('mobile_number'=>$mobileNumber,'amount'=>$payment->amount,'payment_id'=>$payment->id);
+     
+        $request->request->add(['action' => 'RepayLoan','request'=>json_encode($details)]);
+        $serviceProcessor = new ServiceProcessor();
+        $response = $serviceProcessor->doProcess($request);
+        return $response;
     }
 }

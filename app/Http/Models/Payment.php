@@ -21,14 +21,15 @@ class Payment extends Model
     protected $primaryKey = 'id';
     
     protected $attributes = [
-        'currency'=>'KES'
+        'currency'=>'KES',
+        'gateway'=>''
     ];
     /**
      * Attributes that should be mass-assignable.
      *
      * @var array
      */
-    protected $fillable = ['amount','customer_id', 'currency', 'reference', 'gateway', 'loan_id'];
+    protected $fillable = ['amount', 'currency', 'reference', 'gateway', 'loan_id'];
 
     
 }

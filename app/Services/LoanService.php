@@ -207,20 +207,73 @@ class LoanService{
         $payload['command_status'] = $commandStatus;
         return $payload;
     }
-    
-    /**
-     * Offset a loan with the specified amount
-     * @param type $payload
-     * @return string
-     */
     public function offset_loan($payload){
+        $response = [];
         $responseString = '';
         $responseStatus = '';
         $commandStatus = config('app.responseCodes')['no_response'];
         $commandStatus = config('app.responseCodes')['command_failed'];
+        if(isset($payload['mobile_number']) && isset($payload['payment_id'])){
+            $customer = Customer::where('mobile_number',$payload['mobile_number'])->first();
+            $payment = Payment::find($payload['payment_id']);
+            $customer = Customer::where('mobile_number',$payload['mobile_number'])->first();
+            $payment = Payment::find($payload['payment_id']);
+            
+            if($customer){
+                $amountToDeduct = 0;
+                $overPayment = 0;
+                $loan = Loan::where('customer_id',$customer->id)->orderBy('id','desc')->first();
+                $loanBalance = $loan->total - $loan->paid;
+                if($loanBalance >= $payment->amount){
+                    $amountToDeduct = $payment->amount;
+                }else{
+                    $amountToDeduct = $loanBalance;
+                    //put overpayment to withholding account
+                    $customer->withholding_balance += $payment->amount - $amountToDeduct;
+                    $customer->save();
+                }
+                $loan->paid+=$amountToDeduct;
+                $payment->loan_id = $loan->id;
+                if($loan->paid >= $loan->total){
+                    $loan->status= config('app.loanStatus')['paid'];
+                }
+                $loan->save();
+                $payment->save();
+            }
+            $response['mobile_number'] = $customer->mobile_number;
+            $response['email'] = $customer->email;
+            $response['send_notification'] = true;
+            $response['send_now'] = true;
+            $response['service_id'] = $payload['service_id'];
+            $response['message_placeholders'] = array();
+            $response['message_placeholders']['[customer_name]'] = $customer->surname;
+            $response['message_placeholders']['[amount]'] = $payment->amount;
+            $responseString = 'Payment received';
+            $responseStatus = config('app.responseCodes')['command_successful'];
+            $commandStatus = config('app.responseCodes')['command_successful'];
+            
+        }else{
+            $responseStatus = 'Missing parameters';
+            $responseStatus = config('app.responseCodes')['command_failed'];
+            $commandStatus = config('app.responseCodes')['command_failed'];
+        }
+        $response['response_status'] = $responseStatus;
+        $response['respone_string']=$responseString;
+        $response['command_status'] = $commandStatus;
+        return $response;
+    }
+    /**
+     * Offset a loans with the specified amount
+     * @param type $payload
+     * @return string
+     */
+    public function offset_loans($payload){
+        $responseString = '';
+        $responseStatus = config('app.responseCodes')['no_response'];
+        $commandStatus = config('app.responseCodes')['command_failed'];
         $customer = Customer::where('mobile_number',$payload['mobile_number'])->first();
-        $payment = Payment::where('reference',$payload['reference'])->first();
-        if(!$payment){
+        $payment = Payment::find($payload['payment_id']);
+        if($payment){
             if($customer){
                 if(isset($payload['amount']) && $payload['amount']>0){
                     //offset each loan until all amount is replenished
@@ -278,18 +331,6 @@ class LoanService{
                             //there is an overpayment
                             $customer->withholding_balance += $amount;
                             $customer->save();
-                           
-                            if($amount == $payload['amount']){
-                                //this is  a new payment and no loan was processed
-                                $payment = new Payment([
-                                            'customer_id'=>$customer->id,
-                                            'amount'=>$payload['amount'],
-                                            'currency'=>'KES',
-                                            'reference'=>$payload['reference'],
-                                            'gateway'=>$payload['gateway'],
-                                            'loan_id'=>null]);
-                                        $payment->save();
-                            }
                             $responseStatus = config('app.responseCodes')['overpayment'];
                             $responseString="Overpayment amount sent to withholding account";
                             $commandStatus = config('app.responseCodes')['command_successful'];
@@ -307,9 +348,10 @@ class LoanService{
             }
         }else{
             $responseStatus = config('app.responseCodes')['invalid_payment'];
-            $responseString="Payment already used";
+            $responseString="Payment not found";
             $commandStatus = config('app.responseCodes')['command_successful'];
         }
+        
         $payload['response_string'] = $responseString;
         $payload['response_status'] = $responseStatus;
         $payload['command_status'] = $commandStatus;
@@ -320,6 +362,7 @@ class LoanService{
         $responseStatus = '';
         $commandStatus = config('app.responseCodes')['no_response'];
         $commandStatus = config('app.responseCodes')['command_failed'];
+        
         if(isset($payload['send_notification']) && $payload['send_notification']){
            $payload['msisdn'] = $payload['mobile_number'];
            $payload['email'] = $payload['email'];
