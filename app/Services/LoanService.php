@@ -103,7 +103,7 @@ class LoanService{
                 $loan->status = config('app.loanStatus')['approved'];
                 $loan->save();
                 $responseString = 'Loan approved';
-                $responseStatus = config('app.responseCodes')['command_successful'];
+                $responseStatus = config('app.responseCodes')['loan_approved'];
                 $commandStatus = config('app.responseCodes')['command_successful'];
             }else{
                 $responseString = 'Loan cannot be approved';
@@ -171,7 +171,7 @@ class LoanService{
                 $loan->date_disbursed = $now;
                 $loan->save();
                 $responseString = 'Loan sent to customer';
-                $responseStatus = config('app.responseCodes')['command_successful'];
+                $responseStatus = config('app.responseCodes')['loan_disbursed'];
                 $commandStatus = config('app.responseCodes')['command_successful'];
                 $payload['message_placeholders'] = array();
                 $payload['message_placeholders']['[customer_name]'] = $loan->customer->surname;
