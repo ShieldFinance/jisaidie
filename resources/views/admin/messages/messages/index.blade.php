@@ -30,14 +30,14 @@
                             <table class="table table-borderless">
                                 <thead>
                                     <tr>
-                                        <th>ID</th><th>Subject</th><th>Message</th><th>Recipient</th><th>Actions</th>
+                                        <th>ID</th><th>Subject</th><th>Message</th><th>Recipient</th><th>Type</th><th>Status<th>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                 @foreach($messages as $item)
                                     <tr>
                                         <td>{{ $item->id }}</td>
-                                        <td>{{ $item->subject }}</td><td>{{ $item->message }}</td><td>{{ $item->recipient }}</td>
+                                        <td>{{ $item->subject }}</td><td>{{ $item->message }}</td><td>{{ $item->recipient }}</td><td>{{ $item->type }}</td><td>{{ $item->status }}</td>
                                         <td>
                                             <a href="{{ url('/admin/messages/' . $item->id) }}" title="View Message"><button class="btn btn-info btn-xs"><i class="fa fa-eye" aria-hidden="true"></i> View</button></a>
                                             <a href="{{ url('/admin/messages/' . $item->id . '/edit') }}" title="Edit Message"><button class="btn btn-primary btn-xs"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</button></a>

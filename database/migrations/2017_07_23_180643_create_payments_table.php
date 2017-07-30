@@ -14,11 +14,14 @@ class CreatePaymentsTable extends Migration
     {
         Schema::create('payments', function(Blueprint $table) {
             $table->increments('id');
-            $table->integer('customer_id')->default(null);
             $table->decimal('amount');
             $table->string('currency')->default('KES');
             $table->string('reference');
+             $table->string('provider_reference');
+             $table->decimal('provider_fee');
             $table->string('gateway');
+            $table->string('type'); 
+             $table->string('transaction_date');
             $table->integer('loan_id');
             $table->timestamps();
         });

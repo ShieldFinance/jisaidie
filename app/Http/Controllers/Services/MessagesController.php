@@ -29,9 +29,10 @@ class MessagesController extends Controller
 				->orWhere('status', 'LIKE', "%$keyword%")
 				->orWhere('attempts', 'LIKE', "%$keyword%")
 				->orWhere('service_id', 'LIKE', "%$keyword%")
+                                ->orderBy('id','desc')
 				->paginate($perPage);
         } else {
-            $messages = Message::paginate($perPage);
+            $messages = Message::orderBy('id','desc')->paginate($perPage);
         }
 
         return view('admin/messages.messages.index', compact('messages'));

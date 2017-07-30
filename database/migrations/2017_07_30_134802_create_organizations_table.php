@@ -12,12 +12,13 @@ class CreateOrganizationsTable extends Migration
      */
     public function up()
     {
-        Schema::create('organizations', function(Blueprint $table) {
+        Schema::create('organization', function(Blueprint $table) {
             $table->increments('id');
             $table->string('name');
-            $table->double('email');
-            $table->tinyInteger('description');
-            $table->integer('status');
+            $table->string('email');
+            $table->longText('address');
+            $table->string('mobile_number');
+            $table->integer('status')->default(0);
             $table->timestamps();
         });
     }

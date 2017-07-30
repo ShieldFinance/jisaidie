@@ -183,6 +183,7 @@ return [
         // For crud generator & html
         Appzcoder\CrudGenerator\CrudGeneratorServiceProvider::class,
         Collective\Html\HtmlServiceProvider::class,
+        ConsoleTVs\Charts\ChartsServiceProvider::class,
 
     ],
 
@@ -235,6 +236,8 @@ return [
         'Form' => Collective\Html\FormFacade::class,
         'HTML' => Collective\Html\HtmlFacade::class,
         'PushNotification' => Edujugon\PushNotification\Facades\PushNotification::class,
+        'Charts' => ConsoleTVs\Charts\Facades\Charts::class,
+
     ],
     'responseCodes' =>[
         'new_device_new_msisdn' => 100,//new device new mobile number
@@ -273,6 +276,14 @@ return [
         'locked'=>4,//Locked account, cannot borrow
         'one_time_pin'=>5,//User has not changed pin, cannot borrow
         'activation_code'=>6,//User has been sent activation code
+    ],
+    'loanStatus' =>[
+        'pending' => 0,//New loan pending approval
+        'approved' => 1,//approved (for checkoff loans)
+        'rejected' => 2,//rejected (for checkoff loans)
+        'disbursed' => 3,//sent to customer
+        'locked'=>4,//submitted to crb
+        'paid'=>5//loan paid
     ],
 
 ];

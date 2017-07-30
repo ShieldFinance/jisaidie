@@ -30,14 +30,14 @@
                             <table class="table table-borderless">
                                 <thead>
                                     <tr>
-                                        <th>ID</th><th>Customer Id</th><th>Amount Requested</th><th>Amount Processed</th><th>Actions</th>
+                                        <th>ID</th><th>Customer</th><th>Amount Requested</th><th>Amount Processed</th><th>Status<th>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                 @foreach($loan as $item)
                                     <tr>
                                         <td>{{ $item->id }}</td>
-                                        <td>{{ $item->customer_id }}</td><td>{{ $item->amount_requested }}</td><td>{{ $item->amount_processed }}</td>
+                                        <td>{{ $item->customer->mobile_number }}</td><td>{{ $item->amount_requested }}</td><td>{{ $item->amount_processed }}</td><td>{{ array_search ($item->status, config('app.loanStatus')) }}</td>
                                         <td>
                                             <a href="{{ url('/admin/loan/' . $item->id) }}" title="View Loan"><button class="btn btn-info btn-xs"><i class="fa fa-eye" aria-hidden="true"></i> View</button></a>
                                             <a href="{{ url('/admin/loan/' . $item->id . '/edit') }}" title="Edit Loan"><button class="btn btn-primary btn-xs"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</button></a>

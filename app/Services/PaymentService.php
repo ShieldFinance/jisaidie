@@ -16,21 +16,49 @@ use Edujugon\PushNotification\PushNotification;
 use App\Http\Models\CustomerDevice;
 use App\Http\Models\Customer;
 class PaymentService {
+
+    /**
+     * Send money to a single customer
+     * @param type $payload
+     */
+    public function sendMoney($payload){
+        $data = array();
+        if(isset($payload['amount']) && isset($payload['mobile_number'])){
+           $gatewayFunction = 'send' . strtoupper($payload['gateway']);
+            $details = array();
+            $details['recepient'] = $payload['mobile_number'];
+            $details['amount'] = 50;
+            $data = $this->$gatewayFunction($details);
+            
+        }
+        return $data;
+    }
    
-    
-    public function sendMoney($payload) {
-        
-       $productName="";
-       $recipients=array();
-       $recipients[]= array("phoneNumber" => "+254711XXXYYY",
+    public function sendMPESA($payload) {
+        $username = Setting::where('setting_name', 'prsp_username')->first()->setting_value;
+        $key = Setting::where('setting_name', 'prsp_api_key')->first()->setting_value;
+        $senderId = Setting::where('setting_name', 'prsp_sender_id')->first()->setting_value;
+        $productName = Setting::where('setting_name', 'mpesa_product_name')->first()->setting_value;
+        $gateway = new AfricasTalkingGateway($username, $key);
+        $recipient1   = array("phoneNumber" => "+".$payload['recepient'],
                        "currencyCode" => "KES",
-                       "amount"       => 10.50,
-                       "metadata"     => array("name"   => "Clerk",
-                                               "reason" => "May Salary")
-                        );
-       $responses = $gateway->mobilePaymentB2CRequest($productName, $recipients);
-       return $responses;
+                       "amount"       => $payload['amount'],
+                       "metadata"     => array("name"   => "Test Api",
+                                               "reason" => "Develop")
+              );
+        $recipients  = array($recipient1);
+        $responses = $gateway->mobilePaymentB2CRequest($productName, $recipients);
+        $response = $responses[0];
+        if ($response->status == "Queued") {
+        $return['transaction_id']=$response->transactionId;
+        $return['raw_response']=$response->provider;
+      } 
+        return $responses;
     }
     
+    public function receivePayment($payload){
+        
+    }
+  
 
 }

@@ -32,7 +32,7 @@ class Service extends Model
      */
     public function service_commands()
     {
-        return $this->hasMany('App\Http\Models\ServiceCommand');
+        return $this->hasMany('App\Http\Models\ServiceCommand')->orderBy('level','asc');
     }
     
     public function getServiceCommandsByServiceId($service_id){

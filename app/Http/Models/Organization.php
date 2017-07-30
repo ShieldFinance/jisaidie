@@ -11,7 +11,7 @@ class Organization extends Model
      *
      * @var string
      */
-    protected $table = 'organizations';
+    protected $table = 'organization';
 
     /**
     * The database primary key value.
@@ -25,10 +25,11 @@ class Organization extends Model
      *
      * @var array
      */
-    protected $fillable = ['name', 'email', 'description', 'status'];
+    protected $fillable = ['name', 'email', 'address', 'mobile_number','status'];
 
     public function customers()
     {
         return $this->hasMany('App\Http\Models\Customer');
     }
+    
 }

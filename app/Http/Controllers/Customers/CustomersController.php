@@ -4,8 +4,9 @@ namespace App\Http\Controllers\Customers;
 
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
-
+use App\Http\Controllers\ServiceProcessor;
 use App\Http\Models\Customer;
+use App\Http\Models\CustomerDevice;
 use Illuminate\Http\Request;
 use Session;
 
@@ -17,11 +18,95 @@ class CustomersController extends Controller
      * @return \Illuminate\View\View
      */
     public function index(Request $request)
-    {
-        $keyword = $request->get('search');
-        $perPage = 25;
+    { 
+        $payload = array();
+        $payload['keyword'] = $request->get('search');
+        $service = $request->get('service');
+        $customers = $this->getCustomers($payload);
 
-        if (!empty($keyword)) {
+        return view('admin/customers.customers.index', compact('customers'));
+    }
+    
+    public function resetPin(Request $request){
+        
+        $payload = array();
+        $customers = $this->getCustomers($payload);
+        $serviceProcessor = new ServiceProcessor();
+        $customer = Customer::find($request->get('customer_id'));
+        $device = CustomerDevice::where('customer_id',$customer->id)
+        ->orderBy('id','desc')
+        ->first();
+        if(isset($device->registration_token)){
+            $details = array('mobile_number'=>$customer->mobile_number);
+            $request->request->add(['action' => 'ResetPin','request'=>json_encode($details)]);
+            $response = $serviceProcessor->doProcess($request);
+			
+            if(isset($response['send_notification']) && isset($response['send_notification']['sent'])){
+                Session::flash('flash_message', 'Pin reset sent request!');
+            }else{
+                Session::flash('flash_message', 'Pin reset failed!');
+            }
+            
+        }else{
+             Session::flash('flash_message', 'Customer device not registered!');
+        }
+        return view('admin/customers.customers.index', compact('customers'));
+    }
+    public function activate(Request $request)
+    {
+		$response = Customer::find($request->get('customer_id'))->update(['status' => 1]);
+		
+		Session::flash('flash_message', 'Customer activated!');
+
+        return redirect('admin/customers');
+    }
+	public function deactivate(Request $request)
+    {
+		$response = Customer::find($request->get('customer_id'))->update(['status' => 0]);
+        
+       
+		Session::flash('flash_message', 'Customer activated!');
+
+        return redirect('admin/customers');
+    }
+	public function verify(Request $request)
+    {
+		
+		$customer = Customer::find($request->get('customer_id'));
+        $details=array();
+		$details['customer_id']=$customer->id;
+        $details['id_number']=$customer->id_number;
+		$details['first_name']=$customer->surname;
+		$details['middle_name']=$customer->other_name;
+		$details['last_name']=$customer->last_name;
+		
+		if(!empty ( $customer->id_number)){
+			
+		 //api to check id with the crb
+		    $app = \App::getFacadeRoot();
+			$paymentService = $app->make('Crb');
+			$apiResponse = $paymentService->checkID($details);
+		
+			if($apiResponse["match"]==1){
+				  Session::flash('flash_message',$apiResponse["code"]." : ". $apiResponse["message"]);
+			}else{
+				  Session::flash('flash_message',$apiResponse["code"]." : ". $apiResponse["message"]);
+			}
+		}else{
+			 Session::flash('flash_message',"Customer ID Number is empty");
+		}
+		
+        
+      
+
+        return redirect('admin/customers');
+    }
+    public function getCustomers($payload){
+        $perPage = 25;
+        if(isset($payload['perPage'])){
+            $perPage=$payload['perPage'];
+        }
+        if (isset($payload['keyword'])) {
             $customers = Customer::where('first_name', 'LIKE', "%$keyword%")
 				->orWhere('middle_name', 'LIKE', "%$keyword%")
 				->orWhere('surname', 'LIKE', "%$keyword%")
@@ -38,8 +123,7 @@ class CustomersController extends Controller
         } else {
             $customers = Customer::paginate($perPage);
         }
-
-        return view('admin/customers.customers.index', compact('customers'));
+        return $customers;
     }
 
     /**
