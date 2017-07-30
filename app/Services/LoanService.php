@@ -218,7 +218,7 @@ class LoanService{
             $payment = Payment::find($payload['payment_id']);
             $customer = Customer::where('mobile_number',$payload['mobile_number'])->first();
             $payment = Payment::find($payload['payment_id']);
-            
+           
             if($customer){
                 $amountToDeduct = 0;
                 $overPayment = 0;
@@ -401,17 +401,15 @@ class LoanService{
             }
             $response['can_borrow'] = true;
             //then let check if customer has pending loans
-            if(count($customer->loans)){
+            $loan = Loan::where('customer_id',$customer->id)->orderBy('id','desc')->first();
+            if($loan){
                 $loanBalance= 0;
                 $loanPaid = 0;
                 $loanTotal=0;
-                foreach($customer->loans as $loan){
-                    if($loan->status== config('app.loanStatus')['disbursed'] || $loan->status==config('app.loanStatus')['locked']){
-                        $loanTotal += $loan->total;
-                        $loanPaid +=$loan->paid;
-                    }
+                $response['loan'] = $loan;
+                if($loan->status== config('app.loanStatus')['disbursed'] || $loan->status==config('app.loanStatus')['locked']){
+                    $loanBalance=$loan->total -$loan->paid;
                 }
-                $loanBalance=$loanTotal-$loanPaid;
                 if($loanBalance > 0){
                     $response['can_borrow'] = false;
                     $response['reason'] = 'Outstanding balance';
