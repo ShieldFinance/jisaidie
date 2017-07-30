@@ -413,11 +413,13 @@ class LoanService{
                 $loanBalance= 0;
                 $loanPaid = 0;
                 $loanTotal=0;
-                $response['loan'] = $loan;
+               
                 if($loan->status== config('app.loanStatus')['disbursed'] || $loan->status==config('app.loanStatus')['locked']){
-                    $loanBalance=$loan->total -$loan->paid;
+                   $loan->balance=$loan->total -$loan->paid;
                 }
-                if($loanBalance > 0){
+                
+                $response['loan'] = $loan;
+                if($loan->balance > 0){
                     $response['can_borrow'] = false;
                     $response['reason'] = 'Outstanding balance';
                     return $response;
