@@ -6,6 +6,7 @@ use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use App\Mail\AppEmail;
 use App\Http\Models\Message;
+use App\Http\Models\Customer;
 use Illuminate\Http\Request;
 use Session;
 
@@ -45,7 +46,8 @@ class MessagesController extends Controller
      */
     public function create()
     {
-        return view('admin/messages.messages.create');
+        $customers = Customer::all();
+        return view('admin/messages.messages.create',['customers'=>$customers]);
     }
 
     /**
@@ -66,8 +68,20 @@ class MessagesController extends Controller
 			'attempts' => 'required'
 		]);
         $requestData = $request->all();
-        
-        Message::create($requestData);
+        $recepients = $requestData['recipient'];
+        $data = array();
+        foreach($recepients as $recepient){
+            $data[] = [
+			'subject' => $requestData['subject'],
+			'message' => $requestData['message'],
+			'recipient' => $recepient,
+			'type' => $requestData['type'],
+			'status' => $requestData['status'],
+			'attempts' => 0,
+                        'service_id'=>0
+		];
+        }
+        Message::insert($data);
 
         Session::flash('flash_message', 'Message added!');
 
@@ -98,8 +112,8 @@ class MessagesController extends Controller
     public function edit($id)
     {
         $message = Message::findOrFail($id);
-
-        return view('admin/messages.messages.edit', compact('message'));
+        $customers = Customer::all();
+        return view('admin/messages.messages.edit', array('message'=>$message,'customers'=>$customers));
     }
 
     /**

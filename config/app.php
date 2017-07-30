@@ -183,6 +183,7 @@ return [
         // For crud generator & html
         Appzcoder\CrudGenerator\CrudGeneratorServiceProvider::class,
         Collective\Html\HtmlServiceProvider::class,
+        ConsoleTVs\Charts\ChartsServiceProvider::class,
 
     ],
 
@@ -235,6 +236,8 @@ return [
         'Form' => Collective\Html\FormFacade::class,
         'HTML' => Collective\Html\HtmlFacade::class,
         'PushNotification' => Edujugon\PushNotification\Facades\PushNotification::class,
+        'Charts' => ConsoleTVs\Charts\Facades\Charts::class,
+
     ],
     'responseCodes' =>[
         'new_device_new_msisdn' => 100,//new device new mobile number

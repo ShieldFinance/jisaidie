@@ -10,38 +10,38 @@
         {!! Form::textarea('message', null, ['class' => 'form-control', 'required' => 'required']) !!}
         {!! $errors->first('message', '<p class="help-block">:message</p>') !!}
     </div>
-</div><div class="form-group {{ $errors->has('recipient') ? 'has-error' : ''}}">
-    {!! Form::label('recipient', 'Recipient', ['class' => 'col-md-4 control-label']) !!}
-    <div class="col-md-6">
-        {!! Form::text('recipient', null, ['class' => 'form-control', 'required' => 'required']) !!}
-        {!! $errors->first('recipient', '<p class="help-block">:message</p>') !!}
-    </div>
 </div><div class="form-group {{ $errors->has('type') ? 'has-error' : ''}}">
     {!! Form::label('type', 'Type', ['class' => 'col-md-4 control-label']) !!}
     <div class="col-md-6">
-        {!! Form::text('type', null, ['class' => 'form-control', 'required' => 'required']) !!}
+        {!! Form::select('type', array('sms' => 'SMS', 'email' => 'Email','inapp' => 'In App'), ['class' => 'form-control', 'required' => 'required']) !!}
         {!! $errors->first('type', '<p class="help-block">:message</p>') !!}
     </div>
-</div><div class="form-group {{ $errors->has('status') ? 'has-error' : ''}}">
-    {!! Form::label('status', 'Status', ['class' => 'col-md-4 control-label']) !!}
-    <div class="col-md-6">
-        {!! Form::text('status', null, ['class' => 'form-control', 'required' => 'required']) !!}
-        {!! $errors->first('status', '<p class="help-block">:message</p>') !!}
-    </div>
-</div><div class="form-group {{ $errors->has('attempts') ? 'has-error' : ''}}">
-    {!! Form::label('attempts', 'Attempts', ['class' => 'col-md-4 control-label']) !!}
-    <div class="col-md-6">
-        {!! Form::number('attempts', null, ['class' => 'form-control', 'required' => 'required']) !!}
-        {!! $errors->first('attempts', '<p class="help-block">:message</p>') !!}
-    </div>
-</div><div class="form-group {{ $errors->has('service_id') ? 'has-error' : ''}}">
-    {!! Form::label('service_id', 'Service Id', ['class' => 'col-md-4 control-label']) !!}
-    <div class="col-md-6">
-        {!! Form::number('service_id', null, ['class' => 'form-control']) !!}
-        {!! $errors->first('service_id', '<p class="help-block">:message</p>') !!}
-    </div>
 </div>
-
+    <div class="row">
+        <div class="col-xs-5">
+            <select name="from[]" id="search" class="form-control" size="8" multiple="multiple">
+                <?php foreach($customers as $customer){?>
+                <option value="{{$customer->mobile_number}}">{{$customer->mobile_number}}</option>
+                <?php } ?>
+            </select>
+        </div>
+        
+        <div class="col-xs-2">
+            <button type="button" id="undo_redo_undo" class="btn btn-primary btn-block">undo</button>
+            <button type="button" id="search_rightAll" class="btn btn-block"><i class="fa fa-forward"></i></button>
+            <button type="button" id="search_rightSelected" class="btn btn-block"><i class="fa fa-chevron-right"></i></button>
+            <button type="button" id="search_leftSelected" class="btn btn-block"><i class="fa fa-chevron-left"></i></button>
+            <button type="button" id="search_leftAll" class="btn btn-block"><i class="fa fa-backward"></i></button>
+        <button type="button" id="undo_redo_redo" class="btn btn-warning btn-block">redo</button>
+            </div>
+        
+        <div class="col-xs-5">
+            <select name="recipient[]" id="search_to" class="form-control" size="8" multiple="multiple"></select>
+        </div>
+    </div>
+<input type="hidden" name="status" value="draft">
+<input type="hidden" name="attempts" value="0">
+<input type="hidden" name="service_id" value="0">
 <div class="form-group">
     <div class="col-md-offset-4 col-md-4">
         {!! Form::submit(isset($submitButtonText) ? $submitButtonText : 'Create', ['class' => 'btn btn-primary']) !!}

@@ -19,9 +19,10 @@ class CreateCustomersTable extends Migration
             $table->string('other_name');
             $table->string('gender');
             $table->string('dob');
+            $table->integer('id_number')->default(0);
             $table->integer('mobile_number')->unsigned();
             $table->string('employee_number');
-            $table->text('id_number');
+            $table->text('crb_data');
             $table->decimal('net_salary')->default(0);
             $table->text('email');
             $table->tinyInteger('is_checkoff');

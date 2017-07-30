@@ -18,11 +18,13 @@ class ServiceProcessor extends Controller
         $this->payload = [];
         $response = array();
         $serviceModel = Service::where('name',$request->input('action'))->first();
+        
         if($serviceModel){
             $responseProcessor = new ResponseTemplatesController();
             $settings = new Setting();
             $service =  $this->app->make($serviceModel->product, [$settings, $responseProcessor]);
             $serviceCommands = $serviceModel->getServiceCommandsByServiceName($request->input('action'));
+           
             $payload = json_decode($request['request'], true);
             $payload['transaction_id']=$this->logTransaction($serviceModel, $request);
             $payload['service_id'] = $serviceModel->id;

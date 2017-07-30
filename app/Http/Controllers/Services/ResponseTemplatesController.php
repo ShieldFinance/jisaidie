@@ -148,8 +148,10 @@ class ResponseTemplatesController extends Controller
     
     public function processResponse($payload){
         $messageSent = false;
+        
         if(isset($payload['service_id'])){
             $responseTemplates = ResponseTemplate::where(['service_id'=>$payload['service_id'], 'status'=>1])->get();
+           
             if(count($responseTemplates)){
                 $saved = 0;
                 foreach($responseTemplates as $template){

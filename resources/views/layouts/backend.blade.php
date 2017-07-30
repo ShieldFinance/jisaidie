@@ -13,7 +13,9 @@
         <!-- Styles -->
         <link href="/css/app.css" rel="stylesheet">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-
+        <script src="{{ asset('/js/jquery.1.9.1.js') }}" type="text/javascript"></script>
+        <script src="{{ asset('/js/multiselect.js') }}" type="text/javascript"></script>
+        <script src="{{ asset('/js/main.js') }}" type="text/javascript"></script>
         <!-- Scripts -->
         <script>
             window.Laravel = <?php echo json_encode([
