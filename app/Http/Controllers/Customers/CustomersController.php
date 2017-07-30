@@ -40,6 +40,7 @@ class CustomersController extends Controller
             $details = array('mobile_number'=>$customer->mobile_number);
             $request->request->add(['action' => 'ResetPin','request'=>json_encode($details)]);
             $response = $serviceProcessor->doProcess($request);
+			
             if(isset($response['send_notification']) && isset($response['send_notification']['sent'])){
                 Session::flash('flash_message', 'Pin reset sent request!');
             }else{
@@ -51,7 +52,55 @@ class CustomersController extends Controller
         }
         return view('admin/customers.customers.index', compact('customers'));
     }
-    
+    public function activate(Request $request)
+    {
+		$response = Customer::find($request->get('customer_id'))->update(['status' => 1]);
+		
+		Session::flash('flash_message', 'Customer activated!');
+
+        return redirect('admin/customers');
+    }
+	public function deactivate(Request $request)
+    {
+		$response = Customer::find($request->get('customer_id'))->update(['status' => 0]);
+        
+       
+		Session::flash('flash_message', 'Customer activated!');
+
+        return redirect('admin/customers');
+    }
+	public function verify(Request $request)
+    {
+		
+		$customer = Customer::find($request->get('customer_id'));
+        $details=array();
+		$details['customer_id']=$customer->id;
+        $details['id_number']=$customer->id_number;
+		$details['first_name']=$customer->surname;
+		$details['middle_name']=$customer->other_name;
+		$details['last_name']=$customer->last_name;
+		
+		if(!empty ( $customer->id_number)){
+			
+		 //api to check id with the crb
+		    $app = \App::getFacadeRoot();
+			$paymentService = $app->make('Crb');
+			$apiResponse = $paymentService->checkID($details);
+		
+			if($apiResponse["match"]==1){
+				  Session::flash('flash_message',$apiResponse["code"]." : ". $apiResponse["message"]);
+			}else{
+				  Session::flash('flash_message',$apiResponse["code"]." : ". $apiResponse["message"]);
+			}
+		}else{
+			 Session::flash('flash_message',"Customer ID Number is empty");
+		}
+		
+        
+      
+
+        return redirect('admin/customers');
+    }
     public function getCustomers($payload){
         $perPage = 25;
         if(isset($payload['perPage'])){

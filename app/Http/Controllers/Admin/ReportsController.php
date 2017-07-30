@@ -1,15 +1,15 @@
 <?php
 
-namespace App\Http\Controllers\Organizations;
+namespace App\Http\Controllers\Admin;
 
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 
-use App\Http\Models\Organization;
+use App\Report;
 use Illuminate\Http\Request;
 use Session;
-
-class OrganizationsController extends Controller
+use Charts;
+class ReportsController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -18,20 +18,29 @@ class OrganizationsController extends Controller
      */
     public function index(Request $request)
     {
-        $keyword = $request->get('search');
-        $perPage = 25;
-
-        if (!empty($keyword)) {
-            $organizations = Organization::where('name', 'LIKE', "%$keyword%")
-				->orWhere('email', 'LIKE', "%$keyword%")
-				->orWhere('description', 'LIKE', "%$keyword%")
-				->orWhere('status', 'LIKE', "%$keyword%")
-				->paginate($perPage);
-        } else {
-            $organizations = Organization::paginate($perPage);
-        }
-
-        return view('admin/organizations.organizations.index', compact('organizations'));
+       $activeUsers= Charts::create('pie', 'highcharts')
+				->title('Active Users')
+				->labels(['Active users', 'Inactive Users'])
+				->values([30,70])
+				->dimensions(500,250)
+				->responsive(false);	
+		
+		 $verifiedUsers= Charts::create('pie', 'highcharts')
+				->title('Verified Users')
+				->labels(['Active users', 'Inactive Users'])
+				->values([30,70])
+				->dimensions(500,250)
+				->responsive(false);	
+		
+		$check_off_summary= Charts::create('pie', 'highcharts')
+				->title('Check off loans')
+				->labels(['Disbursed', 'Pending Approval','Serviced','Defaulted'])
+				->values([30,70,50])
+				->dimensions(500,250)
+				->responsive(false);	
+			
+			
+        return view('admin.reports.index', ['activeUsers' => $activeUsers,'verifiedUsers' => $verifiedUsers,'check_off_summary' => $check_off_summary]);
     }
 
     /**
@@ -41,7 +50,7 @@ class OrganizationsController extends Controller
      */
     public function create()
     {
-        return view('admin/organizations.organizations.create');
+        return view('admin.reports.create');
     }
 
     /**
@@ -56,11 +65,11 @@ class OrganizationsController extends Controller
         
         $requestData = $request->all();
         
-        Organization::create($requestData);
+        Report::create($requestData);
 
-        Session::flash('flash_message', 'Organization added!');
+        Session::flash('flash_message', 'Report added!');
 
-        return redirect('admin/organizations');
+        return redirect('admin/reports');
     }
 
     /**
@@ -72,9 +81,9 @@ class OrganizationsController extends Controller
      */
     public function show($id)
     {
-        $organization = Organization::findOrFail($id);
+        $report = Report::findOrFail($id);
 
-        return view('admin/organizations.organizations.show', compact('organization'));
+        return view('admin.reports.show', compact('report'));
     }
 
     /**
@@ -86,9 +95,9 @@ class OrganizationsController extends Controller
      */
     public function edit($id)
     {
-        $organization = Organization::findOrFail($id);
+        $report = Report::findOrFail($id);
 
-        return view('admin/organizations.organizations.edit', compact('organization'));
+        return view('admin.reports.edit', compact('report'));
     }
 
     /**
@@ -104,12 +113,12 @@ class OrganizationsController extends Controller
         
         $requestData = $request->all();
         
-        $organization = Organization::findOrFail($id);
-        $organization->update($requestData);
+        $report = Report::findOrFail($id);
+        $report->update($requestData);
 
-        Session::flash('flash_message', 'Organization updated!');
+        Session::flash('flash_message', 'Report updated!');
 
-        return redirect('admin/organizations');
+        return redirect('admin/reports');
     }
 
     /**
@@ -121,10 +130,10 @@ class OrganizationsController extends Controller
      */
     public function destroy($id)
     {
-        Organization::destroy($id);
+        Report::destroy($id);
 
-        Session::flash('flash_message', 'Organization deleted!');
+        Session::flash('flash_message', 'Report deleted!');
 
-        return redirect('admin/organizations');
+        return redirect('admin/reports');
     }
 }

@@ -41,6 +41,7 @@ class MessageService {
      * @param type $payload
      */
     public function sendMessage($payload){
+         
         $sent = false;
         if(isset($payload['message_id'])){
             $message = Message::find($payload['message_id']);
@@ -120,7 +121,7 @@ class MessageService {
         $device = CustomerDevice::where('customer_id',$customer->id)
         ->orderBy('id','desc')
         ->first();
-        
+      
         $deviceTokens =array($device->registration_token);
         $push->setMessage([
             'notification' => [

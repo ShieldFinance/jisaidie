@@ -163,9 +163,16 @@ class LoanService{
         //avoid double disbursement
         if($loan && $loan->status==config('app.loanStatus')['approved']){
             $loan = $this->applyCharges($loan);
-            //api to send cash here 
-            $apiResponse = true;
+            $details=array();
+            $details['amount'];
+            
+            //api to send cash here
+            $app = \App::getFacadeRoot();
+            $paymentService = $app->make('Message');
+            $apiResponse = $paymentService->sendMoney($details);
+           
             if($apiResponse){
+                
                 $now =Carbon::now()->toDateTimeString();
                 $loan->status= config('app.loanStatus')['disbursed'];
                 $loan->date_disbursed = $now;

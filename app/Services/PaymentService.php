@@ -16,6 +16,7 @@ use Edujugon\PushNotification\PushNotification;
 use App\Http\Models\CustomerDevice;
 use App\Http\Models\Customer;
 class PaymentService {
+
     /**
      * Send money to a single customer
      * @param type $payload
@@ -58,7 +59,6 @@ class PaymentService {
     public function receivePayment($payload){
         
     }
-            
-
+  
 
 }
