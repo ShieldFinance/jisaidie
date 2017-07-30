@@ -181,6 +181,7 @@ class ResponseTemplatesController extends Controller
                         'service_id'=>$payload['service_id'],
                         'attempts'=>0
                     ]);
+					
                     if($messaging->save($details)){
                         $saved++;
                         if(isset($payload['send_now']) and $payload['send_now']){
