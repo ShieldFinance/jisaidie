@@ -177,6 +177,7 @@ class LoanService{
             $details['mobile_number'] = $loan->customer->mobile_number;
             $details['gateway'] =  'mpesa';
             $details['email'] = $loan->customer->email;
+            $details['item_id'] = $loan->id;
             $app = \App::getFacadeRoot();
             $paymentService = $app->make('Payment');
             $paymentResponse = $paymentService->sendMoney($details);

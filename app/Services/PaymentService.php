@@ -45,7 +45,7 @@ class PaymentService {
         $recipient1   = array("phoneNumber" => "+".$payload['recepient'],
                        "currencyCode" => "KES",
                        "amount"       => $payload['amount'],
-                       "metadata"     => array("name"   => "Test Api",
+                       "metadata"     => array("mobile_number"   => $payload['recepient'],
                                                "reason" => "Develop")
               );
         $recipients  = array($recipient1);

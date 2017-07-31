@@ -159,7 +159,7 @@ class PaymentsController extends Controller
         }else{
             $payment = $oldPayment;
         }
-        $type =$data['category']=='MobileB2C'?'debit':'credit';
+        $type =($data['category']=='MobileCheckout' || $data['category']=='MobileC2B')?'credit':'debit';
         $payment->currency=$values[0];
         $payment->amount=$values[1];
         $payment->reference=$data['transactionId'];
@@ -171,8 +171,11 @@ class PaymentsController extends Controller
         $payment->mobile_number = $mobileNumber;
         $payment->type = $type;
         $payment->save();
-        $details = array('mobile_number'=>$mobileNumber,'amount'=>$payment->amount,'payment_id'=>$payment->id);
-     
+        $details = array('mobile_number'=> $data['requestMetadata']['mobile_number'],
+            'amount'=>$payment->amount,
+            'payment_id'=>$payment->id,
+           );
+       
         $request->request->add(['action' => 'RepayLoan','request'=>json_encode($details)]);
         $serviceProcessor = new ServiceProcessor();
         $response = $serviceProcessor->doProcess($request);
