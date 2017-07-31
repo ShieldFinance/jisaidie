@@ -278,12 +278,12 @@ return [
         'activation_code'=>6,//User has been sent activation code
     ],
     'loanStatus' =>[
-        'pending' => 0,//New loan pending approval
-        'approved' => 1,//approved (for checkoff loans)
-        'rejected' => 2,//rejected (for checkoff loans)
-        'disbursed' => 3,//sent to customer
-        'locked'=>4,//submitted to crb
-        'paid'=>5//loan paid
+        'pending' => 2,//New loan pending approval
+        'rejected' => 3,//rejected (for checkoff loans)
+        'approved'=>4,//approved (for checkoff loans)
+        'disbursed'=>5,//loan disbursed to customer,
+        'paid'=>6,//loan disbursed to customer
+        'locked'=>7,//loan disbursed to customer
     ],
 
 ];
