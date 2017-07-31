@@ -9,6 +9,7 @@ namespace App\Services;
  */
 
 use App\Helpers\AfricasTalkingGateway;
+use App\Helpers\AfricasTalkingGatewayException;
 use App\Http\Models\Message;
 use App\Setting;
 use App\Mail\AppEmail;
@@ -56,8 +57,24 @@ class PaymentService {
         return $responses;
     }
     
-    public function receivePayment($payload){
-        
+    public function initiate_checkout($payload){
+        $username = Setting::where('setting_name', 'prsp_username')->first()->setting_value;
+        $key = Setting::where('setting_name', 'prsp_api_key')->first()->setting_value;
+        $senderId = Setting::where('setting_name', 'prsp_sender_id')->first()->setting_value;
+        $productName = Setting::where('setting_name', 'mpesa_product_name')->first()->setting_value;
+        $gateway = new AfricasTalkingGateway($username, $key);
+        $currencyCode = $payload['currency'];
+        $phoneNumber = $payload['mobile_number'];
+        $amount  = $payload['amount'];
+        $metadata = isset($payload['metadata'])?$payload['metadata']:array('mobile_number'=>$phoneNumber);
+        $response = array();
+        $response['transactionId'] = 0;
+        try{
+         $response['transactionId'] = $gateway->initiateMobilePaymentCheckout($productName, $phoneNumber,$currencyCode,$amount,$metadata);
+        }catch(AfricasTalkingGatewayException $ex){
+             $response['message']=$ex->getMessage();
+        }
+        return $response;
     }
   
 
