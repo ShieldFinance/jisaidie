@@ -30,7 +30,6 @@ $(function(){
               });
               //$("#page").load("ajax_file.php?t_id="+selectedvalue);//this will pass as string and method will be GET
               //or
-              selectedvalue.splice(0,1);
               $("#selected_customers").val(selectedvalue);//this will pass as array and method will be POST
               $('.customers_form').submit();
              }

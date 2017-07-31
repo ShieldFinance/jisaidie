@@ -47,7 +47,7 @@
                 </select>
         </div>
     </div>
-<input type="hidden" name="status" value="draft">
+<input type="hidden" name="status" value="pending">
 <input type="hidden" name="attempts" value="0">
 <input type="hidden" name="service_id" value="0">
 <div class="form-group">

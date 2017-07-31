@@ -167,6 +167,8 @@ class MessagesController extends Controller
         $data = array();
         $selectedCustomers = $request->input('customers');
         $selectedCustomers = explode(',', $selectedCustomers);
+        if($selectedCustomers[0]=='on')
+            unset($selectedCustomers[0]);
         return view('admin/messages.messages.create',['selectedCustomers'=>$selectedCustomers]);
     }
     public function sendQueuedMessages()
