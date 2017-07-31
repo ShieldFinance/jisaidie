@@ -9,6 +9,9 @@ use Illuminate\Http\Request;
 use Session;
 use App\Http\Models\Ussd;
 use App\Http\Models\Customer;
+use App\Http\Models\Loan;
+use App\Http\Models\Organization;
+use App\Setting;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Controllers\ServiceProcessor;
 class UssdController extends Controller
@@ -346,11 +349,9 @@ class UssdController extends Controller
 		$status[6]="SERVICED";
 		
 		
-		$advances = $this->loan_model->select('id,amount_requested,total,created_on, disbursed_on,company,status,name')
-		 ->where('mobile', $mobile)
-		 ->limit(1,0)
-		 ->order_by("id","DESC")
-		 ->find_all();
+		$advances = Customer::find($account->id);
+		 //echo '<pre>';print_r($advances->loans->take(1));exit;
+		  echo '<pre>';print_r($advances->organization->name);exit;
 		 
 		$message="";
 			if (strtotime($advances[0]->created_on) < strtotime($advances[0]->disbursed_on)) {
@@ -367,6 +368,12 @@ class UssdController extends Controller
 		//queue message
 		$id=0;
 		if($advances[0]->id)
+		
+		//api call for sending message
+		//create message mobile_number,$message,subject,sms
+		
+		//send message
+		
 		$id=Services::queueMessage($message,"+".$existing_session->phoneNumber,"account_statement",$advances[0]->company,$existing_session->sessionId);
 		
 				
@@ -384,7 +391,7 @@ class UssdController extends Controller
 		return $response;
 	}
 	public function checkAdvanceStatus($textarray,$existing_session,$account){
-		  $mobile=  str_pad(substr($existing_session->phoneNumber,3),10,0,STR_PAD_LEFT);
+		  $mobile= $existing_session->phoneNumber;
 		  /*statuses
 			*2-PENDING APPROVAL
 			*3-DECLINED
@@ -404,17 +411,17 @@ class UssdController extends Controller
 		//get customer loan status  //5 paid
 		
 		$app = \App::getFacadeRoot();
-		$paymentService = $app->make('CheckCustomerStatus');
-		$apiResponse = $paymentService->checkID(["mobile_number"=>$mobile]);
+		$paymentService = $app->make('Customer');
+		$apiResponse = $paymentService->check_customer_status(["mobile_number"=>$mobile]);
 		
-		echo '<pre>';print_r($apiResponse);exit;
+		//echo '<pre>';print_r($apiResponse);exit;
 		
-		if(!empty($lastLoandata)){			
+		if(!$apiResponse['can_borrow']['can_borrow']){			
 						   
-			$response= "CON Date: ".$lastLoandata[0]->created_on."  \n";
-			$response.= "Amount applied: KES ".number_format($lastLoandata[0]->amount_requested,2)." \n";
-			$response.= "Status: ".$status[$lastLoandata[0]->status]." \n";
-			$response.= "Amount due: KES ".number_format($lastLoandata[0]->total-$lastLoandata[0]->paid,2)." \n";
+			$response= "CON Date: ".$apiResponse['can_borrow']['loan']->sent_at."  \n";
+			$response.= "Amount applied: KES ".$apiResponse['can_borrow']['loan']->amount_requested." \n";
+			$response.= "Status: ".$status[$apiResponse['can_borrow']['loan']->status]." \n";
+			$response.= "Amount due: KES ".$apiResponse['can_borrow']['loan']->balance." \n";
 			$response .= "00. Back \n";
 			$response .= "000. Exit \n";
 		}else{
@@ -443,44 +450,15 @@ class UssdController extends Controller
 																
 							
 							$loandata = array();
-							$company=$this->company_model->find($account->company);
-								//echo '<pre>';print_r($company);exit;
-								if($company->self_approval==1){
-								  $loandata['status']        = 2;	
-								}else{
-								  $loandata['status']        = 4;
-								}
+							$company=Organization::find($account->organization_id)->first();
+							
+							    // api call with mobile number, amount,type=co
 								
-								$loandata['name']        = $account->display_name;
-								$loandata['mobile']        = $mobile;
-								$loandata['amount']        = end($textarray);
+								 $id=1;
 								
-								
-								$loandata['salary']        = $account->net_salary;
-								$loandata['company']        = $account->company;
-								   //$this->settings_lib->item('site.interest_rate');
-								   //$this->settings_lib->item('site.processing_cost');
-								$loandata['amount_requested']=end($textarray);
-								  
-								$interest_rate=$this->settings_lib->item('site.interest_rate');
-								   
-								$processing_cost=$this->settings_lib->item('site.processing_cost');
-								   
-								$loandata['interest']= $loandata['amount']*($interest_rate/3000);
-														
-								$loandata['amount']=end($textarray)+(40+(end($textarray)*$processing_cost/100));
-								 
-								$loandata['total']= $loandata['amount'];
-								   
-								
-								$id = $this->loan_model->skip_validation(true)->insert($loandata);
 								
 								if($id){
-								  if($company->self_approval==1){
-									Services::_email_request_approval($id);
-								   }else{
-									 Services::_approve($id,true);
-								   }
+								  
 								  $response  = "CON  Thank you for applying for a salary advance from Shield, you will receive the advance amount on your phone. \n";
 								  $response .= "00. Back \n";
 								  $response .= "000. Exit \n";

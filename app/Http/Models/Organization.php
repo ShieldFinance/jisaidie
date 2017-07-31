@@ -25,7 +25,7 @@ class Organization extends Model
      *
      * @var array
      */
-    protected $fillable = ['name', 'email', 'address', 'mobile_number','status'];
+    protected $fillable = ['name', 'email', 'address', 'mobile_number','status','self_approval'];
 
     public function customers()
     {
