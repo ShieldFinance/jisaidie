@@ -171,7 +171,7 @@ class PaymentsController extends Controller
         $payment->mobile_number = $mobileNumber;
         $payment->type = $type;
         $payment->save();
-        $details = array('mobile_number'=> $data['requestMetadata']['mobile_number'],
+        $details = array('mobile_number'=> $mobileNumber,
             'amount'=>$payment->amount,
             'payment_id'=>$payment->id,
            );
