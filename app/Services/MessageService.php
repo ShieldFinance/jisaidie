@@ -105,7 +105,7 @@ class MessageService {
 
     public function sendEMAIL($payload) {
        \Mail::to($payload['recepient'])->send(new AppEmail($payload['message'],$payload['subject']));
-       return array('status'=>1,'attempts'=>1);
+       return array('status'=>'Success','attempts'=>1);
     }
     
     public function sendINAPP($payload){

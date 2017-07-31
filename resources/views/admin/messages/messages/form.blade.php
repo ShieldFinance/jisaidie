@@ -20,8 +20,10 @@
     <div class="row">
         <div class="col-xs-5">
             <select name="from[]" id="search" class="form-control" size="8" multiple="multiple">
+                <?php if(!empty($customers)){?>
                 <?php foreach($customers as $customer){?>
                 <option value="{{$customer->mobile_number}}">{{$customer->mobile_number}}</option>
+                <?php } ?>
                 <?php } ?>
             </select>
         </div>
@@ -36,7 +38,13 @@
             </div>
         
         <div class="col-xs-5">
-            <select name="recipient[]" id="search_to" class="form-control" size="8" multiple="multiple"></select>
+            <select name="recipient[]" id="search_to" class="form-control" size="8" multiple="multiple">
+            <?php if(!empty($selectedCustomers)){?>
+                <?php foreach($selectedCustomers as $customer){?>
+                <option value="{{$customer}}">{{$customer}}</option>
+                <?php } ?>
+                <?php } ?>
+                </select>
         </div>
     </div>
 <input type="hidden" name="status" value="draft">
