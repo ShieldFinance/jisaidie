@@ -248,6 +248,7 @@ class CustomerService extends ApiGuardController{
         $loans = array();
         $where = [];
         $loanSummary = [];
+        $loanSummary['total_loans'] = 0;
         $loanSummary['total_disbursed'] = 0;
         $loanSummary['total_paid'] = 0;
         $loanSummary['total_balance'] = 0;
@@ -280,13 +281,14 @@ class CustomerService extends ApiGuardController{
                         $loan->balance = $loan->total-$loan->paid;
                         $loan->state = $loan->status;
                         if($loan->status==config('app.loanStatus')['disbursed'] || $loan->status==config('app.loanStatus')['locked']|| $loan->status==config('app.loanStatus')['paid']){
-                             $loanSummary['total_disbursed']+=$loan->total;
+                             $loanSummary['total_disbursed']+=$loan->amount_requested;
+                             $loanSummary['total_loans'] += $loan->total;
                         }
                         $loan->amount_requested=number_format($loan->amount_requested,0,'.',',');
                         $loan->total=number_format($loan->total,0,'.',',');
                     }
                     
-                    $loanSummary['total_balance']=$loanSummary['total_disbursed']-$loanSummary['total_paid'];
+                    $loanSummary['total_balance']=$loanSummary['total_loans']-$loanSummary['total_paid'];
                 }
                 
             }
