@@ -46,6 +46,7 @@ class LoanService{
                     $loan->type = isset($payload['type'])?$payload['type']:"co";
                     $loan->purpose = isset($payload['purpose'])?$payload['purpose']:'';
                     $status=config('app.loanStatus')['pending'];
+                    $payload['send_loan'] = true;
                     if($loan->type=='nco' || ($loan->type=='co' && $loan->customer->organization->self_approval)){
                         $status=config('app.loanStatus')['approved'];
                     }
