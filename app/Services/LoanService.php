@@ -415,10 +415,7 @@ class LoanService{
                 $loanBalance= 0;
                 $loanPaid = 0;
                 $loanTotal=0;
-               
-                if($loan->status== config('app.loanStatus')['disbursed'] || $loan->status==config('app.loanStatus')['locked']){
-                   $loan->balance=$loan->total -$loan->paid;
-                }
+                $loan->balance=$loan->total -$loan->paid;
                 $dateDisbursed = new Carbon($loan->date_disbursed);
                 $loan->sent_at = $dateDisbursed->format('F d, Y');
                 $response['loan'] = $loan;
