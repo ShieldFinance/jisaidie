@@ -159,6 +159,7 @@ class PaymentsController extends Controller
         }else{
             $payment = $oldPayment;
         }
+        $type =$data['category']=='MobileB2C'?'debit':'credit';
         $payment->currency=$values[0];
         $payment->amount=$values[1];
         $payment->reference=$data['transactionId'];
@@ -168,7 +169,7 @@ class PaymentsController extends Controller
         $payment->provider_fee = $providerFees[1];
         $payment->transaction_date = $data['transactionDate'];
         $payment->mobile_number = $mobileNumber;
-        $payment->type = "credit";
+        $payment->type = $type;
         $payment->save();
         $details = array('mobile_number'=>$mobileNumber,'amount'=>$payment->amount,'payment_id'=>$payment->id);
      
