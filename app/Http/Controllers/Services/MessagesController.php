@@ -44,8 +44,9 @@ class MessagesController extends Controller
      *
      * @return \Illuminate\View\View
      */
-    public function create()
+    public function create(Request $request)
     {
+        $selectedCustomerIds = $request->input('customers');
         $customers = Customer::all();
         return view('admin/messages.messages.create',['customers'=>$customers]);
     }
@@ -159,7 +160,12 @@ class MessagesController extends Controller
 
         return redirect('admin/messages');
     }
-    
+    public function sendMessage(Request $request){
+        $data = array();
+        $selectedCustomers = $request->input('customers');
+        $selectedCustomers = explode(',', $selectedCustomers);
+        return view('admin/messages.messages.create',['selectedCustomers'=>$selectedCustomers]);
+    }
     public function sendQueuedMessages()
     {
         $app = \App::getFacadeRoot();

@@ -1,6 +1,45 @@
 @extends('layouts.backend')
 
 @section('content')
+<SCRIPT language="javascript">
+$(function(){
+
+	// add multiple select / deselect functionality
+	$("#selectall").click(function () {
+            $('.customer_cbx').attr('checked', this.checked);
+	});
+
+	// if all checkbox are selected, check the selectall checkbox
+	// and viceversa
+	$(".customer_cbx").click(function(){
+
+		if($(".customer_cbx").length == $(".customer_cbx:checked").length) {
+			$("#selectall").attr("checked", "checked");
+		} else {
+			$("#selectall").removeAttr("checked");
+		}
+
+	});
+        
+         $(".send_msg_btn").click(function(){
+            var selectedvalue = [];
+            if ($(':checkbox:checked').length > 0) {
+              $(':checkbox:checked').each(function (i) {
+                  selectedvalue[i] = $(this).val();
+
+              });
+              //$("#page").load("ajax_file.php?t_id="+selectedvalue);//this will pass as string and method will be GET
+              //or
+              selectedvalue.splice(0,1);
+              $("#selected_customers").val(selectedvalue);//this will pass as array and method will be POST
+              $('.customers_form').submit();
+             }
+             
+        });
+       
+       });
+</SCRIPT>
+
     <div class="container">
         <div class="row">
             @include('admin.sidebar')
@@ -12,7 +51,9 @@
                         <a href="{{ url('/admin/customers/create') }}" class="btn btn-success btn-sm" title="Add New Customer">
                             <i class="fa fa-plus" aria-hidden="true"></i> Add New
                         </a>
-
+                        <a href="javascript:void(0)" class="btn btn-success btn-sm send_msg_btn" title="Add New Customer">
+                            <i class="fa fa-envelope" aria-hidden="true"></i> Send message
+                        </a>
                         {!! Form::open(['method' => 'GET', 'url' => '/admin/customers', 'class' => 'navbar-form navbar-right', 'role' => 'search'])  !!}
                         <div class="input-group">
                             <input type="text" class="form-control" name="search" placeholder="Search...">
@@ -27,16 +68,19 @@
                         <br/>
                         <br/>
                         <div class="table-responsive">
+                             {!! Form::open(['method' => 'POST', 'url' => '/admin/sendMessage', 'class' => 'navbar-form navbar-right customers_form'])  !!}
+                             <input type="hidden" name="customers" value="" id="selected_customers"/>
+                             {!! Form::close() !!}
                             <table class="table table-borderless">
                                 <thead>
                                     <tr>
-                                        <th>ID</th><th>Mobile Number</th><th>Account Number</th><th>Surname</th><th>Last name</th><th>Other Name</th><th>Status</th><th>Actions</th>
+                                        <th><input type="checkbox"  id="selectall" />ID</th><th>Mobile Number</th><th>Account Number</th><th>Surname</th><th>Last name</th><th>Other Name</th><th>Status</th><th>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                 @foreach($customers as $item)
                                     <tr>
-                                        <td>{{ $item->id }}</td>
+                                        <td><input type="checkbox"  class="customer_cbx" value="{{$item->mobile_number}}"/></td>
                                          <td>{{ 
                                          $item->mobile_number
                                          

@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Controllers\ServiceProcessor;
 use App\Http\Models\Customer;
 use App\Http\Models\CustomerDevice;
+use App\Http\Models\Message;
 use Illuminate\Http\Request;
 use Session;
 
@@ -26,6 +27,8 @@ class CustomersController extends Controller
 
         return view('admin/customers.customers.index', compact('customers'));
     }
+    
+    
     
     public function resetPin(Request $request){
         
