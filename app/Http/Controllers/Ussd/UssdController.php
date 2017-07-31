@@ -253,8 +253,7 @@ class UssdController extends Controller
 							$response=$this->registerAdvanceApplication($textarray,$existing_session,$account);
 							break;
 						case 2:
-							$account=$this->setNetsalary($textarray,$existing_session,$account);
-							
+						    $this->setNetsalary($textarray,$existing_session,$account);
 							$response=$this->applyAdvance($textarray,$existing_session,$account);
 							break;
 					   case 4:
@@ -280,11 +279,8 @@ class UssdController extends Controller
 		$data = array(
 		'net_salary'		=> end($textarray),
 			);
-		$this->user_model->skip_validation(true)->update($account->id, $data);
-		$accountdata=Ussd::getAccount($mobile);
-				
-		$account=$accountdata[0];
-		return $account;
+		Customer::find($account->id)->update($data);
+		
 	}
 	public function showTC(){
 		$response  = "CON  Visit http://shield.co.ke/ for our terms and conditions \n";
@@ -321,7 +317,7 @@ class UssdController extends Controller
 			'pin_hash'		=> $pin_hash,
 				);
 
-		$this->user_model->skip_validation(true)->update($account->id, $data);
+		Customer::find($account->id)->update($data);
 		$response  = "CON Your pin has been changed.  \n";
 		
 		  $data = array(
@@ -429,7 +425,7 @@ class UssdController extends Controller
 		return $response;
 	}
 	public function registerAdvanceApplication($textarray,$existing_session,$account){
-		$mobile=  str_pad(substr($existing_session->phoneNumber,3),10,0,STR_PAD_LEFT);
+		$mobile= $existing_session->phoneNumber;
 		//user chooses to go back to the main menu
 		if(end($textarray)==00){
 		  $data = array(
@@ -439,10 +435,11 @@ class UssdController extends Controller
 		  USSD::find($existing_session->id)->update($data);
 		  $response=$this->getMainMenu();
 		}else{
-			    //check if amount entered is less than half		
+			   //check if amount entered is less than half
+			   
 			   if($account->net_salary/2 >= end($textarray) && end($textarray)>=500){
 						//register the advance amount on dashboard
-						if($account->active && $account->company){
+						if($account->status && $account->organization_id && $account->is_checkoff){
 																
 							
 							$loandata = array();

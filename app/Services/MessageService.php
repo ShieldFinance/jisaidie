@@ -128,9 +128,13 @@ class MessageService {
                     'title'=>$payload['subject'],
                     'body'=>$payload['message'],
                     'sound' => 'default'
+                    ],
+            'data' => [
+                    'extraPayLoad1' => 'value1',
+                    'extraPayLoad2' => 'value2'
                     ]
             ])
-            ->setDevicesToken($deviceTokens);
+        ->setDevicesToken($deviceTokens);
         $response = $push->send()->getFeedback();
         
         $data['status'] = $response->success?'Success':'pending';
