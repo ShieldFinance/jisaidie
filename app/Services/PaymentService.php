@@ -29,7 +29,7 @@ class PaymentService {
            $gatewayFunction = 'send' . strtoupper($payload['gateway']);
             $details = array();
             $details['recepient'] = $payload['mobile_number'];
-            $details['amount'] = 50;
+            $details['amount'] = $payload['amount'];
             $data = $this->$gatewayFunction($details);
             
         }
