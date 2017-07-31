@@ -16,6 +16,7 @@ use App\Mail\AppEmail;
 use Edujugon\PushNotification\PushNotification;
 use App\Http\Models\CustomerDevice;
 use App\Http\Models\Customer;
+use App\Http\Models\Loan;
 class PaymentService {
 
     /**
@@ -63,9 +64,12 @@ class PaymentService {
         $senderId = Setting::where('setting_name', 'prsp_sender_id')->first()->setting_value;
         $productName = Setting::where('setting_name', 'mpesa_product_name')->first()->setting_value;
         $gateway = new AfricasTalkingGateway($username, $key);
-        $currencyCode = $payload['currency'];
+        $currencyCode = 'KES';
         $phoneNumber = $payload['mobile_number'];
-        $amount  = $payload['amount'];
+        $customer = Customer::where('mobile_number',$phoneNumber)->first();
+        $loan = $customer->loans->take(1);
+        $loan = $loan[0];
+        $amount = $loan->total - $loan->paid;
         $metadata = isset($payload['metadata'])?$payload['metadata']:array('mobile_number'=>$phoneNumber);
         $response = array();
         $response['transactionId'] = 0;
