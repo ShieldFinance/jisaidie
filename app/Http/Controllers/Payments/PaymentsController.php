@@ -143,7 +143,7 @@ class PaymentsController extends Controller
     }
     
     public function receivePayment(Request $request){
-        $data  = json_decode(file_get_contents('php://input'), true);
+        $data  = json_decode(('php://input'), true);
         $mobileNumber = $data['source'];
          
         $values = explode(' ',$data['value']);
