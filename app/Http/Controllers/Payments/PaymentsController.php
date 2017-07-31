@@ -151,11 +151,19 @@ class PaymentsController extends Controller
         if(isset($data['clientAccount']) && strlen($data['clientAccount'])){
             $mobileNumber = $data['clientAccount'];
         }
+        //check if we already have an existing payment
+        $oldPayment = Payment::where('reference', $data['transactionId'])->first();
         $mobileNumber = str_replace('+','',$mobileNumber);
-        $payment = new Payment();
+        if(!$oldPayment){
+            $payment = new Payment();
+        }else{
+            $payment = $oldPayment;
+        }
         $payment->currency=$values[0];
         $payment->amount=$values[1];
         $payment->reference=$data['transactionId'];
+        $payment->status=$data['status'];
+         $payment->response=json_encode($data);
         $payment->provider_reference=$data['providerRefId'];
         $payment->provider_fee = $providerFees[1];
         $payment->transaction_date = $data['transactionDate'];
