@@ -14,7 +14,6 @@ class CreateUssdsTable extends Migration
     {
         Schema::create('ussds', function(Blueprint $table) {
             $table->increments('id');
-            $table->integer('id');
             $table->string('sessionId');
             $table->string('serviceCode');
             $table->integer('pin_verified');

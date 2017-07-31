@@ -1,8 +1,9 @@
 <?php
 
 namespace App\Http\Controllers\Services;
-
+use Illuminate\Support\Facades\Log;
 use App\Http\Requests;
+use App\Jobs\SendBatchMessages;
 use App\Http\Controllers\Controller;
 use App\Mail\AppEmail;
 use App\Http\Models\Message;
@@ -85,7 +86,9 @@ class MessagesController extends Controller
         Message::insert($data);
 
         Session::flash('flash_message', 'Message added!');
-
+        Log::info("Request Cycle with Queues Begins");
+        $this->dispatch(new SendBatchMessages());
+        Log::info("Request Cycle with Queues Ends");
         return redirect('admin/messages');
     }
 
