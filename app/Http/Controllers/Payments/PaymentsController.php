@@ -175,10 +175,12 @@ class PaymentsController extends Controller
             'amount'=>$payment->amount,
             'payment_id'=>$payment->id,
            );
-       
-        $request->request->add(['action' => 'RepayLoan','request'=>json_encode($details)]);
-        $serviceProcessor = new ServiceProcessor();
-        $response = $serviceProcessor->doProcess($request);
+        $response = array();
+        if(($data['category']=='MobileCheckout' || $data['category']=='MobileC2B') && $data['status']=='Success'){
+            $request->request->add(['action' => 'RepayLoan','request'=>json_encode($details)]);
+            $serviceProcessor = new ServiceProcessor();
+            $response = $serviceProcessor->doProcess($request);
+        }
         return $response;
     }
     
