@@ -74,7 +74,8 @@ class PaymentService {
         $response = array();
         $response['transactionId'] = 0;
         try{
-         $response['transactionId'] = $gateway->initiateMobilePaymentCheckout($productName, $phoneNumber,$currencyCode,$amount,$metadata);
+         $response['transactionId'] = $gateway->initiateMobilePaymentCheckout($productName, 
+                 $phoneNumber,$currencyCode,$amount,$metadata);
         }catch(AfricasTalkingGatewayException $ex){
              $response['message']=$ex->getMessage();
         }

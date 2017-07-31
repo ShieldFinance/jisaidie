@@ -143,7 +143,7 @@ class PaymentsController extends Controller
     }
     
     public function receivePayment(Request $request){
-        $data  = json_decode(('php://input'), true);
+        $data  = $request->json()->all();
         $mobileNumber = $data['source'];
          
         $values = explode(' ',$data['value']);
@@ -151,7 +151,6 @@ class PaymentsController extends Controller
         if(isset($data['clientAccount']) && strlen($data['clientAccount'])){
             $mobileNumber = $data['clientAccount'];
         }
-        
         $mobileNumber = str_replace('+','',$mobileNumber);
         $payment = new Payment();
         $payment->currency=$values[0];
