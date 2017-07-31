@@ -29,6 +29,7 @@ class TransactionsController extends Controller
 				->orWhere('amount', 'LIKE', "%$keyword%")
 				->orWhere('charges', 'LIKE', "%$keyword%")
 				->orWhere('profile', 'LIKE', "%$keyword%")
+                                ->orderBy('id','desc')
 				->paginate($perPage);
         } else {
             $transactions = Transaction::paginate($perPage);

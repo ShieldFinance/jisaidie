@@ -305,7 +305,7 @@ class CustomerService extends ApiGuardController{
         $commandStatus = config('app.responseCodes')['command_failed'];
         $responseProcessor = new ResponseTemplatesController();
         $response = array();
-        $response['mobile_number']=$payload['mobile_number'];
+        $response['mobile_number']=isset($payload['mobile_number']);
         if(isset($payload['send_notification']) && $payload['send_notification']){
            $payload['msisdn'] = $payload['mobile_number'];
            $sent = $responseProcessor->processResponse($payload);
@@ -390,10 +390,43 @@ class CustomerService extends ApiGuardController{
         $response['command_status'] = $commandStatus;
         return $response;
     }
+     public function reset_pin_request($payload){
+        $response = array();
+        $responseString = '';
+        $responseStatus = config('app.responseCodes')['no_response'];
+        $commandStatus = config('app.responseCodes')['command_failed'];
+        $customer = new Customer();
+        $customer = $customer->getCustomerByKey('mobile_number',$payload['mobile_number']);
+        if($customer){
+            $response['subject_placeholders'] = array();
+            $response['message_placeholders'] = array();
+            $response['subject_placeholders']['[mobile_number]'] = $payload['mobile_number'];
+            $response['message_placeholders']['[mobile_number]'] = $payload['mobile_number'];
+            $response['message_placeholders']['[email]'] = $customer->email;
+            $response['message_placeholders']['[customer_name]'] = $customer->surname;
+            $response['mobile_number']=$payload['mobile_number'];
+            $response['send_notification'] = true;
+            $response['send_now'] = true;
+            $response['email']=Setting::where('setting_name','customer_care_email')->first()->setting_value;
+            $response['service_id']=$payload['service_id'];
+            $responseString = "Pin reset request sent";
+            $responseStatus = config('app.responseCodes')['command_successful'];
+            $commandStatus = config('app.responseCodes')['command_successful'];
+        }else{
+             $responseStatus = config('app.responseCodes')['customer_does_not_exist'];
+        }
+        $response['response_string'] = $responseString;
+        $response['response_status'] = $responseStatus;
+        $response['command_status'] = $commandStatus;
+        return $response;
+    }
     
+    /**
+     * Send inapp pin request notification
+     * @param type $payload
+     * @return type
+     */
     public function pin_reset_notify($payload){
-        $app = \App::getFacadeRoot();
-        $messageService = $app->make('Loan');
         $response = array();
         $responseString = '';
         $responseStatus = config('app.responseCodes')['no_response'];
