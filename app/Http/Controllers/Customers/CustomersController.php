@@ -47,7 +47,7 @@ class CustomersController extends Controller
         if(!empty($status)){
             $wheres[] =  ['status','=',$status];
         }
-        $customers = $customers->join('organization', 'organization.id', '=', 'organization_id');
+        $customers = $customers->leftjoin('organization', 'organization.id', '=', 'organization_id');
         if(!empty($wheres)){
             $customers=$customers->orWhere($wheres);
         }else{
