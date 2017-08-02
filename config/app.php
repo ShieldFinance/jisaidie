@@ -164,6 +164,7 @@ return [
         Illuminate\View\ViewServiceProvider::class,
         Chrisbjr\ApiGuard\Providers\ApiGuardServiceProvider::class,
         Edujugon\PushNotification\Providers\PushNotificationServiceProvider::class,
+        Maatwebsite\Excel\ExcelServiceProvider::class,
 
         /*
          * Package Service Providers...
@@ -237,6 +238,7 @@ return [
         'HTML' => Collective\Html\HtmlFacade::class,
         'PushNotification' => Edujugon\PushNotification\Facades\PushNotification::class,
         'Charts' => ConsoleTVs\Charts\Facades\Charts::class,
+        'Excel' => 'Maatwebsite\Excel\Facades\Excel',
 
     ],
     'responseCodes' =>[

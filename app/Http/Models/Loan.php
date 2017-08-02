@@ -3,7 +3,7 @@
 namespace App\Http\Models;
 
 use Illuminate\Database\Eloquent\Model;
-
+use App\Http\Models\Customer;
 class Loan extends Model
 {
     /**
@@ -41,5 +41,7 @@ class Loan extends Model
     {
         return $this->belongsTo('App\Http\Models\Customer');
     }
+    
+    
     
 }

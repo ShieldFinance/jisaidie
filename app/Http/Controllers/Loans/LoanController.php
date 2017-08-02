@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Controllers\ServiceProcessor;
 use App\Http\Models\Loan;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 use Session;
 
 class LoanController extends Controller
@@ -21,6 +22,7 @@ class LoanController extends Controller
         $keyword = $request->get('search');
         $perPage = 25;
         $action_buttons = $this->getActionButtons();
+        
         if (!empty($keyword)) {
             $loan = Loan::where('customer_id', 'LIKE', "%$keyword%")
 				->orWhere('amount_requested', 'LIKE', "%$keyword%")
@@ -41,7 +43,6 @@ class LoanController extends Controller
         } else {
             $loan = Loan::orderBy('id','desc')->paginate($perPage);
         }
-
         return view('admin/loans.loan.index', compact('loan','action_buttons'));
     }
     
@@ -53,7 +54,6 @@ class LoanController extends Controller
         $perPage = 25;
         $user = Auth::user();
         $userIsAdmin =  Auth::user()->hasRole('Super Admin');
-        $loan = Loan::orderBy('id','desc')->paginate($perPage);
         if($action){
             $loan_ids = $request->input('loans');
             $loan_ids = explode(',', $loan_ids);
@@ -90,7 +90,8 @@ class LoanController extends Controller
                 }else{
                     Session::flash('flash_message', 'Loans not sent');
                 }
-                return view('admin/loans.loan.index', compact('loan','action_buttons'));
+                 $loan = Loan::orderBy('id','desc')->paginate($perPage);
+                 return view('admin/loans.loan.index', compact('loan','action_buttons'));
             }
             if($action=='RejectLoanApplication' && $user->can('can_reject_loan')){
                 $canProcess = true;
@@ -105,7 +106,8 @@ class LoanController extends Controller
                 $checkStatus = config('app.responseCodes')['loan_disbursed_reversed'];
             }
             if($action=='ExportLoans' && $user->can('can_export_loans')) {
-                $canProcess = true;
+                $canProcess = false;
+                $this->export($request);
             }
             if($userIsAdmin){
                 $canProcess = true;
@@ -123,11 +125,55 @@ class LoanController extends Controller
                 $flashMessage = "You do not have access to perform this action";
             }
         }
-        
+        $loan = Loan::orderBy('id','desc')->paginate($perPage);
         if(strlen($flashMessage)){
             Session::flash('flash_message', $flashMessage);
         }
         return view('admin/loans.loan.index', compact('loan','action_buttons'));
+    }
+    
+    public function export(Request $request){
+        Excel::create('Loans-'.date('Y-m-d'), function($excel) {
+        $loans = Loan::all();
+        $data = array();
+        $headers = array(
+            'Mobile Number',
+            'Amount Requested',
+            'Amount Processed',
+            'Daily Interest',
+            'Fees',
+            'Total',
+            'Transaction Ref',
+            'Paid',
+            'Invoiced',
+            'Status',
+            'Date disbursed',
+            'Deleted',
+            'Date Created',
+            'Date Updated',
+            'Purpose',
+            'Payment Status',
+            'Type',
+            'Transaction Fee',
+            'Provider',
+            'Net Salary'
+        );
+        $data[]=$headers;
+        foreach($loans as $loan){
+            $l = $loan->toArray();
+            unset($l['payment_response']);
+            unset($l['id']);
+            $l['status'] = array_search ($l['status'], config('app.loanStatus'));
+            $l['customer_id'] = $loan->customer->mobile_number;
+            $data[] = $l;
+        }
+        $excel->sheet('Loan', function($sheet) use ($data) {
+
+               $sheet->fromArray($data);
+
+            });
+
+        })->download('xls');
     }
 
     /**
@@ -260,12 +306,18 @@ ACTIONS;
             
             if($user->can('can_export_loans') || $userIsAdmin) {
                 $action_buttons.=<<<ACTIONS
-                      <a href="javascript:void(0)" data-act='export_loan' class="btn btn-info btn-sm process_loan" title="Export Loans">
+                      <a href="javascript:void(0)" data-service='ExportLoans' class="btn btn-info btn-sm process_loan" title="Export Loans">
                             <i class="fa fa-download" aria-hidden="true"></i> Export to excel
                         </a>
 ACTIONS;
             }
         }
+        $action_buttons.=<<<ACTIONS
+                      <span class='dropdown'> <a href="#" rel="popover" data-popover-content="#myPopover">
+                            <i class="fa fa-filter" aria-hidden="true"></i> Filter
+                        </a></span>
+                	
+ACTIONS;
         return $action_buttons;
         
     }
