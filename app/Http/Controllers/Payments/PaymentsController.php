@@ -9,6 +9,7 @@ use App\Http\Models\Payment;
 use App\Http\Models\Loan;
 use Illuminate\Http\Request;
 use Session;
+use Illuminate\Support\Facades\Log;
 
 class PaymentsController extends Controller
 {
@@ -145,46 +146,51 @@ class PaymentsController extends Controller
     
     public function receivePayment(Request $request){
         $data  = $request->json()->all();
-        $mobileNumber = $data['source'];
-         
-        $values = explode(' ',$data['value']);
-        $providerFees = explode(' ', $data['providerFee']);
-        if(isset($data['clientAccount']) && strlen($data['clientAccount'])){
-            $mobileNumber = $data['clientAccount'];
-        }
-        //check if we already have an existing payment
-        $oldPayment = Payment::where('reference', $data['transactionId'])->first();
-        $mobileNumber = str_replace('+','',$mobileNumber);
-        if(!$oldPayment){
-            $payment = new Payment();
-        }else{
-            $payment = $oldPayment;
-        }
-        $type =($data['category']=='MobileCheckout' || $data['category']=='MobileC2B')?'credit':'debit';
-        $payment->currency=$values[0];
-        $payment->amount=$values[1];
-        $payment->reference=$data['transactionId'];
-        $payment->status=$data['status'];
-         $payment->response=json_encode($data);
-        $payment->provider_reference=$data['providerRefId'];
-        $payment->provider_fee = $providerFees[1];
-        $payment->transaction_date = $data['transactionDate'];
-        $payment->mobile_number = $mobileNumber;
-        $payment->type = $type;
-        $payment->save();
-        $details = array('mobile_number'=> $mobileNumber,
-            'amount'=>$payment->amount,
-            'payment_id'=>$payment->id,
-           );
-        $response = array();
-        //check if it's customer paying loan
-        if(($data['category']=='MobileCheckout' || $data['category']=='MobileC2B') && $data['status']=='Success'){
-            $request->request->add(['action' => 'RepayLoan','request'=>json_encode($details)]);
-            $serviceProcessor = new ServiceProcessor();
-            $response = $serviceProcessor->doProcess($request);
-        }else{
-            //this is B2C notification
-            Loan::where('transaction_ref', $payment->reference)->update(array('payment_status'=>$data['status']));
+        try{
+            $mobileNumber = $data['source'];
+
+            $values = explode(' ',$data['value']);
+            $providerFees = explode(' ', $data['providerFee']);
+            if(isset($data['clientAccount']) && strlen($data['clientAccount'])){
+                $mobileNumber = $data['clientAccount'];
+            }
+            //check if we already have an existing payment
+            $oldPayment = Payment::where('reference', $data['transactionId'])->first();
+            $mobileNumber = str_replace('+','',$mobileNumber);
+            if(!$oldPayment){
+                $payment = new Payment();
+            }else{
+                $payment = $oldPayment;
+            }
+            $type =($data['category']=='MobileCheckout' || $data['category']=='MobileC2B')?'credit':'debit';
+            $payment->currency=$values[0];
+            $payment->amount=$values[1];
+            $payment->reference=$data['transactionId'];
+            $payment->status=$data['status'];
+             $payment->response=json_encode($data);
+            $payment->provider_reference=$data['providerRefId'];
+            $payment->provider_fee = $providerFees[1];
+            $payment->transaction_date = $data['transactionDate'];
+            $payment->mobile_number = $mobileNumber;
+            $payment->type = $type;
+            $payment->save();
+            $details = array('mobile_number'=> $mobileNumber,
+                'amount'=>$payment->amount,
+                'payment_id'=>$payment->id,
+               );
+            $response = array();
+            //check if it's customer paying loan
+            if(($data['category']=='MobileCheckout' || $data['category']=='MobileC2B') && $data['status']=='Success'){
+                $request->request->add(['action' => 'RepayLoan','request'=>json_encode($details)]);
+                $serviceProcessor = new ServiceProcessor();
+                $response = $serviceProcessor->doProcess($request);
+            }else{
+                //this is B2C notification
+                Loan::where('transaction_ref', $payment->reference)->update(array('payment_status'=>$data['status']));
+            }
+        }catch(\Exception $e){
+            Log::error('Error: '.$e->getMessage());
+            return array('Error: '.$e->getMessage());
         }
         return $response;
     }
