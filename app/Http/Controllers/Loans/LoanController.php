@@ -9,6 +9,7 @@ use App\Http\Models\Loan;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use Session;
+use Illuminate\Support\Facades\DB;
 
 class LoanController extends Controller
 {
@@ -20,30 +21,37 @@ class LoanController extends Controller
     public function index(Request $request)
     {
         $keyword = $request->get('search');
+        $organization_id = $request->get('search_organization');
+        $type = $request->get('search_type');
+        $status = $request->get('search_status');
         $perPage = 25;
         $action_buttons = $this->getActionButtons();
+        $organizations = \App\Http\Models\Organization::all();
+        $wheres = array();
         
-        if (!empty($keyword)) {
-            $loan = Loan::where('customer_id', 'LIKE', "%$keyword%")
-				->orWhere('amount_requested', 'LIKE', "%$keyword%")
-				->orWhere('amount_processed', 'LIKE', "%$keyword%")
-				->orWhere('daily_interest', 'LIKE', "%$keyword%")
-				->orWhere('fees', 'LIKE', "%$keyword%")
-				->orWhere('total', 'LIKE', "%$keyword%")
-				->orWhere('transaction_ref', 'LIKE', "%$keyword%")
-				->orWhere('paid', 'LIKE', "%$keyword%")
-				->orWhere('invoiced', 'LIKE', "%$keyword%")
-				->orWhere('status', 'LIKE', "%$keyword%")
-				->orWhere('net_salary', 'LIKE', "%$keyword%")
-				->orWhere('date_disbursed', 'LIKE', "%$keyword%")
-				->orWhere('deleted', 'LIKE', "%$keyword%")
-                                ->orderBy('id','desc')
-				->paginate($perPage);
-            
-        } else {
-            $loan = Loan::orderBy('id','desc')->paginate($perPage);
+        if(!empty($organization_id)){
+            $wheres[] =  ['organization.id' ,'=',$organization_id];        
         }
-        return view('admin/loans.loan.index', compact('loan','action_buttons'));
+        if(!empty($keyword)){
+            $wheres[] =  ['c.mobile_number' ,'LIKE',"%$keyword%"];
+        }
+        if(!empty($type)){
+            $wheres[] =  ['loans.type','=',$type];
+        }
+        if(!empty($status)){
+            $wheres[] =  ['loans.status','=',$status];
+        }
+        if(empty($wheres)){
+            $wheres[] = ['loans.id','>',0];
+        }
+        $loans = DB::table('loans')
+        ->join('customers as c', 'c.id', '=', 'loans.customer_id')
+        ->join('organization', 'organization.id', '=', 'c.organization_id')
+        ->where($wheres)
+        ->select('loans.*','c.mobile_number')
+        ->orderBy('loans.id','desc')
+        ->paginate($perPage);
+        return view('admin/loans.loan.index', compact('loans','action_buttons','organizations'));
     }
     
     public function processLoan(Request $request){
@@ -90,7 +98,13 @@ class LoanController extends Controller
                 }else{
                     Session::flash('flash_message', 'Loans not sent');
                 }
-                 $loan = Loan::orderBy('id','desc')->paginate($perPage);
+                 $loans = DB::table('loans')
+                ->join('customers as c', 'c.id', '=', 'loans.customer_id')
+                ->join('organization', 'organization.id', '=', 'c.organization_id')
+                ->where(['id','>',0])
+                ->select('loans.*','c.mobile_number')
+                ->orderBy('id','desc')
+                ->paginate($perPage);
                  return view('admin/loans.loan.index', compact('loan','action_buttons'));
             }
             if($action=='RejectLoanApplication' && $user->can('can_reject_loan')){
@@ -125,11 +139,17 @@ class LoanController extends Controller
                 $flashMessage = "You do not have access to perform this action";
             }
         }
-        $loan = Loan::orderBy('id','desc')->paginate($perPage);
+        $loans = DB::table('loans')
+                ->join('customers as c', 'c.id', '=', 'loans.customer_id')
+                ->join('organization', 'organization.id', '=', 'c.organization_id')
+                ->where([['loans.id','>',0]])
+                ->select('loans.*','c.mobile_number')
+                ->orderBy('loans.id','desc')
+                ->paginate($perPage);
         if(strlen($flashMessage)){
             Session::flash('flash_message', $flashMessage);
         }
-        return view('admin/loans.loan.index', compact('loan','action_buttons'));
+        return view('admin/loans.loan.index', compact('loans','action_buttons'));
     }
     
     public function export(Request $request){

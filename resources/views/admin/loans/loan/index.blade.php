@@ -117,15 +117,15 @@ $(document).on('click', function (e) {
                             <table class="table table-borderless">
                                 <thead>
                                     <tr>
-                                        <th><input type="checkbox"  id="selectall" /></th><th>ID</th><th>Customer</th><th>Type</th><th>Amount Requested</th><th>Amount Processed</th><th>Status<th>Actions</th>
+                                        <th><input type="checkbox"  id="selectall" /></th><th>#</th><th>Customer</th><th>Type</th><th>Amount Requested</th><th>Amount Processed</th><th>Status<th>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                @foreach($loan as $item)
+                                @foreach($loans as $item)
                                     <tr>
                                         <td><input type="checkbox"  class="loan_cbx" value="{{$item->id}}"/></td>
                                         <td>{{ $loop->iteration }}</td>
-                                        <td>{{ $item->customer->mobile_number }}</td>
+                                        <td>{{ $item->mobile_number }}</td>
                                          <td>{{ $item->type }}</td>
                                         <td>{{ $item->amount_requested }}</td>
                                         <td>{{ $item->amount_processed }}</td>
@@ -138,7 +138,7 @@ $(document).on('click', function (e) {
                                 @endforeach
                                 </tbody>
                             </table>
-                            <div class="pagination-wrapper"> {!! $loan->appends(['search' => Request::get('search')])->render() !!} </div>
+                            <div class="pagination-wrapper"> {!! $loans->appends(['search' => Request::get('search')])->render() !!} </div>
                         </div>
 
                     </div>
@@ -147,30 +147,47 @@ $(document).on('click', function (e) {
         </div>
     </div>
 <div id="myPopover" class="hide">
-{!! Form::open(['method' => 'GET', 'url' => '/admin/loan', 'class' => 'navbar-form navbar-right', 'role' => 'search'])  !!}
+{!! Form::open(['method' => 'GET', 'url' => '/admin/loan', 'class' => 'search_form', 'role' => 'search'])  !!}
     <div class="input-group">
         <input type="text" class="form-control" name="search" placeholder="Search...">
-        <span class="input-group-btn">
-            <button class="btn btn-default" type="submit">
-                <i class="fa fa-search"></i>
-            </button>
-        </span>
+        
     </div>
  <div class="input-group">
-      <div class="col-xs-6 col-sm-3">
-            <a class="btn btn-info btn-select btn-select-light">
-                <input type="hidden" class="btn-select-input" id="" name="" value="" />
-                <span class="btn-select-value">Select an Item</span>
-                <span class='btn-select-arrow glyphicon glyphicon-chevron-down'></span>
-                <ul>
-                    <li>Option 1</li>
-                    <li>Option 2</li>
-                    <li>Option 3</li>
-                    <li>Option 4</li>
-                </ul>
-            </a>
-        </div>
+
+      <label for="">Organization</label>
+     <select class="form-control" name="search_organization">
+         <option value=''>Select</option>
+         <?php if(isset($organizations)){ ?>
+          @foreach($organizations as $organization)
+         <option value='{{$organization->id}}'>{{$organization->name}}</option>
+         @endforeach
+         <?php } ?>
+     </select>
     </div>
+<div class="input-group">
+    <label for="">Loan type</label>
+     <select class="form-control" name="search_type">
+         <option value="">Select</option>
+         <option value='co'>Checkoff</option>
+         <option value='nco'>Non Checkoff</option>
+     </select>
+    </div>
+<div class="input-group">
+    <label for="">Loan Status</label>
+     <select class="form-control" name="search_status">
+         <option value="">Select</option>
+         <option value="{{ config('app.loanStatus')['pending']}}">Pending</option>
+         <option value='{{ config('app.loanStatus')['approved']}}'>Approved</option>
+         <option value='{{ config('app.loanStatus')['disbursed']}}'>Disbursed</option>
+         <option value='{{ config('app.loanStatus')['rejected']}}'>Rejected</option>
+          <option value='{{ config('app.loanStatus')['locked']}}'>Locked</option>
+          <option value='{{ config('app.loanStatus')['paid']}}'>Paid</option>
+     </select>
+    </div>
+<div style="margin-top:5px; ">
+    <button type="submit" class="btn btn-primary"><i class="fa fa-search"></i> Search</button>
+    <button type="submit" class="btn btn-default pull-right"><i class="fa fa-search"></i> Clear</button>
+</div>
 {!! Form::close() !!}
 </div
 @endsection
