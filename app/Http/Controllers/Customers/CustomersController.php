@@ -45,7 +45,7 @@ class CustomersController extends Controller
             $wheres[] =  ['customers.email' ,'LIKE',"%$keyword%"];
         }
         if(!empty($status)){
-            $wheres[] =  ['status','=',$status];
+            $wheres[] =  ['customers.status','=',$status];
         }
         $customers = $customers->leftjoin('organization', 'organization.id', '=', 'organization_id');
         if(!empty($wheres)){
