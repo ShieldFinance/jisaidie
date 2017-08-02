@@ -46,6 +46,7 @@ class PaymentService {
         $gateway = new AfricasTalkingGateway($username, $key);
         $recipient   = array("phoneNumber" => "+".$payload['recepient'],
                        "currencyCode" => "KES",
+                       "providerChannel"=>"387070",
                        "amount"       => $payload['amount'],
                        "metadata"     => array("mobile_number"   => $payload['recepient'],
                                                "reason" => "Develop")
@@ -65,7 +66,7 @@ class PaymentService {
         $key = Setting::where('setting_name', 'prsp_api_key')->first()->setting_value;
         $senderId = Setting::where('setting_name', 'prsp_sender_id')->first()->setting_value;
         $productName = Setting::where('setting_name', 'mpesa_product_name')->first()->setting_value;
-         $providerChannel = "387070";
+        $providerChannel = "777400";
         $gateway = new AfricasTalkingGateway($username, $key);
         $currencyCode = 'KES';
         $phoneNumber = $payload['mobile_number'];

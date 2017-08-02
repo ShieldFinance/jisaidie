@@ -71,9 +71,25 @@ class LoanController extends Controller
             }
             if($action=='DisburseLoan' && $user->can('can_disburse_loan')){
                 $canProcess = true;
-                $returnKey = 'disburse_loan';
+                $returnKey = 'send_funds';
                 $successMessage = "Loans disbursed";
                 $checkStatus = config('app.responseCodes')['loan_disbursed'];
+                $details['send_loan'] = true;
+                //send several loans, this need to be refactored in future to allow queuing for faster processing
+                $request->request->add(['action' => $action,'request'=>json_encode($details)]);
+                $response = $serviceProcessor->doProcess($request);
+                $processedLoans = 0;
+                foreach($loan_ids as $loan_id){
+                    if(isset($response[$returnKey]) && $response[$returnKey]['response_status']==$checkStatus){
+                        $processedLoans++;
+                    }
+                }
+                if($processedLoans > 0){
+                    Session::flash('flash_message', 'Loans sent');
+                }else{
+                    Session::flash('flash_message', 'Loans not sent');
+                }
+                return view('admin/loans.loan.index', compact('loan','action_buttons'));
             }
             if($action=='RejectLoanApplication' && $user->can('can_reject_loan')){
                 $canProcess = true;
@@ -96,10 +112,10 @@ class LoanController extends Controller
             if($canProcess){
                 $request->request->add(['action' => $action,'request'=>json_encode($details)]);
                 $response = $serviceProcessor->doProcess($request);
-                if($response[$returnKey]['response_status']==$checkStatus){
+                if(isset($response[$returnKey]) && $response[$returnKey]['response_status']==$checkStatus){
                     $flashMessage = $successMessage;
                 }else{
-                    $flashMessage =$response[$returnKey]['response_string'];
+                    $flashMessage =isset($response[$returnKey])?$response[$returnKey]['response_string']:'Request failed';
                 }
             }else{
                
