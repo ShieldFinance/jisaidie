@@ -17,7 +17,8 @@ Route::get('/', 'HomeController@index')->name('home');
 Route::get('/home', 'HomeController@index')->name('home');
 Route::get('/sendMessages', 'Services\\MessagesController@sendQueuedMessages');
 Route::post('/notifyPayment', 'Payments\\PaymentsController@receivePayment');
-Route::post('/admin/sendMessage', 'Services\\MessagesController@sendMessage');
+Route::group(['middleware' => 'auth'], function() {
+  Route::post('/admin/sendMessage', 'Services\\MessagesController@sendMessage');
 Route::get('admin', 'Admin\AdminController@index');
 Route::get('admin/give-role-permissions', 'Admin\AdminController@getGiveRolePermissions');
 Route::post('admin/give-role-permissions', 'Admin\AdminController@postGiveRolePermissions');
@@ -40,10 +41,13 @@ Route::resource('admin/response-templates', 'Services\\ResponseTemplatesControll
 Route::resource('admin/messages', 'Services\\MessagesController');
 
 Route::post('admin/customers/reset_pin', 'Customers\\CustomersController@resetPin');
+Route::post('admin/loans/process_loan', 'Loans\\LoanController@processLoan');
 Route::post('admin/customers/activate', 'Customers\\CustomersController@activate');
 Route::post('admin/customers/deactivate', 'Customers\\CustomersController@deactivate');
 Route::post('admin/customers/verify', 'Customers\\CustomersController@verify');
 Route::resource('admin/reports', 'Admin\\ReportsController');
+});
+
 
 Route::resource('ussd/ussd', 'Ussd\\UssdController');
 Route::post('ussd/process', 'Ussd\\UssdController@processRequest');

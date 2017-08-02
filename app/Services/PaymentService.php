@@ -41,15 +41,17 @@ class PaymentService {
         $key = Setting::where('setting_name', 'prsp_api_key')->first()->setting_value;
         $senderId = Setting::where('setting_name', 'prsp_sender_id')->first()->setting_value;
         $productName = Setting::where('setting_name', 'mpesa_product_name')->first()->setting_value;
+        // Here you should provide providerChannel as your B2C paybill
+        $providerChannel = "387070";
         $gateway = new AfricasTalkingGateway($username, $key);
-        $recipient1   = array("phoneNumber" => "+".$payload['recepient'],
+        $recipient   = array("phoneNumber" => "+".$payload['recepient'],
                        "currencyCode" => "KES",
                        "amount"       => $payload['amount'],
                        "metadata"     => array("mobile_number"   => $payload['recepient'],
                                                "reason" => "Develop")
               );
-        $recipients  = array($recipient1);
-        $responses = $gateway->mobilePaymentB2CRequest($productName, $recipients);
+        $recipients  = array($recipient);
+        $responses = $gateway->mobilePaymentB2CRequest($productName,$providerChannel, $recipients);
         $response = $responses[0];
         if ($response->status == "Queued") {
         $return['transaction_id']=$response->transactionId;
@@ -63,6 +65,7 @@ class PaymentService {
         $key = Setting::where('setting_name', 'prsp_api_key')->first()->setting_value;
         $senderId = Setting::where('setting_name', 'prsp_sender_id')->first()->setting_value;
         $productName = Setting::where('setting_name', 'mpesa_product_name')->first()->setting_value;
+         $providerChannel = "387070";
         $gateway = new AfricasTalkingGateway($username, $key);
         $currencyCode = 'KES';
         $phoneNumber = $payload['mobile_number'];
@@ -74,7 +77,7 @@ class PaymentService {
         $response = array();
         $response['transactionId'] = 0;
         try{
-         $response['transactionId'] = $gateway->initiateMobilePaymentCheckout($productName, 
+         $response['transactionId'] = $gateway->initiateMobilePaymentCheckout($productName, $providerChannel,
                  $phoneNumber,$currencyCode,$amount,$metadata);
         }catch(AfricasTalkingGatewayException $ex){
              $response['message']=$ex->getMessage();

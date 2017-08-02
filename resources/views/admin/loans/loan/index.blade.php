@@ -1,6 +1,44 @@
 @extends('layouts.backend')
 
 @section('content')
+<SCRIPT language="javascript">
+$(function(){
+
+	// add multiple select / deselect functionality
+	$("#selectall").click(function () {
+            $('.loan_cbx').attr('checked', this.checked);
+	});
+
+	// if all checkbox are selected, check the selectall checkbox
+	// and viceversa
+	$(".loan_cbx").click(function(){
+
+		if($(".loan_cbx").length == $(".loan_cbx:checked").length) {
+			$("#selectall").attr("checked", "checked");
+		} else {
+			$("#selectall").removeAttr("checked");
+		}
+
+	});
+        
+         $(".process_loan").click(function(){
+            var selectedvalue = [];
+            if ($(':checkbox:checked').length > 0) {
+              $(':checkbox:checked').each(function (i) {
+                  selectedvalue[i] = $(this).val();
+
+              });
+              $("#service").val($(this).data('service'));
+              //$("#page").load("ajax_file.php?t_id="+selectedvalue);//this will pass as string and method will be GET
+              //or
+              $("#selected_loans").val(selectedvalue);//this will pass as array and method will be POST
+              $('.loans_form').submit();
+             }
+             
+        });
+       
+       });
+</SCRIPT>
     <div class="container">
         <div class="row">
             @include('admin.sidebar')
@@ -9,9 +47,7 @@
                 <div class="panel panel-default">
                     <div class="panel-heading">Loan</div>
                     <div class="panel-body">
-                        <a href="{{ url('/admin/loan/create') }}" class="btn btn-success btn-sm" title="Add New Loan">
-                            <i class="fa fa-plus" aria-hidden="true"></i> Add New
-                        </a>
+                        {!! $action_buttons !!}
 
                         {!! Form::open(['method' => 'GET', 'url' => '/admin/loan', 'class' => 'navbar-form navbar-right', 'role' => 'search'])  !!}
                         <div class="input-group">
@@ -26,17 +62,22 @@
 
                         <br/>
                         <br/>
+                          {!! Form::open(['method' => 'POST', 'url' => '/admin/loans/process_loan', 'class' => 'navbar-form navbar-right loans_form'])  !!}
+                             <input type="hidden" name="loans" value="" id="selected_loans"/>
+                             <input type="hidden" name="service" value="" id="service"/>
+                           {!! Form::close() !!}
                         <div class="table-responsive">
                             <table class="table table-borderless">
                                 <thead>
                                     <tr>
-                                        <th>ID</th><th>Customer</th><th>Type</th><th>Amount Requested</th><th>Amount Processed</th><th>Status<th>Actions</th>
+                                        <th><input type="checkbox"  id="selectall" /></th><th>ID</th><th>Customer</th><th>Type</th><th>Amount Requested</th><th>Amount Processed</th><th>Status<th>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                 @foreach($loan as $item)
                                     <tr>
-                                        <td>{{ $item->id }}</td>
+                                        <td><input type="checkbox"  class="loan_cbx" value="{{$item->id}}"/></td>
+                                        <td>{{ $loop->iteration }}</td>
                                         <td>{{ $item->customer->mobile_number }}</td>
                                          <td>{{ $item->type }}</td>
                                         <td>{{ $item->amount_requested }}</td>
