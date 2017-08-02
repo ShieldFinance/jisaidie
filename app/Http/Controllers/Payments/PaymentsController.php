@@ -150,7 +150,13 @@ class PaymentsController extends Controller
             $mobileNumber = $data['source'];
 
             $values = explode(' ',$data['value']);
-            $providerFees = explode(' ', $data['providerFee']);
+            if(isset($data['providerFee'])){
+                $providerFees = $data['providerFee'];
+            }
+            if(isset($data['transactionFee'])){
+                $providerFees = $data['transactionFee'];
+            }
+            $providerFees = explode(' ', $providerFees);
             if(isset($data['clientAccount']) && strlen($data['clientAccount'])){
                 $mobileNumber = $data['clientAccount'];
             }
