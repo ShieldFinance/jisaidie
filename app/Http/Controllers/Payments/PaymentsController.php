@@ -148,7 +148,9 @@ class PaymentsController extends Controller
         $data  = $request->json()->all();
         try{
             $mobileNumber = $data['source'];
-
+            if(isset($data['requestMetadata'])){
+                $mobileNumber = $data['requestMetadata']['mobile_number'];
+            }
             $values = explode(' ',$data['value']);
             if(isset($data['providerFee'])){
                 $providerFees = $data['providerFee'];
