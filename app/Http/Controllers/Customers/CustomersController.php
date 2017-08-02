@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers\Customers;
-
+use Illuminate\Support\Facades\Auth;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\ServiceProcessor;
@@ -9,6 +9,7 @@ use App\Http\Models\Customer;
 use App\Http\Models\CustomerDevice;
 use App\Http\Models\Message;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Session;
 
 class CustomersController extends Controller
@@ -23,17 +24,47 @@ class CustomersController extends Controller
         $payload = array();
         $payload['keyword'] = $request->get('search');
         $service = $request->get('service');
-        $customers = $this->getCustomers($payload);
-
-        return view('admin/customers.customers.index', compact('customers'));
+        //$customers = $this->getCustomers($payload);
+        $organizations = \App\Http\Models\Organization::all();
+        $action_buttons = $this->getActionButtons();
+        $perPage = 25;
+        $keyword = $request->get('search');
+        $organization_id = $request->get('search_organization');
+        $status = $request->get('search_status');
+        $wheres = array();
+        $customers = DB::table('customers');
+        if(!empty($organization_id)){
+            $wheres[] =  ['organization_id' ,'=',$organization_id];        
+        }
+        if(!empty($keyword)){
+            $customers=$customers->where('customers.mobile_number','LIKE',"%$keyword%");
+            $wheres[] =  ['customers.mobile_number' ,'LIKE',"%$keyword%"];
+            $wheres[] =  ['customers.surname' ,'LIKE',"%$keyword%"];
+            $wheres[] =  ['customers.other_name' ,'LIKE',"%$keyword%"];
+            $wheres[] =  ['customers.last_name' ,'LIKE',"%$keyword%"];
+            $wheres[] =  ['customers.email' ,'LIKE',"%$keyword%"];
+        }
+        if(!empty($status)){
+            $wheres[] =  ['status','=',$status];
+        }
+        $customers = $customers->join('organization', 'organization.id', '=', 'organization_id');
+        if(!empty($wheres)){
+            $customers=$customers->orWhere($wheres);
+        }else{
+            $customers=$customers->where('customers.id','>',0);
+        }
+        
+        $customers=$customers->select('customers.*','organization.name as company_name')
+        ->orderBy('customers.id','desc')
+        ->paginate($perPage);
+        return view('admin/customers.customers.index', compact('customers','action_buttons','organizations'));
     }
     
     
     
     public function resetPin(Request $request){
-        
+        $action_buttons = $this->getActionButtons();
         $payload = array();
-        $customers = $this->getCustomers($payload);
         $serviceProcessor = new ServiceProcessor();
         $customer = Customer::find($request->get('customer_id'));
         $device = CustomerDevice::where('customer_id',$customer->id)
@@ -53,7 +84,7 @@ class CustomersController extends Controller
         }else{
              Session::flash('flash_message', 'Customer device not registered!');
         }
-        return view('admin/customers.customers.index', compact('customers'));
+        return redirect('admin/customers');
     }
     public function activate(Request $request)
     {
@@ -128,7 +159,47 @@ class CustomersController extends Controller
         }
         return $customers;
     }
-
+public function getActionButtons(){
+        $user = Auth::user();
+        $action_buttons ='';
+        if($user){
+        $userIsAdmin =  Auth::user()->hasRole('Super Admin');
+        
+            if($user->can('can_add_customer') || $userIsAdmin) {
+                $action_buttons.=<<<ACTIONS
+                        <a href="{{ url('/admin/customers/create') }}" class="btn btn-success btn-sm" title="Add New Customer">
+                            <i class="fa fa-plus" aria-hidden="true"></i> Add New
+                        </a>
+ACTIONS;
+            }
+            
+            if($user->can('can_send_message') || $userIsAdmin) {
+                $action_buttons.=<<<ACTIONS
+                       <a href="javascript:void(0)" class="btn btn-success btn-sm send_msg_btn" title="Add New Customer">
+                            <i class="fa fa-envelope" aria-hidden="true"></i> Send message
+                        </a>
+ACTIONS;
+            }
+            
+            if($user->can('can_export_loans') || $userIsAdmin) {
+                $action_buttons.=<<<ACTIONS
+                      <a href="javascript:void(0)" data-action='ExportCustomer' class="btn btn-info btn-sm process_customer" title="Export Customers">
+                            <i class="fa fa-download" aria-hidden="true"></i> Export to excel
+                        </a>
+ACTIONS;
+            }
+            
+            $action_buttons.=<<<ACTIONS
+                      <span class='dropdown'> <a href="#" rel="popover" data-popover-content="#myPopover">
+                            <i class="fa fa-filter" aria-hidden="true"></i> Filter
+                        </a></span>
+                	
+ACTIONS;
+            
+        return $action_buttons;
+        
+    }
+}
     /**
      * Show the form for creating a new resource.
      *
