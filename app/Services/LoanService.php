@@ -155,7 +155,19 @@ class LoanService{
         $payload['response_status'] = config('app.responseCodes')['command_failed'];
         $payload['command_status'] = config('app.responseCodes')['command_failed'];
         if(isset($payload['loan_id'])){
-            $loan = Loan::where('id', $payload['loan_id'])->first();
+            if(!is_array($payload['loan_id'])){
+                 $payload['loan_id'] = array($payload['loan_id']);
+            }
+            $loans = Loan::whereIn('id', $payload['loan_id'])->get();
+            foreach($loans as $l){
+                //remove any loan whose status is not disbursed
+                if($l->status != config('app.loanStatus')['disbursed'] || $l->payment_status=='Success'){
+                   $key = array_search ($l->id, $payload['loan_id']);
+                   unset($payload['loan_id'][$key]);
+                }
+            }
+            $updated = Loan::whereIn('id', $payload['loan_id'])->update(array('status' => config('app.loanStatus')['approved']));
+             
             if($loan && $loan->status==config('app.loanStatus')['approved']){
                 $payload['send_loan'] = true;
                 $loan->status = config('app.loanStatus')['disbursed'];
@@ -174,19 +186,18 @@ class LoanService{
     
     public function reject_loan_application($payload){
         if(isset($payload['loan_id'])){
-            if(is_array($payload['loan_id'])){
-                 $loans = Loan::whereIn('id', $payload['loan_id'])->get();
-                 foreach($loans as $l){
-                     //remove any loan whose status is not pending
-                     if($l->status==config('app.loanStatus')['disbursed']){
-                        $key = array_search ($l->id, $payload['loan_id']);
-                        unset($payload['loan_id'][$key]);
-                     }
-                 }
-             }else{
+            if(!is_array($payload['loan_id'])){
                  $payload['loan_id'] = array($payload['loan_id']);
-             }
-
+            }
+            $loans = Loan::whereIn('id', $payload['loan_id'])->get();
+            foreach($loans as $l){
+                //remove any loan whose status is disbursed,paid or locked
+                if($l->status > config('app.loanStatus')['approved']){
+                   $key = array_search ($l->id, $payload['loan_id']);
+                   unset($payload['loan_id'][$key]);
+                }
+            }
+             
              $updated = Loan::whereIn('id', $payload['loan_id'])->update(array('status' => config('app.loanStatus')['rejected']));
              
              if($updated){

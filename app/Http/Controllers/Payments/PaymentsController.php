@@ -176,10 +176,14 @@ class PaymentsController extends Controller
             'payment_id'=>$payment->id,
            );
         $response = array();
+        //check if it's customer paying loan
         if(($data['category']=='MobileCheckout' || $data['category']=='MobileC2B') && $data['status']=='Success'){
             $request->request->add(['action' => 'RepayLoan','request'=>json_encode($details)]);
             $serviceProcessor = new ServiceProcessor();
             $response = $serviceProcessor->doProcess($request);
+        }else{
+            //this is B2C notification
+            Loan::where('transaction_ref', $payment->reference)->update(array('payment_status'=>$data['status']));
         }
         return $response;
     }

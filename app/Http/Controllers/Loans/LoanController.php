@@ -53,6 +53,7 @@ class LoanController extends Controller
         $perPage = 25;
         $user = Auth::user();
         $userIsAdmin =  Auth::user()->hasRole('Super Admin');
+        $loan = Loan::orderBy('id','desc')->paginate($perPage);
         if($action){
             $loan_ids = $request->input('loans');
             $loan_ids = explode(',', $loan_ids);
@@ -122,7 +123,7 @@ class LoanController extends Controller
                 $flashMessage = "You do not have access to perform this action";
             }
         }
-        $loan = Loan::orderBy('id','desc')->paginate($perPage);
+        
         if(strlen($flashMessage)){
             Session::flash('flash_message', $flashMessage);
         }

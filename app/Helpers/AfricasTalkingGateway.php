@@ -290,8 +290,9 @@ class AfricasTalkingGateway
 					    "phoneNumber"  => $phoneNumber_,
 					    "currencyCode" => $currencyCode_,
 					    "amount"       => $amount_,
-                                            "providerChannel_" =>  $providerChannel_,
+                                            "providerChannel" =>  $providerChannel_,
 					    "metadata"     => $metadata_));
+   
     $this->_requestUrl  = $this->getMobilePaymentCheckoutUrl();
     
     $this->executeJsonPOST();

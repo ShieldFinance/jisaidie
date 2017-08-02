@@ -46,7 +46,7 @@ class PaymentService {
         $gateway = new AfricasTalkingGateway($username, $key);
         $recipient   = array("phoneNumber" => "+".$payload['recepient'],
                        "currencyCode" => "KES",
-                       "providerChannel"=>"387070",
+                       "providerChannel"=>$providerChannel,
                        "amount"       => $payload['amount'],
                        "metadata"     => array("mobile_number"   => $payload['recepient'],
                                                "reason" => "Develop")
