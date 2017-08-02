@@ -168,7 +168,7 @@ class LoanService{
             }
             $updated = Loan::whereIn('id', $payload['loan_id'])->update(array('status' => config('app.loanStatus')['approved']));
              
-            if($loan && $loan->status==config('app.loanStatus')['approved']){
+            if($updated){
                 $payload['send_loan'] = true;
                 $loan->status = config('app.loanStatus')['disbursed'];
                 $loan->save();
@@ -310,7 +310,7 @@ class LoanService{
                 }
                 $loan->save();
                 $payment->save();
-            }
+            
             $response['mobile_number'] = $customer->mobile_number;
             $response['email'] = $customer->email;
             $response['send_notification'] = true;
@@ -322,7 +322,7 @@ class LoanService{
             $responseString = 'Payment received';
             $responseStatus = config('app.responseCodes')['command_successful'];
             $commandStatus = config('app.responseCodes')['command_successful'];
-            
+            }
         }else{
             $responseStatus = 'Missing parameters';
             $responseStatus = config('app.responseCodes')['command_failed'];
@@ -435,8 +435,8 @@ class LoanService{
         $commandStatus = config('app.responseCodes')['command_failed'];
         
         if(isset($payload['send_notification']) && $payload['send_notification']){
-           $payload['msisdn'] = $payload['mobile_number'];
-           $payload['email'] = $payload['email'];
+           $payload['msisdn'] = isset($payload['mobile_number'])?$payload['mobile_number']:'';
+           $payload['email'] = isset($payload['email'])?$payload['email']:'';
            if($this->responseProcessor->processResponse($payload)){
                $responseStatus = config('app.responseCodes')['command_successful'];
                $commandStatus = config('app.responseCodes')['command_successful'];
