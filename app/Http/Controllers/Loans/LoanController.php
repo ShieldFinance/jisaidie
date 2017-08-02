@@ -6,9 +6,11 @@ use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\ServiceProcessor;
 use App\Http\Models\Loan;
+use App\Http\Models\Customer;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use Session;
+use Illuminate\Support\Facades\DB;
 
 class LoanController extends Controller
 {
@@ -20,30 +22,38 @@ class LoanController extends Controller
     public function index(Request $request)
     {
         $keyword = $request->get('search');
+        $organization_id = $request->get('search_organization');
         $perPage = 25;
         $action_buttons = $this->getActionButtons();
+        $organizations = \App\Http\Models\Organization::all();
+        $wheres = array();
+        if(!empty($organization_id)){
+            $wheres = [
+                    ['organization.id' ,'=',$organization_id]
+                 ];
+        }
+        $loans = DB::table('loans')
+        ->join('customers', 'customers.id', '=', 'loans.customer_id')
+        ->join('organization', 'organization.id', '=', 'customers.organization_id')
+        ->where($wheres)
+        ->select('loans.*')
+        ->paginate($perPage);
         
         if (!empty($keyword)) {
-            $loan = Loan::where('customer_id', 'LIKE', "%$keyword%")
-				->orWhere('amount_requested', 'LIKE', "%$keyword%")
-				->orWhere('amount_processed', 'LIKE', "%$keyword%")
-				->orWhere('daily_interest', 'LIKE', "%$keyword%")
-				->orWhere('fees', 'LIKE', "%$keyword%")
-				->orWhere('total', 'LIKE', "%$keyword%")
+            $customers = Customer::select('id')->where('mobile_number','LIKE',"%$keyword%")->get()->toArray();
+            $customerIds = array();
+            foreach($customers as $customer){
+                $customerIds[]=$customer['id'];
+            }
+            $loans = Loan::whereIn('customer_id', $customerIds)
 				->orWhere('transaction_ref', 'LIKE', "%$keyword%")
-				->orWhere('paid', 'LIKE', "%$keyword%")
-				->orWhere('invoiced', 'LIKE', "%$keyword%")
-				->orWhere('status', 'LIKE', "%$keyword%")
-				->orWhere('net_salary', 'LIKE', "%$keyword%")
-				->orWhere('date_disbursed', 'LIKE', "%$keyword%")
-				->orWhere('deleted', 'LIKE', "%$keyword%")
                                 ->orderBy('id','desc')
 				->paginate($perPage);
             
-        } else {
-            $loan = Loan::orderBy('id','desc')->paginate($perPage);
+        }elseif(empty($loans)){
+            $loans = Loan::orderBy('id','desc')->paginate($perPage);
         }
-        return view('admin/loans.loan.index', compact('loan','action_buttons'));
+        return view('admin/loans.loan.index', compact('loans','action_buttons','organizations'));
     }
     
     public function processLoan(Request $request){
