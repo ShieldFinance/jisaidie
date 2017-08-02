@@ -322,7 +322,7 @@ class LoanService{
             $response['message_placeholders']['[amount]'] = $payment->amount;
             $responseString = 'Payment received';
             $responseStatus = config('app.responseCodes')['command_successful'];
-            $commandStatus = config('app.responseCodes')['command_successful'];
+            $commandStatus = config('app.responseCodes')['command_successful']; 
             }
         }else{
             $responseStatus = 'Missing parameters';
