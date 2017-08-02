@@ -153,7 +153,6 @@ $(document).on('click', function (e) {
         
     </div>
  <div class="input-group">
-
       <label for="">Organization</label>
      <select class="form-control" name="search_organization">
          <option value=''>Select</option>
@@ -187,6 +186,7 @@ $(document).on('click', function (e) {
 <div style="margin-top:5px; ">
     <button type="submit" class="btn btn-primary"><i class="fa fa-search"></i> Search</button>
     <button type="submit" class="btn btn-default pull-right"><i class="fa fa-search"></i> Clear</button>
+
 </div>
 {!! Form::close() !!}
 </div

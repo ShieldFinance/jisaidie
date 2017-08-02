@@ -12,7 +12,8 @@
 
         <!-- Styles -->
         <link href="/css/app.css" rel="stylesheet">
-            <link href="/css/style.css" rel="stylesheet">
+            <link href="/css/style.css" rel="stylesheet"><script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.4/js/bootstrap-select.min.js"></script>
+            
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
         <script src="{{ asset('/js/jquery.1.9.1.js') }}" type="text/javascript"></script>
         <script src="{{ asset('/js/multiselect.js') }}" type="text/javascript"></script>

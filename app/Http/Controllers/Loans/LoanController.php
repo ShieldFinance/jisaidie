@@ -6,6 +6,7 @@ use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\ServiceProcessor;
 use App\Http\Models\Loan;
+use App\Http\Models\Customer;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use Session;
@@ -51,6 +52,7 @@ class LoanController extends Controller
         ->select('loans.*','c.mobile_number')
         ->orderBy('loans.id','desc')
         ->paginate($perPage);
+
         return view('admin/loans.loan.index', compact('loans','action_buttons','organizations'));
     }
     

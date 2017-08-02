@@ -235,6 +235,7 @@ class LoanService{
             $details=array();
             $details['amount']=$loan->amount_requested;
             $details['mobile_number'] = $loan->customer->mobile_number;
+            $payload['mobile_number'] = $loan->customer->mobile_number;
             $details['gateway'] =  'mpesa';
             $details['email'] = $loan->customer->email;
             $details['item_id'] = $loan->id;
@@ -321,7 +322,7 @@ class LoanService{
             $response['message_placeholders']['[amount]'] = $payment->amount;
             $responseString = 'Payment received';
             $responseStatus = config('app.responseCodes')['command_successful'];
-            $commandStatus = config('app.responseCodes')['command_successful'];
+            $commandStatus = config('app.responseCodes')['command_successful']; 
             }
         }else{
             $responseStatus = 'Missing parameters';
