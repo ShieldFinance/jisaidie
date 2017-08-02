@@ -6,6 +6,7 @@ use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\ServiceProcessor;
 use App\Http\Models\Payment;
+use App\Http\Models\Loan;
 use Illuminate\Http\Request;
 use Session;
 
