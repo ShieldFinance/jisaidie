@@ -20,7 +20,7 @@ class MessageService {
     public function sendMessages() {
         $messages = Message::where([
                     ['status', '=', 'pending'],
-                ])->limit(1)->get();
+                ])->limit(20)->get();
         if (count($messages)) {
             foreach ($messages as $message) {
                 $type = strtoupper($message->type);
