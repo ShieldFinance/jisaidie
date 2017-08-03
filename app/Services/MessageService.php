@@ -104,9 +104,13 @@ class MessageService {
     }
 
     public function sendEMAIL($payload) {
-      $response = \Mail::to($payload['recepient'])->send(new AppEmail($payload['message'],$payload['subject']));
-     
-      return array('status'=>'Success','attempts'=>1);
+        $response = array('status'=>'Failed','attempts'=>1);
+        if (filter_var($payload['recepient'], FILTER_VALIDATE_EMAIL)) {
+             $response = \Mail::to($payload['recepient'])->send(new AppEmail($payload['message'],$payload['subject']));
+             $response =array('status'=>'Success','attempts'=>1);
+        }
+      
+      return $response;
     }
     
     public function sendINAPP($payload){

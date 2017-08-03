@@ -508,17 +508,21 @@ class LoanService{
         if($loan->customer->organization_id){
             $charges = 'co_processing_fee';
         }
-        $fees = floatval($this->setting->where('setting_name',$charges)->first()->setting_value);
-        $fixedCost =  	floatval($this->setting->where('setting_name','fixed_loan_cost')->first()->setting_value);
         $interest =  	floatval($this->setting->where('setting_name','loan_interest_rate')->first()->setting_value);
         $dailyInterest = ($interest/3000);
         $interestToday = $dailyInterest * $loan->amount_requested;
-        $processedAmount = $fees+$loan->amount_requested;
-        $loanTotal = $interestToday + $processedAmount;
-        $loan->daily_interest = $interestToday;
-        $loan->amount_processed = ceil($processedAmount);
-        $loan->fees = $fees;
-        $loan->total = ceil($loanTotal);
+        //if this is a new loan apply one off fees
+        if($loan->total==0 && $loan->status==config('app.loanStatus')['approved']){
+            $fees = floatval($this->setting->where('setting_name',$charges)->first()->setting_value);
+            //$fixedCost =  	floatval($this->setting->where('setting_name','fixed_loan_cost')->first()->setting_value);
+            $loan->amount_processed = ceil($fees+$loan->amount_requested);
+            $loan->total = $loan->amount_processed + $interestToday;
+            $loan->daily_interest = $interestToday;
+            $loan->fees = $fees;
+        }else{
+            //this is an existing loan, just add the daily fees
+            $loan->total+=$interestToday;
+        }
         $loan->save();
         return $loan;
     }
