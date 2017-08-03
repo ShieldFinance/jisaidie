@@ -161,6 +161,15 @@ class PaymentsController extends Controller
             $providerFees = explode(' ', $providerFees);
             if(isset($data['clientAccount']) && strlen($data['clientAccount'])){
                 $mobileNumber = $data['clientAccount'];
+                $prefix = mb_substr($mobileNumber, 0, 1);
+                echo $mobileNumber.' ';
+                if($prefix=='0'){
+                    $mobileNumber = str_replace($prefix, '254',$mobileNumber);
+                }
+                if($prefix=='+'){
+                    $mobileNumber = str_replace($prefix, '',$mobileNumber);
+                }
+               
             }
             //check if we already have an existing payment
             $oldPayment = Payment::where('reference', $data['transactionId'])->first();
