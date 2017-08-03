@@ -86,12 +86,9 @@ class MessagesController extends Controller
         Message::insert($data);
 
         Session::flash('flash_message', 'Message added!');
-        //Log::info("Request Cycle with Queues Begins");
-        //$this->dispatch(new SendBatchMessages());
-        //Log::info("Request Cycle with Queues Ends");
-        $app = \App::getFacadeRoot();
-        $messagingService = $app->make('Message');
-        $messagingService->sendMessages();
+        Log::info("Request Cycle with Queues Begins");
+        $this->dispatch((new SendBatchMessages())->delay(5));
+        Log::info("Request Cycle with Queues Ends");
         return redirect('admin/messages');
     }
 
@@ -147,7 +144,7 @@ class MessagesController extends Controller
         $message->update($requestData);
 
         Session::flash('flash_message', 'Message updated!');
-        
+
         return redirect('admin/messages');
     }
 
