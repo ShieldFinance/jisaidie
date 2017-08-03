@@ -52,7 +52,7 @@ class LoanController extends Controller
         ->select('loans.*','c.mobile_number')
         ->orderBy('loans.id','desc')
         ->paginate($perPage);
-
+        $request->session()->put('loans', $loans);
         return view('admin/loans.loan.index', compact('loans','action_buttons','organizations'));
     }
     
@@ -107,7 +107,8 @@ class LoanController extends Controller
                 ->select('loans.*','c.mobile_number')
                 ->orderBy('id','desc')
                 ->paginate($perPage);
-                 return view('admin/loans.loan.index', compact('loan','action_buttons'));
+                 $request->session()->put('loans', $loans);
+                 return view('admin/loans.loan.index', compact('loans','action_buttons'));
             }
             if($action=='RejectLoanApplication' && $user->can('can_reject_loan')){
                 $canProcess = true;
@@ -151,12 +152,13 @@ class LoanController extends Controller
         if(strlen($flashMessage)){
             Session::flash('flash_message', $flashMessage);
         }
+        $request->session()->put('loans', $loans);
         return view('admin/loans.loan.index', compact('loans','action_buttons'));
     }
     
     public function export(Request $request){
-        Excel::create('Loans-'.date('Y-m-d'), function($excel) {
-        $loans = Loan::all();
+        Excel::create('Loans-'.date('Y-m-d'), function($excel) use($request) {
+        $loans = $request->session()->get('loans');
         $data = array();
         $headers = array(
             'Mobile Number',
@@ -182,16 +184,16 @@ class LoanController extends Controller
         );
         $data[]=$headers;
         foreach($loans as $loan){
-            $l = $loan->toArray();
+            $l = (array)$loan;
             unset($l['payment_response']);
             unset($l['id']);
             $l['status'] = array_search ($l['status'], config('app.loanStatus'));
-            $l['customer_id'] = $loan->customer->mobile_number;
+            $l['customer_id'] = $loan->mobile_number;
             $data[] = $l;
         }
         $excel->sheet('Loan', function($sheet) use ($data) {
 
-               $sheet->fromArray($data);
+               $sheet->fromArray($data,null,'A1',false,false);
 
             });
 

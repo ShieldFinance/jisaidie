@@ -45,6 +45,7 @@ Route::post('admin/loans/process_loan', 'Loans\\LoanController@processLoan');
 Route::post('admin/customers/activate', 'Customers\\CustomersController@activate');
 Route::post('admin/customers/deactivate', 'Customers\\CustomersController@deactivate');
 Route::post('admin/customers/verify', 'Customers\\CustomersController@verify');
+Route::post('admin/customers/export', 'Customers\\CustomersController@export');
 Route::resource('admin/reports', 'Admin\\ReportsController');
 });
 

@@ -38,6 +38,10 @@ $(function(){
              
         });
         
+        $('.export_customer').click(function(){
+            $('.export_customers').submit();
+        })
+        
         $('[rel="popover"]').popover({
         container: 'body',
         html: true,
@@ -62,18 +66,9 @@ $(function(){
                     <div class="panel-heading">Customers</div>
                     <div class="panel-body">
                          {!! $action_buttons !!}
-                        {!! Form::open(['method' => 'GET', 'url' => '/admin/customers', 'class' => 'navbar-form navbar-right', 'role' => 'search'])  !!}
-                        <div class="input-group">
-                            <input type="text" class="form-control" name="search" placeholder="Search...">
-                            <span class="input-group-btn">
-                                <button class="btn btn-default" type="submit">
-                                    <i class="fa fa-search"></i>
-                                </button>
-                            </span>
-                        </div>
+                        {!! Form::open(['method' => 'POST', 'url' => '/admin/customers/export', 'class' => 'navbar-form navbar-right export_customers'])  !!}
+                        
                         {!! Form::close() !!}
-
-                        <br/>
                         <br/>
                         <div class="table-responsive">
                              {!! Form::open(['method' => 'POST', 'url' => '/admin/sendMessage', 'class' => 'navbar-form navbar-right customers_form'])  !!}
