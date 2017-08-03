@@ -212,7 +212,7 @@ public function getActionButtons(){
         
             if($user->can('can_add_customer') || $userIsAdmin) {
                 $action_buttons.=<<<ACTIONS
-                        <a href="{{ url('/admin/customers/create') }}" class="btn btn-success btn-sm" title="Add New Customer">
+                        <a href="/admin/customers/create" class="btn btn-success btn-sm" title="Add New Customer">
                             <i class="fa fa-plus" aria-hidden="true"></i> Add New
                         </a>
 ACTIONS;
