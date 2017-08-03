@@ -148,7 +148,7 @@ class PaymentsController extends Controller
         $data  = $request->json()->all();
         try{
             $mobileNumber = $data['source'];
-            if(isset($data['requestMetadata'])){
+            if(isset($data['requestMetadata']) && isset($data['requestMetadata']['mobile_number'])){
                 $mobileNumber = $data['requestMetadata']['mobile_number'];
             }
             $values = explode(' ',$data['value']);
@@ -198,6 +198,7 @@ class PaymentsController extends Controller
             }
         }catch(\Exception $e){
             Log::error('Error: '.$e->getMessage());
+            Log::error("Response: ".json_encode($data));
             return array('Error: '.$e->getMessage());
         }
         return $response;
