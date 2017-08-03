@@ -10,6 +10,7 @@ use Session;
 use App\Http\Models\Ussd;
 use App\Http\Models\Customer;
 use App\Http\Models\Loan;
+use App\Http\Models\Message;
 use App\Http\Models\Organization;
 use App\Setting;
 use Illuminate\Support\Facades\Hash;
@@ -186,7 +187,7 @@ class UssdController extends Controller
 		$response="END Sorry,A technical error occured,Kindly check with us later.";
 		//check if its an existing account else apply online
 		if(empty($customer_exist)){
-		  $response  = "END Your number is not registered in our system.please register online at www.shield.co.ke \n";	
+		  $response  = "END Your number is not registered in our system.please register online at www.Setting::where('setting_name', 'site_name')->first()->setting_value.co.ke \n";	
 		}else{
 		  $account=Customer::where('mobile_number',$data['phoneNumber'])->firstOrFail();
 		 
@@ -197,10 +198,10 @@ class UssdController extends Controller
 			
 			if($data['text'] ==""){	//first call
 				    //check if user has set pin
-					if($account->pin_hash!=0){
-						$response  = "CON Dear customer, welcome to your Shield account. Please enter your Shield PIN.  Forgot your PIN? Call 0786 798 822 \n";
+					if($account->pin_hash!=null){
+						$response  = "CON Dear customer, welcome to your ".Setting::where('setting_name', 'site_name')->first()->setting_value." account. Please enter your ".Setting::where('setting_name', 'site_name')->first()->setting_value." PIN.  Forgot your PIN? Call ".Setting::where('setting_name', 'support_mobile_number')->first()->setting_value."\n";
 					}else{
-						$response  = "CON Dear customer, welcome to Shield. Please set your Shield PIN (4 characters[0-9]) \n";
+						$response  = "CON Dear customer, welcome to ".Setting::where('setting_name', 'site_name')->first()->setting_value.". Please set your ".Setting::where('setting_name', 'site_name')->first()->setting_value." PIN (4 characters[0-9]) \n";
 					}
 			}else if($existing_session->level==0){
 				if((end($textarray)==0 && strlen(end($textarray))==1) && strlen(end($textarray))==3){
@@ -286,7 +287,7 @@ class UssdController extends Controller
 		
 	}
 	public function showTC(){
-		$response  = "CON  Visit http://shield.co.ke/ for our terms and conditions \n";
+		$response  = "CON  Visit http://jisaidie.co.ke/ for our terms and conditions \n";
 		$response .= "00. Back \n";
 		$response .= "000. Exit \n";
 		return $response;
@@ -313,8 +314,8 @@ class UssdController extends Controller
 		  USSD::find($existing_session->id)->update($data);
 		  $response=$this->getMainMenu();
 		}else{
-		$pin = $this->auth->hash_password(end($textarray));
-		$pin_hash = $pin['hash'];
+		
+		$pin_hash =  Hash::make(end($textarray));
 		
 		$data = array(
 			'pin_hash'		=> $pin_hash,
@@ -350,41 +351,56 @@ class UssdController extends Controller
 		
 		
 		$advances = Customer::find($account->id);
-		 //echo '<pre>';print_r($advances->loans->take(1));exit;
-		  echo '<pre>';print_r($advances->organization->name);exit;
-		 
+		$loan=$advances->loans->take(1);
+	 
 		$message="";
-			if (strtotime($advances[0]->created_on) < strtotime($advances[0]->disbursed_on)) {
-			$date=date("Y-M-d H:i:s",strtotime($advances[0]->disbursed_on));
+		
+		
+			if (strtotime($loan[0]->created_at) < strtotime($loan[0]->date_disbursed)) {
+			$date=date("Y-M-d H:i:s",strtotime($loan[0]->date_disbursed));
 			}else{
-			$date=date("Y-M-d H:i:s",strtotime($advances[0]->created_on));	
+			$date=date("Y-M-d H:i:s",strtotime($loan[0]->created_at));	
 			}
-			$message.=$date." \nAdvance Amount KES ".number_format($advances[0]->amount_requested,2)."\n";
-			$message.="Due Amount KES ".number_format($advances[0]->total,2)."\n";
-			$message.="Transaction status ".$status[$advances[0]->status]."\n";
+			$message.=$date." \nAdvance Amount KES ".number_format($loan[0]->amount_requested,2)."\n";
+			$message.="Due Amount KES ".number_format($loan[0]->total,2)."\n";
+			$message.="Transaction status ".$status[$loan[0]->status]."\n";
 		
 		
 		
 		//queue message
 		$id=0;
-		if($advances[0]->id)
+		if($loan[0]->id)
 		
 		//api call for sending message
 		//create message mobile_number,$message,subject,sms
 		
 		//send message
+		$messaging = new Message([
+			'subject'=>"Mini-statement",
+			'message'=>$message,
+			'recipient'=>$mobile,
+			'type'=>"SMS",
+			'status'=>'pending',
+			'service_id'=>0,
+			'attempts'=>0
+		]);
 		
-		$id=Services::queueMessage($message,"+".$existing_session->phoneNumber,"account_statement",$advances[0]->company,$existing_session->sessionId);
+		if($messaging->save()){
+			
+				$app = \App::getFacadeRoot();
+				$messagingService = $app->make('Message');
+				$messagingService->sendMessage(array('message_id'=>$messaging->id,'type'=>$messaging->type));
 		
+		}
 				
-		if($id){
-		 Services::sendMessage($id);
+		if($messaging->id){
+		
 		 $response  = "CON Your mini statement will be sent to your mobile phone shortly. \n";
 		 $response .= "00. Back \n";
 		 $response .= "000. Exit \n";
 		 
 		}else{
-		 $response  = "CON Dear customer, You do not have any outstanding balance with shield.Thank you . \n";
+		 $response  = "CON Dear customer, You do not have any outstanding balance with Setting::where('setting_name', 'site_name')->first()->setting_value.Thank you . \n";
 		 $response .= "00. Back \n";
 		 $response .= "000. Exit \n";
 		}
@@ -416,7 +432,7 @@ class UssdController extends Controller
 		
 		//echo '<pre>';print_r($apiResponse);exit;
 		
-		if(!$apiResponse['can_borrow']['can_borrow']){			
+		if($apiResponse['can_borrow']['can_borrow']==1){			
 						   
 			$response= "CON Date: ".$apiResponse['can_borrow']['loan']->sent_at."  \n";
 			$response.= "Amount applied: KES ".$apiResponse['can_borrow']['loan']->amount_requested." \n";
@@ -425,7 +441,7 @@ class UssdController extends Controller
 			$response .= "00. Back \n";
 			$response .= "000. Exit \n";
 		}else{
-			$response="CON Dear Customer, You have not applied for any advance with shield.Kindly proceed to apply for an advance.";
+			$response="CON Dear Customer, You have not applied for any advance with ".Setting::where('setting_name', 'site_name')->first()->setting_value.". Kindly proceed to apply for an advance.";
 			$response .= "00. Back \n";
 			$response .= "000. Exit \n";
 		}
@@ -444,7 +460,7 @@ class UssdController extends Controller
 		}else{
 			   //check if amount entered is less than half
 			   
-			   if($account->net_salary/2 >= end($textarray) && end($textarray)>=500){
+			   if($account->net_salary/2 >= end($textarray) && end($textarray)>=Setting::where('setting_name', 'co_minimum_amount')->first()->setting_value){
 						//register the advance amount on dashboard
 						if($account->status && $account->organization_id && $account->is_checkoff){
 																
@@ -454,12 +470,14 @@ class UssdController extends Controller
 							
 							    // api call with mobile number, amount,type=co
 								
-								 $id=1;
 								
+								$app = \App::getFacadeRoot();
+								$paymentService = $app->make('Loan');
+								$apiResponse = $paymentService->create_loan(["mobile_number"=>$existing_session->phoneNumber,"amount"=>end($textarray),"type"=>"co"]);
 								
-								if($id){
+								if(isset($apiResponse["loan_id"]) && $apiResponse["loan_id"]>0){
 								  
-								  $response  = "CON  Thank you for applying for a salary advance from Shield, you will receive the advance amount on your phone. \n";
+								  $response  = "CON  Thank you for applying for a salary advance from ".Setting::where('setting_name', 'site_name')->first()->setting_value.", you will receive the advance amount on your phone. \n";
 								  $response .= "00. Back \n";
 								  $response .= "000. Exit \n";
 								}else{
@@ -472,7 +490,7 @@ class UssdController extends Controller
 						}
 				
 			   }else{
-				$response  = "CON  Kindly enter amount that is atleast KES.500 and less than or equal to KES.".($account->net_salary/2)." . \n";
+				$response  = "CON  Kindly enter amount that is atleast ".Setting::where('setting_name', 'co_minimum_mount')->first()->setting_value." and less than or equal to KES.".($account->net_salary/2)." . \n";
 				$response .= "00. Back \n";
 				$response .= "000. Exit \n";
 			   }
@@ -499,7 +517,8 @@ class UssdController extends Controller
 		  $app = \App::getFacadeRoot();
 		  $paymentService = $app->make('Customer');
 		  $apiResponse = $paymentService->check_customer_status(["mobile_number"=>$existing_session->phoneNumber]);
-		
+		  
+			//echo '<pre>';print_r($apiResponse['can_borrow']['loan']);exit;
 		
 		   if(empty($apiResponse['can_borrow']['can_borrow'])){
 						
@@ -530,7 +549,7 @@ class UssdController extends Controller
 			}else{
 		  
 		  
-				  if($lastLoandata[0]->status==6 || $lastLoandata[0]->status==3 ){
+				  if($apiResponse['can_borrow']['loan']->status==6 || $apiResponse['can_borrow']['loan']->status==3 ){//if loan is serviced or loan is rejected 3
 					$data = array(
 					'level' =>2,
 					'action' =>1
@@ -560,8 +579,9 @@ class UssdController extends Controller
 	public function pinVerification($textarray,$existing_session,$account){
 		if($account->pin_hash!=""){//user just entered pin to login so proceed with menu after verification
 					
-					
-						if (Hash::make(end($textarray))==$account->pin_hash){
+				
+				
+						if (Hash::check(end($textarray),$account->pin_hash)){
 							$data = array(
                                'pin_verified' =>1
                              );
@@ -587,6 +607,7 @@ class UssdController extends Controller
 						}
 					 }else if($existing_session->pin_verified){
 						
+						$response=$this->getMainMenu();
 						
 					 }else{//set users new pin and display menu
 						
@@ -605,7 +626,7 @@ class UssdController extends Controller
 		return $response;
 	}
 	public function ExitApp(){
-	   $response="END Thank you. For customer care call 0786 798 822";
+	   $response="END Thank you. For customer care call ".Setting::where('setting_name', 'support_mobile_number')->first()->setting_value;
 	   return $response;	
 	}
 	public function getMainMenu(){

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Customers;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\ServiceProcessor;
+use App\Http\Models\ResponseTemplate;
 use App\Http\Models\Customer;
 use App\Http\Models\CustomerDevice;
 use App\Http\Models\Message;
@@ -57,7 +58,27 @@ class CustomersController extends Controller
     }
     public function activate(Request $request)
     {
-		$response = Customer::find($request->get('customer_id'))->update(['status' => 1]);
+		$customer = Customer::find($request->get('customer_id'));
+		
+		$customer->update(['status' => 1]);
+		
+		$message=ResponseTemplate::find(9);
+		//send message
+		$messaging = new Message([
+			'subject'=>$message->subject,
+			'message'=>str_replace('[customer_name]',$customer->surname." ".$customer->last_name ,$message->message),
+			'recipient'=>$customer->email,
+			'type'=>"email",
+			'status'=>'pending',
+			'service_id'=>0,
+			'attempts'=>0
+		]);
+		
+		if($messaging->save()){
+		        $app = \App::getFacadeRoot();
+				$messagingService = $app->make('Message');
+				$messagingService->sendMessage(array('message_id'=>$messaging->id,'type'=>$messaging->type));
+		}
 		
 		Session::flash('flash_message', 'Customer activated!');
 
@@ -89,12 +110,15 @@ class CustomersController extends Controller
 		    $app = \App::getFacadeRoot();
 			$paymentService = $app->make('Crb');
 			$apiResponse = $paymentService->checkID($details);
-		
-			if($apiResponse["match"]==1){
-				  Session::flash('flash_message',$apiResponse["code"]." : ". $apiResponse["message"]);
-			}else{
-				  Session::flash('flash_message',$apiResponse["code"]." : ". $apiResponse["message"]);
-			}
+				if($apiResponse["code"]==200){
+					if($apiResponse["match"]==1){
+						  Session::flash('flash_message',$apiResponse["code"]." : ". $apiResponse["message"]);
+					}else{
+						  Session::flash('flash_message',$apiResponse["code"]." : ". $apiResponse["message"]);
+					}
+				}else{
+					 Session::flash('flash_message',$apiResponse["code"]." : ". $apiResponse["message"]);
+				}
 		}else{
 			 Session::flash('flash_message',"Customer ID Number is empty");
 		}

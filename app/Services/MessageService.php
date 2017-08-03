@@ -128,12 +128,13 @@ class MessageService {
             'notification' => [
                     'title'=>$payload['subject'],
                     'body'=>$payload['message'],
-                    'sound' => 'default'
+                    'sound' => 'default',
+                    'icon'=>'ic_logo'
                     ],
-            'data' => [
-                    'extraPayLoad1' => 'value1',
-                    'extraPayLoad2' => 'value2'
+             'data' => [
+                      'title'=>$payload['subject'],
                     ]
+           
             ])
         ->setDevicesToken($deviceTokens);
         $response = $push->send()->getFeedback();

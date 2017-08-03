@@ -49,3 +49,8 @@ Route::resource('ussd/ussd', 'Ussd\\UssdController');
 Route::post('ussd/process', 'Ussd\\UssdController@processRequest');
 Route::resource('Organization/organizations', 'Organization\\OrganizationsController');
 Route::resource('Organization/organizations', 'Organization\\OrganizationsController');
+
+
+//ajax report calls
+Route::post('admin/userRegistration', 'Admin\\ReportsController@userRegistration');
+Route::post('admin/loanData', 'Admin\\ReportsController@loanStats');

@@ -13,6 +13,9 @@ class VerifyCsrfToken extends BaseVerifier
      */
     protected $except = [
         '/notifyPayment',
-        'ussd/process'
+        'ussd/process',
+        'admin/userRegistration',
+        'admin/loanData',
+        
     ];
 }

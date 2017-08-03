@@ -39,7 +39,7 @@ return [
     */
     'templates' => [
         'material' => [
-            '#2196F3', '#F44336', '#FFC107',
+            '#602D91', '#8DC853', '#FFC107','#B71C1C', '#F44336', '#E57373',
         ],
         'red-material' => [
             '#B71C1C', '#F44336', '#E57373',
@@ -123,6 +123,7 @@ return [
                 'https://cdnjs.cloudflare.com/ajax/libs/highcharts/5.0.7/js/modules/offline-exporting.js',
                 'https://cdnjs.cloudflare.com/ajax/libs/highmaps/5.0.7/js/modules/map.js',
                 'https://cdnjs.cloudflare.com/ajax/libs/highmaps/5.0.7/js/modules/data.js',
+                'https://code.highcharts.com/modules/drilldown.js',
                 'https://code.highcharts.com/mapdata/custom/world.js',
             ],
         ],

@@ -73,7 +73,7 @@ $(function(){
                             <table class="table table-borderless">
                                 <thead>
                                     <tr>
-                                        <th><input type="checkbox"  id="selectall" />ID</th><th>Mobile Number</th><th>Account Number</th><th>Surname</th><th>Last name</th><th>Other Name</th><th>Status</th><th>Actions</th>
+                                        <th><input type="checkbox"  id="selectall" />ID</th><th>Mobile Number</th><th>Account Number</th><th>Email</th><th>Surname</th><th>Last name</th><th>Other Name</th><th>Status</th><th>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -90,9 +90,15 @@ $(function(){
                                              @if($item->id_verified==1)
                                          <i class="fa fa-check" aria-hidden="true"></i>
                                          @endif
-                                         @if($item->id_verified==2)
+                                         @if($item->id_verified==2 || $item->id_verified==3)
                                          <i class="fa fa-ban" aria-hidden="true"></i>
                                          @endif
+                                         </td>
+											<td>{{ 
+                                         $item->email
+                                         
+                                         }}
+                                         
                                          </td>
                                         <td>{{ $item->surname }}</td><td>{{ $item->last_name }}</td><td>{{ $item->other_name }}</td>
                                         <td>{{ $item->status?"Active":"Inactive" }}</td>
