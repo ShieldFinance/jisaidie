@@ -236,7 +236,7 @@ public function getActionButtons(){
         
             if($user->can('can_add_customer') || $userIsAdmin) {
                 $action_buttons.=<<<ACTIONS
-                        <a href="{{ url('/admin/customers/create') }}" class="btn btn-success btn-sm" title="Add New Customer">
+                        <a href="/admin/customers/create" class="btn btn-success btn-sm" title="Add New Customer">
                             <i class="fa fa-plus" aria-hidden="true"></i> Add New
                         </a>
 ACTIONS;
@@ -244,7 +244,7 @@ ACTIONS;
             
             if($user->can('can_send_message') || $userIsAdmin) {
                 $action_buttons.=<<<ACTIONS
-                       <a href="javascript:void(0)" class="btn btn-success btn-sm send_msg_btn" title="Add New Customer">
+                       <a href="javascript:void(0)" class="btn btn-success btn-sm send_msg_btn" title="Send message">
                             <i class="fa fa-envelope" aria-hidden="true"></i> Send message
                         </a>
 ACTIONS;
