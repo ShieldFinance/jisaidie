@@ -45,8 +45,17 @@ class LoanService{
                     $loan->customer_id = $customer->id;
                     $loan->type = isset($payload['type'])?$payload['type']:"co";
                     $loan->purpose = isset($payload['purpose'])?$payload['purpose']:'';
-                    $loan->status = $loan->type=='nco'?config('app.loanStatus')['approved']:config('app.loanStatus')['pending'];
+                    $status=config('app.loanStatus')['pending'];
+                    $payload['send_loan'] = true;
+                    if($loan->type=='nco' || ($loan->type=='co' && $loan->customer->organization->self_approval)){
+                        $status=config('app.loanStatus')['approved'];
+                    }
+                    if($loan->type=='co'){
+                        $payload['send_loan'] = false;
+                    }
+                    $loan->status = $status;
                     $loan->save();
+                    $payload['loan'] = $loan;
                     $payload['loan_id'] = $loan->id;
                     $payload['response_string'] = 'Loan Created';
                     $payload['response_status'] = config('app.responseCodes')['command_successful'];
@@ -98,15 +107,27 @@ class LoanService{
         $commandStatus = config('app.responseCodes')['no_response'];
         $commandStatus = config('app.responseCodes')['command_failed'];
         if(isset($payload['loan_id'])){
-            $loan = Loan::where('id', $payload['loan_id'])->first();
-            if($loan && $loan->status==config('app.loanStatus')['pending']){
-                $loan->status = config('app.loanStatus')['approved'];
-                $loan->save();
+            if(is_array($payload['loan_id'])){
+             $loans = Loan::whereIn('id', $payload['loan_id'])->get();
+             foreach($loans as $l){
+                 //remove any loan whose status is not pending
+                 if($l->status!=config('app.loanStatus')['pending']){
+                    $key = array_search ($l->id, $payload['loan_id']);
+                    unset($payload['loan_id'][$key]);
+                 }
+             }
+            }else{
+                $payload['loan_id'] = array($payload['loan_id']);
+            }
+            
+            $updated = Loan::whereIn('id', $payload['loan_id'])->update(array('status' => config('app.loanStatus')['approved']));
+            
+            if($updated){
                 $responseString = 'Loan approved';
                 $responseStatus = config('app.responseCodes')['loan_approved'];
                 $commandStatus = config('app.responseCodes')['command_successful'];
             }else{
-                $responseString = 'Loan cannot be approved';
+                $responseString = 'Loans could not be approved, check status';
                 $responseStatus = config('app.responseCodes')['command_successful'];
                 $commandStatus = config('app.responseCodes')['command_failed'];
             }
@@ -117,10 +138,10 @@ class LoanService{
         $payload['command_status'] = $commandStatus;
         return $payload;
     }
-    public function reverse_loan_disbursal($payload){
+    public function disburse_loan($payload){
         if(isset($payload['loan_id'])){
-            $loan = Loan::where('id', $payload['loan_id'])->first();
-            if($loan && $loan->status==config('app.loanStatus')['disbursed']){
+              $loan = Loan::where('id', $payload['loan_id'])->first();
+               if($loan && $loan->status==config('app.loanStatus')['disbursed']){
                 $loan->status = config('app.loanStatus')['approved'];
                 $loan->save();
                 $payload['response_string'] = 'Loan Disbursement reversed';
@@ -128,23 +149,71 @@ class LoanService{
                 $payload['command_status'] = config('app.responseCodes')['command_successful'];
             }
         }
+    }
+    public function reverse_loan_disbursal($payload){
+        $payload['response_string'] = 'Loan id not specified';
+        $payload['response_status'] = config('app.responseCodes')['command_failed'];
+        $payload['command_status'] = config('app.responseCodes')['command_failed'];
+        if(isset($payload['loan_id'])){
+            if(!is_array($payload['loan_id'])){
+                 $payload['loan_id'] = array($payload['loan_id']);
+            }
+            $loans = Loan::whereIn('id', $payload['loan_id'])->get();
+            foreach($loans as $l){
+                //remove any loan whose status is not disbursed
+                if($l->status != config('app.loanStatus')['disbursed'] || $l->payment_status=='Success'){
+                   $key = array_search ($l->id, $payload['loan_id']);
+                   unset($payload['loan_id'][$key]);
+                }
+            }
+            $updated = Loan::whereIn('id', $payload['loan_id'])->update(array('status' => config('app.loanStatus')['approved']));
+             
+            if($updated){
+                $payload['send_loan'] = true;
+                $loan->status = config('app.loanStatus')['disbursed'];
+                $loan->save();
+                $payload['response_string'] = 'Loan Disbursement reversed';
+                $payload['response_status'] = config('app.responseCodes')['command_successful'];
+                $payload['command_status'] = config('app.responseCodes')['command_successful'];
+            }
+        }else{
+            $payload['response_string'] = 'Loan id not specified';
+            $payload['response_status'] = config('app.responseCodes')['command_successful'];
+            $payload['command_status'] = config('app.responseCodes')['command_failed'];
+        }
         return $payload;
     }
     
     public function reject_loan_application($payload){
         if(isset($payload['loan_id'])){
-            $loan = Loan::where('id', $payload['loan_id'])->first();
-            if($loan && $loan->status!=config('app.loanStatus')['disbursed']){
-                $loan->status = config('app.loanStatus')['rejected'];
-                $loan->save();
-                $payload['response_string'] = 'Loan rejected';
-                $payload['response_status'] = config('app.responseCodes')['command_successful'];
-                $payload['command_status'] = config('app.responseCodes')['command_successful'];
-            }else{
-                $payload['response_string'] = 'Loan not rejected';
-                $payload['response_status'] = config('app.responseCodes')['command_successful'];
-                $payload['command_status'] = config('app.responseCodes')['command_failed'];
+            if(!is_array($payload['loan_id'])){
+                 $payload['loan_id'] = array($payload['loan_id']);
             }
+            $loans = Loan::whereIn('id', $payload['loan_id'])->get();
+            foreach($loans as $l){
+                //remove any loan whose status is disbursed,paid or locked
+                if($l->status > config('app.loanStatus')['approved']){
+                   $key = array_search ($l->id, $payload['loan_id']);
+                   unset($payload['loan_id'][$key]);
+                }
+            }
+             
+             $updated = Loan::whereIn('id', $payload['loan_id'])->update(array('status' => config('app.loanStatus')['rejected']));
+             
+             if($updated){
+                 $payload['response_string'] = 'Loan rejected';
+                 $payload['response_status'] = config('app.responseCodes')['loan_rejected'];
+                 $payload['command_status'] = config('app.responseCodes')['command_successful'];
+             }else{
+                 $payload['response_string'] = 'Loan not rejected, check status';
+                 $payload['response_status'] = config('app.responseCodes')['command_successful'];
+                 $payload['command_status'] = config('app.responseCodes')['command_failed'];
+             }
+            
+        }else{
+            $payload['response_string'] = 'Please provide loan_id parameter';
+            $payload['response_status'] = config('app.responseCodes')['command_successful'];
+            $payload['command_status'] = config('app.responseCodes')['command_failed'];
         }
         return $payload;
     }
@@ -161,22 +230,23 @@ class LoanService{
         $commandStatus = config('app.responseCodes')['command_failed'];
         $loan = Loan::where('id', $payload['loan_id'])->first();
         //avoid double disbursement
-        if($loan && $loan->status==config('app.loanStatus')['approved']){
+        if($loan && $loan->status==config('app.loanStatus')['approved'] && $payload['send_loan']){
             $loan = $this->applyCharges($loan);
             $details=array();
-            $details['amount'];
-            
-            //api to send cash here
+            $details['amount']=$loan->amount_requested;
+            $details['mobile_number'] = $loan->customer->mobile_number;
+            $payload['mobile_number'] = $loan->customer->mobile_number;
+            $details['gateway'] =  'mpesa';
+            $details['email'] = $loan->customer->email;
+            $details['item_id'] = $loan->id;
             $app = \App::getFacadeRoot();
-            $paymentService = $app->make('Message');
-            $apiResponse = $paymentService->sendMoney($details);
-           
-            if($apiResponse){
-                
+            $paymentService = $app->make('Payment');
+            $paymentResponse = $paymentService->sendMoney($details);
+            $loan->payment_response = json_encode($paymentResponse);
+            if($paymentResponse[0]->status=='Queued'){
                 $now =Carbon::now()->toDateTimeString();
                 $loan->status= config('app.loanStatus')['disbursed'];
                 $loan->date_disbursed = $now;
-                $loan->save();
                 $responseString = 'Loan sent to customer';
                 $responseStatus = config('app.responseCodes')['loan_disbursed'];
                 $commandStatus = config('app.responseCodes')['command_successful'];
@@ -184,26 +254,21 @@ class LoanService{
                 $payload['message_placeholders']['[customer_name]'] = $loan->customer->surname;
                 $payload['send_notification'] = true;
                 $payload['send_now'] = true;
-                $payload['mobile_number'] = $loan->customer->mobile_number;
-                $payload['gateway'] =  'mpesa';
-                $payload['email'] = $loan->customer->email;
-                $app = \App::getFacadeRoot();
-                $paymentService = $app->make('Payment');
-                $paymentResponse = $paymentService->sendMoney($payload);
-                $loan->payment_response = json_encode($paymentResponse);
+                
                 if(isset($paymentResponse[0]) && $paymentResponse[0]->status=='Queued'){
                     $loan->payment_status = $paymentResponse[0]->status;
                     $loan->transaction_fee = $paymentResponse[0]->transactionFee;
                     $loan->transaction_ref  = $paymentResponse[0]->transactionId;
                     $loan->provider = $paymentResponse[0]->provider;
                 }
-                $loan->save();
+               
                 
             }else{
                 $responseString = 'Loan not sent to customer';
                 $responseStatus = config('app.responseCodes')['command_failed'];
                 $commandStatus = config('app.responseCodes')['command_failed'];
             }
+             $loan->save();
         }else{
            $responseString = 'Loan does not exist or not approved';
            $responseStatus = config('app.responseCodes')['command_failed'];
@@ -246,7 +311,7 @@ class LoanService{
                 }
                 $loan->save();
                 $payment->save();
-            }
+            
             $response['mobile_number'] = $customer->mobile_number;
             $response['email'] = $customer->email;
             $response['send_notification'] = true;
@@ -257,8 +322,8 @@ class LoanService{
             $response['message_placeholders']['[amount]'] = $payment->amount;
             $responseString = 'Payment received';
             $responseStatus = config('app.responseCodes')['command_successful'];
-            $commandStatus = config('app.responseCodes')['command_successful'];
-            
+            $commandStatus = config('app.responseCodes')['command_successful']; 
+            }
         }else{
             $responseStatus = 'Missing parameters';
             $responseStatus = config('app.responseCodes')['command_failed'];
@@ -371,8 +436,8 @@ class LoanService{
         $commandStatus = config('app.responseCodes')['command_failed'];
         
         if(isset($payload['send_notification']) && $payload['send_notification']){
-           $payload['msisdn'] = $payload['mobile_number'];
-           $payload['email'] = $payload['email'];
+           $payload['msisdn'] = isset($payload['mobile_number'])?$payload['mobile_number']:'';
+           $payload['email'] = isset($payload['email'])?$payload['email']:'';
            if($this->responseProcessor->processResponse($payload)){
                $responseStatus = config('app.responseCodes')['command_successful'];
                $commandStatus = config('app.responseCodes')['command_successful'];
@@ -413,11 +478,9 @@ class LoanService{
                 $loanBalance= 0;
                 $loanPaid = 0;
                 $loanTotal=0;
-               
-                if($loan->status== config('app.loanStatus')['disbursed'] || $loan->status==config('app.loanStatus')['locked']){
-                   $loan->balance=$loan->total -$loan->paid;
-                }
-                
+                $loan->balance=$loan->total -$loan->paid;
+                $dateDisbursed = new Carbon($loan->date_disbursed);
+                $loan->sent_at = $dateDisbursed->format('F d, Y');
                 $response['loan'] = $loan;
                 if($loan->balance > 0){
                     $response['can_borrow'] = false;
@@ -449,11 +512,10 @@ class LoanService{
         $fixedCost =  	floatval($this->setting->where('setting_name','fixed_loan_cost')->first()->setting_value);
         $interest =  	floatval($this->setting->where('setting_name','loan_interest_rate')->first()->setting_value);
         $dailyInterest = ($interest/3000);
-        $interestAndLoan = $dailyInterest * $loan->amount_requested;
-        $feesAndLoan = ($fees/100)*$loan->amount_requested;
-        $processedAmount = $loan->amount_requested +$feesAndLoan;
-        $loanTotal = $interestAndLoan + $processedAmount;
-        $loan->daily_interest = $interestAndLoan;
+        $interestToday = $dailyInterest * $loan->amount_requested;
+        $processedAmount = $fees+$loan->amount_requested;
+        $loanTotal = $interestToday + $processedAmount;
+        $loan->daily_interest = $interestToday;
         $loan->amount_processed = ceil($processedAmount);
         $loan->fees = $fees;
         $loan->total = ceil($loanTotal);

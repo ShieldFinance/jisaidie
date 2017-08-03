@@ -32,9 +32,27 @@ $(function(){
               //or
               $("#selected_customers").val(selectedvalue);//this will pass as array and method will be POST
               $('.customers_form').submit();
+             }else{
+                 alert('Please select one or more customers from the list')
              }
              
         });
+        
+        $('.export_customer').click(function(){
+            $('.export_customers').submit();
+        })
+        
+        $('[rel="popover"]').popover({
+        container: 'body',
+        html: true,
+        placement:'bottom',
+        content: function () {
+            var clone = $($(this).data('popover-content')).clone(true).removeClass('hide');
+            return clone;
+        }
+    }).click(function(e) {
+        e.preventDefault();
+    });
        
        });
 </SCRIPT>
@@ -47,24 +65,10 @@ $(function(){
                 <div class="panel panel-default">
                     <div class="panel-heading">Customers</div>
                     <div class="panel-body">
-                        <a href="{{ url('/admin/customers/create') }}" class="btn btn-success btn-sm" title="Add New Customer">
-                            <i class="fa fa-plus" aria-hidden="true"></i> Add New
-                        </a>
-                        <a href="javascript:void(0)" class="btn btn-success btn-sm send_msg_btn" title="Add New Customer">
-                            <i class="fa fa-envelope" aria-hidden="true"></i> Send message
-                        </a>
-                        {!! Form::open(['method' => 'GET', 'url' => '/admin/customers', 'class' => 'navbar-form navbar-right', 'role' => 'search'])  !!}
-                        <div class="input-group">
-                            <input type="text" class="form-control" name="search" placeholder="Search...">
-                            <span class="input-group-btn">
-                                <button class="btn btn-default" type="submit">
-                                    <i class="fa fa-search"></i>
-                                </button>
-                            </span>
-                        </div>
+                         {!! $action_buttons !!}
+                        {!! Form::open(['method' => 'POST', 'url' => '/admin/customers/export', 'class' => 'navbar-form navbar-right export_customers'])  !!}
+                        
                         {!! Form::close() !!}
-
-                        <br/>
                         <br/>
                         <div class="table-responsive">
                              {!! Form::open(['method' => 'POST', 'url' => '/admin/sendMessage', 'class' => 'navbar-form navbar-right customers_form'])  !!}
@@ -73,13 +77,18 @@ $(function(){
                             <table class="table table-borderless">
                                 <thead>
                                     <tr>
+
                                         <th><input type="checkbox"  id="selectall" />ID</th><th>Mobile Number</th><th>Account Number</th><th>Email</th><th>Surname</th><th>Last name</th><th>Other Name</th><th>Status</th><th>Actions</th>
+
                                     </tr>
                                 </thead>
                                 <tbody>
                                 @foreach($customers as $item)
                                     <tr>
-                                        <td><input type="checkbox"  class="customer_cbx" value="{{$item->mobile_number}}"/></td>
+                                        <td>
+                                            <input type="checkbox"  class="customer_cbx" value="{{$item->mobile_number}}"/>
+                                        </td>
+                                         <td>{{ $loop->iteration }}</td>
                                          <td>{{ 
                                          $item->mobile_number
                                          
@@ -94,13 +103,19 @@ $(function(){
                                          <i class="fa fa-ban" aria-hidden="true"></i>
                                          @endif
                                          </td>
+
 											<td>{{ 
                                          $item->email
                                          
                                          }}
                                          
                                          </td>
-                                        <td>{{ $item->surname }}</td><td>{{ $item->last_name }}</td><td>{{ $item->other_name }}</td>
+
+                                        <td>{{ $item->surname }}</td>
+                                        <td>{{ $item->last_name }}</td>
+                                        <td>{{ $item->other_name }}</td>
+                                        <td>{{ $item->company_name }}</td>
+
                                         <td>{{ $item->status?"Active":"Inactive" }}</td>
                                         
                                         <td>
@@ -205,4 +220,41 @@ $(function(){
             </div>
         </div>
     </div>
+<div id="myPopover" class="hide">
+{!! Form::open(['method' => 'GET', 'url' => '/admin/customers', 'class' => 'search_form', 'role' => 'search'])  !!}
+    <div class="input-group">
+        <input type="text" class="form-control" name="search" placeholder="Search...">
+        
+    </div>
+ <div class="input-group">
+
+      <label for="">Organization</label>
+     <select class="form-control" name="search_organization">
+         <option value=''>Select</option>
+         <?php if(isset($organizations)){ ?>
+          @foreach($organizations as $organization)
+         <option value='{{$organization->id}}'>{{$organization->name}}</option>
+         @endforeach
+         <?php } ?>
+     </select>
+    </div>
+<div class="input-group">
+    <label for="">Status</label>
+     <select class="form-control" name="search_status">
+         <option value="">Select</option>
+         <option value="{{ config('app.customerStatus')['new']}}">New</option>
+         <option value='{{ config('app.customerStatus')['active']}}'>Actve</option>
+         <option value='{{ config('app.customerStatus')['suspended']}}'>Suspended</option>
+         <option value='{{ config('app.customerStatus')['deleted']}}'>deleted</option>
+          <option value='{{ config('app.customerStatus')['locked']}}'>Locked</option>
+          <option value='{{ config('app.customerStatus')['one_time_pin']}}'>One Time pin</option>
+          <option value='{{ config('app.customerStatus')['activation_code']}}'>Activation code</option>
+     </select>
+    </div>
+<div style="margin-top:5px; ">
+    <button type="submit" class="btn btn-primary"><i class="fa fa-search"></i> Search</button>
+    <button type="submit" class="btn btn-default pull-right"><i class="fa fa-search"></i> Clear</button>
+</div>
+{!! Form::close() !!}
+</div
 @endsection

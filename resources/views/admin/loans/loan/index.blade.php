@@ -1,6 +1,102 @@
 @extends('layouts.backend')
 
 @section('content')
+<SCRIPT language="javascript">
+$(function(){
+
+	// add multiple select / deselect functionality
+	$("#selectall").click(function () {
+            $('.loan_cbx').attr('checked', this.checked);
+	});
+
+	// if all checkbox are selected, check the selectall checkbox
+	// and viceversa
+	$(".loan_cbx").click(function(){
+
+		if($(".loan_cbx").length == $(".loan_cbx:checked").length) {
+			$("#selectall").attr("checked", "checked");
+		} else {
+			$("#selectall").removeAttr("checked");
+		}
+
+	});
+        
+         $(".process_loan").click(function(){
+            var selectedvalue = [];
+            if ($(':checkbox:checked').length > 0) {
+              $(':checkbox:checked').each(function (i) {
+                  selectedvalue[i] = $(this).val();
+
+              });
+              $("#service").val($(this).data('service'));
+              //$("#page").load("ajax_file.php?t_id="+selectedvalue);//this will pass as string and method will be GET
+              //or
+              $("#selected_loans").val(selectedvalue);//this will pass as array and method will be POST
+              $('.loans_form').submit();
+             }else if($(this).data('service')=='ExportLoans'){
+                  $("#service").val($(this).data('service'));
+                 $('.loans_form').submit();
+             }else{
+                 alert("Please select at least one item from the list")
+             }
+             
+             
+        });
+       
+       $('[rel="popover"]').popover({
+        container: 'body',
+        html: true,
+        placement:'bottom',
+        content: function () {
+            var clone = $($(this).data('popover-content')).clone(true).removeClass('hide');
+            return clone;
+        }
+    }).click(function(e) {
+        e.preventDefault();
+    });
+       });
+       
+       $(document).ready(function () {
+    $(".btn-select").each(function (e) {
+        var value = $(this).find("ul li.selected").html();
+        if (value != undefined) {
+            $(this).find(".btn-select-input").val(value);
+            $(this).find(".btn-select-value").html(value);
+        }
+    });
+});
+
+$(document).on('click', '.btn-select', function (e) {
+    e.preventDefault();
+    var ul = $(this).find("ul");
+    if ($(this).hasClass("active")) {
+        if (ul.find("li").is(e.target)) {
+            var target = $(e.target);
+            target.addClass("selected").siblings().removeClass("selected");
+            var value = target.html();
+            $(this).find(".btn-select-input").val(value);
+            $(this).find(".btn-select-value").html(value);
+        }
+        ul.hide();
+        $(this).removeClass("active");
+    }
+    else {
+        $('.btn-select').not(this).each(function () {
+            $(this).removeClass("active").find("ul").hide();
+        });
+        ul.slideDown(300);
+        $(this).addClass("active");
+    }
+});
+
+$(document).on('click', function (e) {
+    var target = $(e.target).closest(".btn-select");
+    if (!target.length) {
+        $(".btn-select").removeClass("active").find("ul").hide();
+    }
+});
+
+</SCRIPT>
     <div class="container">
         <div class="row">
             @include('admin.sidebar')
@@ -9,56 +105,40 @@
                 <div class="panel panel-default">
                     <div class="panel-heading">Loan</div>
                     <div class="panel-body">
-                        <a href="{{ url('/admin/loan/create') }}" class="btn btn-success btn-sm" title="Add New Loan">
-                            <i class="fa fa-plus" aria-hidden="true"></i> Add New
-                        </a>
-
-                        {!! Form::open(['method' => 'GET', 'url' => '/admin/loan', 'class' => 'navbar-form navbar-right', 'role' => 'search'])  !!}
-                        <div class="input-group">
-                            <input type="text" class="form-control" name="search" placeholder="Search...">
-                            <span class="input-group-btn">
-                                <button class="btn btn-default" type="submit">
-                                    <i class="fa fa-search"></i>
-                                </button>
-                            </span>
-                        </div>
-                        {!! Form::close() !!}
+                        {!! $action_buttons !!}
 
                         <br/>
                         <br/>
+                          {!! Form::open(['method' => 'POST', 'url' => '/admin/loans/process_loan', 'class' => 'navbar-form navbar-right loans_form'])  !!}
+                             <input type="hidden" name="loans" value="" id="selected_loans"/>
+                             <input type="hidden" name="service" value="" id="service"/>
+                           {!! Form::close() !!}
                         <div class="table-responsive">
                             <table class="table table-borderless">
                                 <thead>
                                     <tr>
-                                        <th>ID</th><th>Customer</th><th>Amount Requested</th><th>Amount Processed</th><th>Status<th>Actions</th>
+                                        <th><input type="checkbox"  id="selectall" /></th><th>#</th><th>Customer</th><th>Type</th><th>Amount Requested</th><th>Amount Processed</th><th>Status<th>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                @foreach($loan as $item)
+                                @foreach($loans as $item)
                                     <tr>
-                                        <td>{{ $item->id }}</td>
-                                        <td>{{ $item->customer->mobile_number }}</td><td>{{ $item->amount_requested }}</td><td>{{ $item->amount_processed }}</td><td>{{ array_search ($item->status, config('app.loanStatus')) }}</td>
+                                        <td><input type="checkbox"  class="loan_cbx" value="{{$item->id}}"/></td>
+                                        <td>{{ $loop->iteration }}</td>
+                                        <td>{{ $item->mobile_number }}</td>
+                                         <td>{{ $item->type }}</td>
+                                        <td>{{ $item->amount_requested }}</td>
+                                        <td>{{ $item->amount_processed }}</td>
+                                        <td>{{ array_search ($item->status, config('app.loanStatus')) }}</td>
                                         <td>
                                             <a href="{{ url('/admin/loan/' . $item->id) }}" title="View Loan"><button class="btn btn-info btn-xs"><i class="fa fa-eye" aria-hidden="true"></i> View</button></a>
-                                            <a href="{{ url('/admin/loan/' . $item->id . '/edit') }}" title="Edit Loan"><button class="btn btn-primary btn-xs"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</button></a>
-                                            {!! Form::open([
-                                                'method'=>'DELETE',
-                                                'url' => ['/admin/loan', $item->id],
-                                                'style' => 'display:inline'
-                                            ]) !!}
-                                                {!! Form::button('<i class="fa fa-trash-o" aria-hidden="true"></i> Delete', array(
-                                                        'type' => 'submit',
-                                                        'class' => 'btn btn-danger btn-xs',
-                                                        'title' => 'Delete Loan',
-                                                        'onclick'=>'return confirm("Confirm delete?")'
-                                                )) !!}
-                                            {!! Form::close() !!}
+                                            
                                         </td>
                                     </tr>
                                 @endforeach
                                 </tbody>
                             </table>
-                            <div class="pagination-wrapper"> {!! $loan->appends(['search' => Request::get('search')])->render() !!} </div>
+                            <div class="pagination-wrapper"> {!! $loans->appends(['search' => Request::get('search')])->render() !!} </div>
                         </div>
 
                     </div>
@@ -66,4 +146,48 @@
             </div>
         </div>
     </div>
+<div id="myPopover" class="hide">
+{!! Form::open(['method' => 'GET', 'url' => '/admin/loan', 'class' => 'search_form', 'role' => 'search'])  !!}
+    <div class="input-group">
+        <input type="text" class="form-control" name="search" placeholder="Search...">
+        
+    </div>
+ <div class="input-group">
+      <label for="">Organization</label>
+     <select class="form-control" name="search_organization">
+         <option value=''>Select</option>
+         <?php if(isset($organizations)){ ?>
+          @foreach($organizations as $organization)
+         <option value='{{$organization->id}}'>{{$organization->name}}</option>
+         @endforeach
+         <?php } ?>
+     </select>
+    </div>
+<div class="input-group">
+    <label for="">Loan type</label>
+     <select class="form-control" name="search_type">
+         <option value="">Select</option>
+         <option value='co'>Checkoff</option>
+         <option value='nco'>Non Checkoff</option>
+     </select>
+    </div>
+<div class="input-group">
+    <label for="">Loan Status</label>
+     <select class="form-control" name="search_status">
+         <option value="">Select</option>
+         <option value="{{ config('app.loanStatus')['pending']}}">Pending</option>
+         <option value='{{ config('app.loanStatus')['approved']}}'>Approved</option>
+         <option value='{{ config('app.loanStatus')['disbursed']}}'>Disbursed</option>
+         <option value='{{ config('app.loanStatus')['rejected']}}'>Rejected</option>
+          <option value='{{ config('app.loanStatus')['locked']}}'>Locked</option>
+          <option value='{{ config('app.loanStatus')['paid']}}'>Paid</option>
+     </select>
+    </div>
+<div style="margin-top:5px; ">
+    <button type="submit" class="btn btn-primary"><i class="fa fa-search"></i> Search</button>
+    <button type="submit" class="btn btn-default pull-right"><i class="fa fa-search"></i> Clear</button>
+
+</div>
+{!! Form::close() !!}
+</div
 @endsection

@@ -16,6 +16,7 @@ use App\Mail\AppEmail;
 use Edujugon\PushNotification\PushNotification;
 use App\Http\Models\CustomerDevice;
 use App\Http\Models\Customer;
+use App\Http\Models\Loan;
 class PaymentService {
 
     /**
@@ -28,7 +29,7 @@ class PaymentService {
            $gatewayFunction = 'send' . strtoupper($payload['gateway']);
             $details = array();
             $details['recepient'] = $payload['mobile_number'];
-            $details['amount'] = 50;
+            $details['amount'] = $payload['amount'];
             $data = $this->$gatewayFunction($details);
             
         }
@@ -40,15 +41,18 @@ class PaymentService {
         $key = Setting::where('setting_name', 'prsp_api_key')->first()->setting_value;
         $senderId = Setting::where('setting_name', 'prsp_sender_id')->first()->setting_value;
         $productName = Setting::where('setting_name', 'mpesa_product_name')->first()->setting_value;
+        // Here you should provide providerChannel as your B2C paybill
+        $providerChannel = "387070";
         $gateway = new AfricasTalkingGateway($username, $key);
-        $recipient1   = array("phoneNumber" => "+".$payload['recepient'],
+        $recipient   = array("phoneNumber" => "+".$payload['recepient'],
                        "currencyCode" => "KES",
+                       "providerChannel"=>$providerChannel,
                        "amount"       => $payload['amount'],
-                       "metadata"     => array("name"   => "Test Api",
+                       "metadata"     => array("mobile_number"   => $payload['recepient'],
                                                "reason" => "Develop")
               );
-        $recipients  = array($recipient1);
-        $responses = $gateway->mobilePaymentB2CRequest($productName, $recipients);
+        $recipients  = array($recipient);
+        $responses = $gateway->mobilePaymentB2CRequest($productName,$providerChannel, $recipients);
         $response = $responses[0];
         if ($response->status == "Queued") {
         $return['transaction_id']=$response->transactionId;
@@ -62,15 +66,20 @@ class PaymentService {
         $key = Setting::where('setting_name', 'prsp_api_key')->first()->setting_value;
         $senderId = Setting::where('setting_name', 'prsp_sender_id')->first()->setting_value;
         $productName = Setting::where('setting_name', 'mpesa_product_name')->first()->setting_value;
+        $providerChannel = "777400";
         $gateway = new AfricasTalkingGateway($username, $key);
-        $currencyCode = $payload['currency'];
+        $currencyCode = 'KES';
         $phoneNumber = $payload['mobile_number'];
-        $amount  = $payload['amount'];
+        $customer = Customer::where('mobile_number',$phoneNumber)->first();
+        $loan = $customer->loans->take(1);
+        $loan = $loan[0];
+        $amount = $loan->total - $loan->paid;
         $metadata = isset($payload['metadata'])?$payload['metadata']:array('mobile_number'=>$phoneNumber);
         $response = array();
         $response['transactionId'] = 0;
         try{
-         $response['transactionId'] = $gateway->initiateMobilePaymentCheckout($productName, $phoneNumber,$currencyCode,$amount,$metadata);
+         $response['transactionId'] = $gateway->initiateMobilePaymentCheckout($productName, $providerChannel,
+                 $phoneNumber,$currencyCode,$amount,$metadata);
         }catch(AfricasTalkingGatewayException $ex){
              $response['message']=$ex->getMessage();
         }

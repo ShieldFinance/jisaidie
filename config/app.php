@@ -164,6 +164,7 @@ return [
         Illuminate\View\ViewServiceProvider::class,
         Chrisbjr\ApiGuard\Providers\ApiGuardServiceProvider::class,
         Edujugon\PushNotification\Providers\PushNotificationServiceProvider::class,
+        Maatwebsite\Excel\ExcelServiceProvider::class,
 
         /*
          * Package Service Providers...
@@ -237,6 +238,7 @@ return [
         'HTML' => Collective\Html\HtmlFacade::class,
         'PushNotification' => Edujugon\PushNotification\Facades\PushNotification::class,
         'Charts' => ConsoleTVs\Charts\Facades\Charts::class,
+        'Excel' => 'Maatwebsite\Excel\Facades\Excel',
 
     ],
     'responseCodes' =>[
@@ -255,6 +257,7 @@ return [
         'loan_approved'=>201,//A loan approved successfully
         'loan_rejected'=>202,//A loan approval rejected
         'loan_disbursed'=>203,//A loan sent to customer
+        'loan_disbursed_reversed'=>204,//Loan changed from disbursed to approved
         'loan_paid'=>205,
         'overpayment'=>206,
         'no_response'=>300,
@@ -278,12 +281,12 @@ return [
         'activation_code'=>6,//User has been sent activation code
     ],
     'loanStatus' =>[
-        'pending' => 0,//New loan pending approval
-        'approved' => 1,//approved (for checkoff loans)
-        'rejected' => 2,//rejected (for checkoff loans)
-        'disbursed' => 3,//sent to customer
-        'locked'=>4,//submitted to crb
-        'paid'=>5//loan paid
+        'pending' => 2,//New loan pending approval
+        'rejected' => 3,//rejected (for checkoff loans)
+        'approved'=>4,//approved (for checkoff loans)
+        'disbursed'=>5,//loan disbursed to customer,
+        'paid'=>6,//loan disbursed to customer
+        'locked'=>7,//loan disbursed to customer
     ],
 
 ];

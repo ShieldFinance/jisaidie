@@ -84,9 +84,9 @@ return [
     |
     */
 
-    'username' => env('kennykinako@gmail.com'),
+    'username' => env('dev@jisaidie.co.ke'),
 
-    'password' => env('Mckennie2000%%'),
+    'password' => env('Digi/2017'),
 
     /*
     |--------------------------------------------------------------------------

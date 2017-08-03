@@ -39,6 +39,7 @@ class Customer extends Model
     public function loans()
     {
         return $this->hasMany('App\Http\Models\Loan')->orderBy("id","desc");
+
     }
     
     public function getLoanStatement($params){

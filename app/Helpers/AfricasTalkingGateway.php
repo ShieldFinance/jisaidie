@@ -279,6 +279,8 @@ class AfricasTalkingGateway
 
   // Payments
   public function initiateMobilePaymentCheckout($productName_,
+          
+                                                $providerChannel_,
 						$phoneNumber_,
 						$currencyCode_,
 						$amount_,
@@ -288,7 +290,9 @@ class AfricasTalkingGateway
 					    "phoneNumber"  => $phoneNumber_,
 					    "currencyCode" => $currencyCode_,
 					    "amount"       => $amount_,
+                                            "providerChannel" =>  $providerChannel_,
 					    "metadata"     => $metadata_));
+   
     $this->_requestUrl  = $this->getMobilePaymentCheckoutUrl();
     
     $this->executeJsonPOST();
@@ -300,10 +304,11 @@ class AfricasTalkingGateway
     throw new AfricasTalkingGatewayException($this->_responseBody);
   }
 
-  public function mobilePaymentB2CRequest($productName_,
+  public function mobilePaymentB2CRequest($productName_,$providerChannel_,
 					  $recipients_) {
     $this->_requestBody = json_encode(array("username"     => $this->_username,
 					    "productName"  => $productName_,
+                                            "providerChannel" => $providerChannel_,
 					    "recipients"   => $recipients_));
 		
     $this->_requestUrl  = $this->getMobilePaymentB2CUrl();
