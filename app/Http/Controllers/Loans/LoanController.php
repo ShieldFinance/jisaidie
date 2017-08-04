@@ -7,11 +7,13 @@ use App\Http\Controllers\Controller;
 use App\Http\Controllers\ServiceProcessor;
 use App\Http\Models\Loan;
 use App\Http\Models\Customer;
+use App\Http\Models\Message;
+use App\Http\Models\ResponseTemplate;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use Session;
 use Illuminate\Support\Facades\DB;
-
+use Carbon\Carbon;
 class LoanController extends Controller
 {
     /**
@@ -360,5 +362,125 @@ ACTIONS;
         Session::flash('flash_message', 'Loan deleted!');
 
         return redirect('admin/loan');
+    }
+    
+    public function sendReminders(Request $request){
+        $today = Carbon::today();  
+        $daysAgo = $today->copy()->subDays(28)->toDateTimeString();
+        $loans = Loan::whereDate('date_disbursed', '<=', $daysAgo)
+	   ->whereDate('last_sent', '<>', date('Y-m-d'))
+	   ->where('status','=',config('app.loanStatus')['disbursed'])
+           ->take(200)
+           ->get();
+        $overDueMessage1 = ResponseTemplate::find(10);
+        $overDueMessage2 = ResponseTemplate::find(10);;
+        $reminderMessage1 = ResponseTemplate::find(11);;
+        $reminderMessage2 = ResponseTemplate::find(12);;
+        $messages = array();
+        $messageString ='';
+        $subject ='';
+        $loan_ids=array();
+        foreach($loans as $loan){
+            $dateDisbursed = new Carbon($loan->date_disbursed);
+            $dueDate = $dateDisbursed->copy()->addDays(30);
+            $diff = $today->diffInDays($dueDate,false);
+            echo 'Date disbursed: '.$dateDisbursed->toDateString().' <br>';
+            echo 'Due date: '.$dueDate->toDateString().' <br>';
+            echo 'Day remaining: '.$diff.'<p>';
+            $balance = $loan->total - $loan->paid;
+            if($diff==2){
+                $messageString = $reminderMessage1->message;
+                $subject = $reminderMessage1->subject;
+            }elseif($diff==0){
+                $messageString = $reminderMessage2->message;
+                $subject = $reminderMessage2->subject;
+            }elseif($diff == -1){
+                $messageString = $overDueMessage1->message;
+                $subject = $overDueMessage1->subject;
+            }elseif($diff == -5){
+                $messageString = $overDueMessage2->message;
+                $subject = $overDueMessage2->subject;
+            }
+            if(strlen($messageString)){
+                $loan_ids[] = $loan->id;
+                $messageString = str_replace('[customer_name]', $loan->customer->surname, $messageString);
+                $messageString = str_replace('[amount]', $loan->total, $messageString);
+                $messageString = str_replace('[loan_balance]', $balance, $messageString);
+                $messageString = str_replace('[due_date]', $dueDate->format('F d, Y'), $messageString);
+                $messages[] = [
+                            'subject' => $subject,
+                            'message' => $messageString,
+                            'recipient' => $loan->customer->mobile_number,
+                            'type' => 'sms',
+                            'status' => 'pending',
+                            'attempts' => 0,
+                            'service_id'=>0
+                    ];
+            }
+        }
+        if(!empty($messages)){
+            Message::insert($messages);
+            Loan::whereIn('id', $loan_ids)->update(['last_sent'=>$today->toDateTimeString()]);
+        }
+        
+    }
+    
+    public function lockLoans(Request $request){
+        $today = Carbon::today();  
+        $daysAgo = $today->subDays(60)->toDateTimeString();
+        $loans = Loan::whereDate('date_disbursed', '<=', $daysAgo)
+	   ->whereDate('last_sent', '<>', date('Y-m-d'))
+	   ->where('status','=',config('app.loanStatus')['disbursed'])
+           ->take(200)
+           ->get();
+        if(!empty($loans)){
+            $loan_ids = array();
+            $customer_ids = array();
+            $messages = array();
+            $template = ResponseTemplate::find(13);
+            $messageString = $template->message;
+            foreach($loans as $loan){
+                $balance = $loan->total - $loan->paid;
+                if($balance > 0){
+                    $loan_ids[]=$loan->id;
+                    $customer_ids[]=$loan->customer_id;
+                    $dateDisbursed = new Carbon($loan->date_disbursed);
+                    $dueDate = $dateDisbursed->copy()->addDays(30);
+                    $messageString = str_replace('[customer_name]', $loan->customer->surname, $messageString);
+                    $messageString = str_replace('[loan_balance]', $balance, $messageString);
+                    $messageString = str_replace('[due_date]', $dueDate->format('F d, Y'), $messageString);
+                     $messages[] = [
+                            'subject' => $template->subject,
+                            'message' => $messageString,
+                            'recipient' => $loan->customer->mobile_number,
+                            'type' => 'sms',
+                            'status' => 'pending',
+                            'attempts' => 0,
+                            'service_id'=>0
+                    ];
+                }
+            }
+            
+            if(!empty($messages)){
+                Customer::whereIn('id', $customer_ids)->update(array('status' => config('app.customerStatus')['locked']));
+                Loan::whereIn('id', $loan_ids)->update(array('status' => config('app.loanStatus')['locked']));
+                Message::insert($messages);
+            }
+        }
+    }
+    
+    public function applyDailyCharges(Request $request){
+        $app = \App::getFacadeRoot();
+        $loanService = $app->make('Loan');
+        $loans = Loan::where('status','=',config('app.loanStatus')['disbursed'])
+                       ->where('last_fees_update','<>',date('Y-m-d'))
+                       ->take(200)
+                       ->get();
+        if(!empty($loans)){
+            foreach($loans as $loan){
+                $balance = $loan->total - $loan->paid;
+                $loanService->applyCharges($loan);
+            }
+        }
     }
 }
