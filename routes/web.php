@@ -17,6 +17,9 @@ Route::get('/', 'HomeController@index')->name('home');
 Route::get('/home', 'HomeController@index')->name('home');
 Route::get('/sendMessages', 'Services\\MessagesController@sendQueuedMessages');
 Route::post('/notifyPayment', 'Payments\\PaymentsController@receivePayment');
+Route::get('/sendReminders', 'Loans\\LoanController@sendReminders');
+Route::get('/applyCharges', 'Loans\\LoanController@applyDailyCharges');
+Route::get('/lockLoans', 'Loans\\LoanController@lockLoans');
 Route::group(['middleware' => 'auth'], function() {
   Route::post('/admin/sendMessage', 'Services\\MessagesController@sendMessage');
 Route::get('admin', 'Admin\AdminController@index');

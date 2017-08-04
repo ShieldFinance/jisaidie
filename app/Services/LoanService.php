@@ -516,13 +516,14 @@ class LoanService{
             $fees = floatval($this->setting->where('setting_name',$charges)->first()->setting_value);
             //$fixedCost =  	floatval($this->setting->where('setting_name','fixed_loan_cost')->first()->setting_value);
             $loan->amount_processed = ceil($fees+$loan->amount_requested);
-            $loan->total = $loan->amount_processed + $interestToday;
+            $loan->total = ceil($loan->amount_processed + $interestToday);
             $loan->daily_interest = $interestToday;
             $loan->fees = $fees;
         }else{
             //this is an existing loan, just add the daily fees
-            $loan->total+=$interestToday;
+            $loan->total+=ceil($interestToday);
         }
+        $loan->last_fees_update = Carbon::now()->toDateTimeString();
         $loan->save();
         return $loan;
     }

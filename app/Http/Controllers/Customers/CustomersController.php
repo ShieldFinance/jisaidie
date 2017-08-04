@@ -9,6 +9,7 @@ use App\Http\Models\ResponseTemplate;
 use App\Http\Models\Customer;
 use App\Http\Models\CustomerDevice;
 use App\Http\Models\Message;
+use App\Http\Models\Organization;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
@@ -276,7 +277,15 @@ ACTIONS;
      */
     public function create()
     {
-        return view('admin/customers.customers.create');
+        $customer_status = array_flip(config('app.customerStatus'));
+        $organizations = array('0'=>'Select an organization');
+        $orgs = Organization::all();
+        if(!empty($orgs)){
+        foreach($orgs as $org){
+            $organizations[$org->id]=$org->name;
+        }
+        }
+        return view('admin/customers.customers.create',compact('customer_status','organizations'));
     }
 
     /**
@@ -289,11 +298,11 @@ ACTIONS;
     public function store(Request $request)
     {
         $this->validate($request, [
-			'first_name' => 'required',
+			'surname' => 'required',
 			'last_name' => 'required',
 			'id_number' => 'required',
 			'net_salary' => 'required',
-			'organization_id' => 'required'
+			'mobile_number' => 'required'
 		]);
         $requestData = $request->all();
         
@@ -328,8 +337,15 @@ ACTIONS;
     public function edit($id)
     {
         $customer = Customer::findOrFail($id);
-
-        return view('admin/customers.customers.edit', compact('customer'));
+        $customer_status = array_flip(config('app.customerStatus'));
+        $organizations = array('0'=>'Select an organization');
+        $orgs = Organization::all();
+        if(!empty($orgs)){
+        foreach($orgs as $org){
+            $organizations[$org->id]=$org->name;
+        }
+        }
+        return view('admin/customers.customers.edit', compact('customer','customer_status','organizations'));
     }
 
     /**
@@ -343,11 +359,11 @@ ACTIONS;
     public function update($id, Request $request)
     {
         $this->validate($request, [
-			'first_name' => 'required',
+			'surname' => 'required',
 			'last_name' => 'required',
+			'mobile_number' => 'required',
 			'id_number' => 'required',
-			'net_salary' => 'required',
-			'organization_id' => 'required'
+			'net_salary' => 'required'
 		]);
         $requestData = $request->all();
         
