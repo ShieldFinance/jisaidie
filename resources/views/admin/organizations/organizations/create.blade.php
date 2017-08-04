@@ -23,7 +23,7 @@
 
                         {!! Form::open(['url' => '/admin/organizations', 'class' => 'form-horizontal', 'files' => true]) !!}
 
-                        @include ('admin\organizations.organizations.form')
+                        @include ('admin/organizations.organizations.form')
 
                         {!! Form::close() !!}
 
