@@ -23,7 +23,7 @@
 
                         {!! Form::open(['url' => '/admin/customers', 'class' => 'form-horizontal', 'files' => true]) !!}
 
-                        @include ('admin\customers.customers.form')
+                        @include ('admin/customers.customers.form')
 
                         {!! Form::close() !!}
 
