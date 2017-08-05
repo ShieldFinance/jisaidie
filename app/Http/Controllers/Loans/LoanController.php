@@ -52,7 +52,7 @@ class LoanController extends Controller
         ->join('customers as c', 'c.id', '=', 'loans.customer_id')
         ->leftJoin('organization', 'organization.id', '=', 'c.organization_id')
         ->where($wheres)
-        ->select('loans.*','c.mobile_number')
+        ->select('loans.*','c.mobile_number','c.email','c.id_number',DB::raw('CONCAT(c.surname, " ", c.last_name) AS customer_name'))
         ->orderBy('loans.id','desc')
         ->paginate($perPage);
         $request->session()->put('loans', $loans);

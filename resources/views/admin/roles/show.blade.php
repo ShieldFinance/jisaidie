@@ -38,9 +38,11 @@
                                     <tr>
                                         <td>{{ $role->id }}</td> 
                                         <td> {{ $role->name }} </td>
-                                        <td><ol>
+                                        <td>
+                                            
+                                            <ol>
                                             @foreach($permissions as $item)
-                                            <li>{{ $item->permission_name }}</li>
+                                            <li>{{ $item->permission_label }}</li>
                                             @endforeach
                                             </ol>
                                         </td>

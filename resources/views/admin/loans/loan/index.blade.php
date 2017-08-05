@@ -117,7 +117,16 @@ $(document).on('click', function (e) {
                             <table class="table table-borderless">
                                 <thead>
                                     <tr>
-                                        <th><input type="checkbox"  id="selectall" /></th><th>#</th><th>Customer</th><th>Type</th><th>Amount Requested</th><th>Amount Processed</th><th>Status<th>Actions</th>
+                                        <th><input type="checkbox"  id="selectall" /></th>
+                                        <th>#</th>
+                                        <th>Account</th>
+                                        <th>Name</th>
+                                        <th>Type</th>
+                                        <th>Amount Requested</th>
+                                        <th>Amount Processed</th>
+                                        <th>Total</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -125,10 +134,16 @@ $(document).on('click', function (e) {
                                     <tr>
                                         <td><input type="checkbox"  class="loan_cbx" value="{{$item->id}}"/></td>
                                         <td>{{ $loop->iteration }}</td>
-                                        <td>{{ $item->mobile_number }}</td>
+                                        <td>
+                                            <b>Phone:</b> {{ $item->mobile_number }}<br>
+                                            <b>Email:</b> {{ $item->email}}<br>
+                                            <b>Id No.</b> {{ $item->id_number}}
+                                        </td>
+                                        <td>{{$item->customer_name}}</td>
                                          <td>{{ $item->type }}</td>
                                         <td>{{ $item->amount_requested }}</td>
                                         <td>{{ $item->amount_processed }}</td>
+                                        <td>{{ number_format($item->total,2,'.',',')}}</td>
                                         <td>{{ array_search ($item->status, config('app.loanStatus')) }}</td>
                                         <td>
                                             <a href="{{ url('/admin/loan/' . $item->id) }}" title="View Loan"><button class="btn btn-info btn-xs"><i class="fa fa-eye" aria-hidden="true"></i> View</button></a>
