@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Models;
-
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use App\Http\Models\Customer;
 class Loan extends Model
@@ -29,6 +29,8 @@ class Loan extends Model
         'invoiced'=>'0',
         'deleted'=>0,
         'transaction_fee'=>0,
+        'last_fees_update'=>'1970-01-01 00:00:00',
+        'last_sent'=>'1970-01-01 00:00:00'
     ];
 
     /**

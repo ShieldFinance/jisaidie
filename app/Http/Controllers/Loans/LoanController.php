@@ -47,9 +47,10 @@ class LoanController extends Controller
         if(empty($wheres)){
             $wheres[] = ['loans.id','>',0];
         }
+        
         $loans = DB::table('loans')
         ->join('customers as c', 'c.id', '=', 'loans.customer_id')
-        ->join('organization', 'organization.id', '=', 'c.organization_id')
+        ->leftJoin('organization', 'organization.id', '=', 'c.organization_id')
         ->where($wheres)
         ->select('loans.*','c.mobile_number')
         ->orderBy('loans.id','desc')
@@ -76,11 +77,13 @@ class LoanController extends Controller
             }
             $details = array('loan_id'=>$loan_ids);
             $canProcess = false;
+            
             if($action=='ApproveLoan' && $user->can('can_approve_loan')){
                 $canProcess = true;
                 $returnKey = 'approve_loan_application';
                 $successMessage = "Loans approved";
                 $checkStatus = config('app.responseCodes')['loan_approved'];
+               
             }
             if($action=='DisburseLoan' && $user->can('can_disburse_loan')){
                 $canProcess = true;
@@ -128,12 +131,11 @@ class LoanController extends Controller
                 $canProcess = false;
                 $this->export($request);
             }
-            if($userIsAdmin){
-                $canProcess = true;
-            }
+            
             if($canProcess){
                 $request->request->add(['action' => $action,'request'=>json_encode($details)]);
                 $response = $serviceProcessor->doProcess($request);
+               
                 if(isset($response[$returnKey]) && $response[$returnKey]['response_status']==$checkStatus){
                     $flashMessage = $successMessage;
                 }else{
@@ -146,7 +148,7 @@ class LoanController extends Controller
         }
         $loans = DB::table('loans')
                 ->join('customers as c', 'c.id', '=', 'loans.customer_id')
-                ->join('organization', 'organization.id', '=', 'c.organization_id')
+                ->leftjoin('organization', 'organization.id', '=', 'c.organization_id')
                 ->where([['loans.id','>',0]])
                 ->select('loans.*','c.mobile_number')
                 ->orderBy('loans.id','desc')

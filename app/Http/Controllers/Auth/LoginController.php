@@ -44,6 +44,6 @@ class LoginController extends Controller
             return redirect('admin/reports');
         }
 
-     return redirect('admin/dashboard');
+     return redirect('admin');
     }
 }
