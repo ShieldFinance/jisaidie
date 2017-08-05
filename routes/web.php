@@ -59,3 +59,5 @@ Route::resource('Organization/organizations', 'Organization\\OrganizationsContro
 //ajax report calls
 Route::post('admin/userRegistration', 'Admin\\ReportsController@userRegistration');
 Route::post('admin/loanData', 'Admin\\ReportsController@loanStats');
+Route::post('admin/loanDataAverages', 'Admin\\ReportsController@loanDataAverages');
+
