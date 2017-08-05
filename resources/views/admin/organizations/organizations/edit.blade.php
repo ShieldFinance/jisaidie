@@ -28,7 +28,7 @@
                             'files' => true
                         ]) !!}
 
-                        @include ('admin\organizations.organizations.form', ['submitButtonText' => 'Update'])
+                        @include ('admin/organizations.organizations.form', ['submitButtonText' => 'Update'])
 
                         {!! Form::close() !!}
 

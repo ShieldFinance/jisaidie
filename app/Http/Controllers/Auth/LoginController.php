@@ -1,10 +1,10 @@
 <?php
 
 namespace App\Http\Controllers\Auth;
-
+use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
-
+use Illuminate\Support\Facades\Auth;
 class LoginController extends Controller
 {
     /*
@@ -25,7 +25,7 @@ class LoginController extends Controller
      *
      * @var string
      */
-    protected $redirectTo = '/home';
+    protected $redirectTo = 'admin/reports';
 
     /**
      * Create a new controller instance.
@@ -35,5 +35,15 @@ class LoginController extends Controller
     public function __construct()
     {
         $this->middleware('guest')->except('logout');
+    }
+    protected function authenticated(Request $request)
+    {
+        $user = Auth::user();
+        $userIsAdmin =  Auth::user()->hasRole('Super Admin');
+        if ( $user->can('can_view_reports') || $userIsAdmin ) {// do your margic here
+            return redirect('admin/reports');
+        }
+
+     return redirect('admin');
     }
 }

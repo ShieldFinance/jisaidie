@@ -148,7 +148,7 @@ class PaymentsController extends Controller
         $data  = $request->json()->all();
         try{
             $mobileNumber = $data['source'];
-            if(isset($data['requestMetadata'])){
+            if(isset($data['requestMetadata']) && isset($data['requestMetadata']['mobile_number'])){
                 $mobileNumber = $data['requestMetadata']['mobile_number'];
             }
             $values = explode(' ',$data['value']);
@@ -161,6 +161,15 @@ class PaymentsController extends Controller
             $providerFees = explode(' ', $providerFees);
             if(isset($data['clientAccount']) && strlen($data['clientAccount'])){
                 $mobileNumber = $data['clientAccount'];
+                $prefix = mb_substr($mobileNumber, 0, 1);
+                echo $mobileNumber.' ';
+                if($prefix=='0'){
+                    $mobileNumber = str_replace($prefix, '254',$mobileNumber);
+                }
+                if($prefix=='+'){
+                    $mobileNumber = str_replace($prefix, '',$mobileNumber);
+                }
+               
             }
             //check if we already have an existing payment
             $oldPayment = Payment::where('reference', $data['transactionId'])->first();
@@ -198,6 +207,7 @@ class PaymentsController extends Controller
             }
         }catch(\Exception $e){
             Log::error('Error: '.$e->getMessage());
+            Log::error("Response: ".json_encode($data));
             return array('Error: '.$e->getMessage());
         }
         return $response;

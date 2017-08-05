@@ -28,7 +28,7 @@
                             'files' => true
                         ]) !!}
 
-                        @include ('admin\customers.customers.form', ['submitButtonText' => 'Update'])
+                        @include ('admin/customers.customers.form', ['submitButtonText' => 'Update'])
 
                         {!! Form::close() !!}
 

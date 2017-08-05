@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Mail\AppEmail;
 use App\Http\Models\ResponseTemplate;
 use App\Http\Models\Message;
+use App\Http\Models\Service;
 use Illuminate\Http\Request;
 use Session;
 
@@ -45,7 +46,12 @@ class ResponseTemplatesController extends Controller
      */
     public function create()
     {
-        return view('admin.response-templates.create');
+        $servs = Service::all();
+        $services = array();
+        foreach($servs as $service){
+            $services[$service->id]=$service->name;
+        }
+        return view('admin.response-templates.create',compact('services'));
     }
 
     /**
@@ -98,8 +104,12 @@ class ResponseTemplatesController extends Controller
     public function edit($id)
     {
         $responsetemplate = ResponseTemplate::findOrFail($id);
-
-        return view('admin.response-templates.edit', compact('responsetemplate'));
+        $servs = Service::all();
+        $services = array();
+        foreach($servs as $service){
+            $services[$service->id]=$service->name;
+        }
+        return view('admin.response-templates.edit', compact('responsetemplate','services'));
     }
 
     /**

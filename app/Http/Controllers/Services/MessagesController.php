@@ -87,7 +87,7 @@ class MessagesController extends Controller
 
         Session::flash('flash_message', 'Message added!');
         Log::info("Request Cycle with Queues Begins");
-        $this->dispatch(new SendBatchMessages());
+        $this->dispatch((new SendBatchMessages())->delay(5));
         Log::info("Request Cycle with Queues Ends");
         return redirect('admin/messages');
     }

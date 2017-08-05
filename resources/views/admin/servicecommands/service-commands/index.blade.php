@@ -37,7 +37,7 @@
                                 @foreach($servicecommands as $item)
                                     <tr>
                                         <td>{{ $item->id }}</td>
-                                        <td>{{ $item->processing_function }}</td><td>{{ $item->service_id }}</td><td>{{ $item->level }}</td>
+                                        <td>{{ $item->processing_function }}</td><td>{{ $item->service->name }}</td><td>{{ $item->level }}</td>
                                         <td>
                                             <a href="{{ url('/admin/service-commands/' . $item->id) }}" title="View ServiceCommand"><button class="btn btn-info btn-xs"><i class="fa fa-eye" aria-hidden="true"></i> View</button></a>
                                             <a href="{{ url('/admin/service-commands/' . $item->id . '/edit') }}" title="Edit ServiceCommand"><button class="btn btn-primary btn-xs"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</button></a>

@@ -20,7 +20,7 @@ class MessageService {
     public function sendMessages() {
         $messages = Message::where([
                     ['status', '=', 'pending'],
-                ])->limit(1)->get();
+                ])->limit(20)->get();
         if (count($messages)) {
             foreach ($messages as $message) {
                 $type = strtoupper($message->type);
@@ -104,9 +104,13 @@ class MessageService {
     }
 
     public function sendEMAIL($payload) {
-      $response = \Mail::to($payload['recepient'])->send(new AppEmail($payload['message'],$payload['subject']));
-     
-      return array('status'=>'Success','attempts'=>1);
+        $response = array('status'=>'Failed','attempts'=>1);
+        if (filter_var($payload['recepient'], FILTER_VALIDATE_EMAIL)) {
+             $response = \Mail::to($payload['recepient'])->send(new AppEmail($payload['message'],$payload['subject']));
+             $response =array('status'=>'Success','attempts'=>1);
+        }
+      
+      return $response;
     }
     
     public function sendINAPP($payload){
@@ -139,7 +143,7 @@ class MessageService {
         ->setDevicesToken($deviceTokens);
         $response = $push->send()->getFeedback();
         
-        $data['status'] = $response->success?'Success':'pending';
+        $data['status'] = $response->success?'Success':$data['status'];
         if($response->failure){
             $data['status']='failed';
         }

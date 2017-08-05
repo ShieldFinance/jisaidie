@@ -49,14 +49,15 @@
 </div><div class="form-group {{ $errors->has('is_checkoff') ? 'has-error' : ''}}">
     {!! Form::label('is_checkoff', 'Is Checkoff', ['class' => 'col-md-4 control-label']) !!}
     <div class="col-md-6">
-        {!! Form::number('is_checkoff', null, ['class' => 'form-control']) !!}
+        {!! Form::select('is_checkoff', array('1' => 'Yes', '0' => 'No'),['class' => 'form-control']) !!};
         {!! $errors->first('is_checkoff', '<p class="help-block">:message</p>') !!}
     </div>
 </div><div class="form-group {{ $errors->has('status') ? 'has-error' : ''}}">
     {!! Form::label('status', 'Status', ['class' => 'col-md-4 control-label']) !!}
     <div class="col-md-6">
-        {!! Form::number('status', null, ['class' => 'form-control']) !!}
+         {!! Form::select('status', $customer_status,['class' => 'form-control']) !!};
         {!! $errors->first('status', '<p class="help-block">:message</p>') !!}
+        
     </div>
 </div><div class="form-group {{ $errors->has('activation_code') ? 'has-error' : ''}}">
     {!! Form::label('activation_code', 'Activation Code', ['class' => 'col-md-4 control-label']) !!}
@@ -67,7 +68,7 @@
 </div><div class="form-group {{ $errors->has('organization_id') ? 'has-error' : ''}}">
     {!! Form::label('organization_id', 'Organization Id', ['class' => 'col-md-4 control-label']) !!}
     <div class="col-md-6">
-        {!! Form::number('organization_id', null, ['class' => 'form-control', 'required' => 'required']) !!}
+         {!! Form::select('organization_id', $organizations,['class' => 'form-control']) !!};
         {!! $errors->first('organization_id', '<p class="help-block">:message</p>') !!}
     </div>
 </div>

@@ -28,7 +28,7 @@
                             'files' => true
                         ]) !!}
 
-                        @include ('admin\servicecommands.service-commands.form', ['submitButtonText' => 'Update'])
+                        @include ('admin/servicecommands.service-commands.form', ['submitButtonText' => 'Update'])
 
                         {!! Form::close() !!}
 

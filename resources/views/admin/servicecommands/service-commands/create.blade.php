@@ -23,7 +23,7 @@
 
                         {!! Form::open(['url' => '/admin/service-commands', 'class' => 'form-horizontal', 'files' => true]) !!}
 
-                        @include ('admin\servicecommands.service-commands.form')
+                        @include ('admin/servicecommands.service-commands.form')
 
                         {!! Form::close() !!}
 

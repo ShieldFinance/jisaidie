@@ -29,7 +29,7 @@ class ServiceCommand extends Model
 
     public function service()
 	{
-		return $this->belongsTo('App\Service');
+		return $this->belongsTo('App\Http\Models\Service');
 	}
 	
 }
