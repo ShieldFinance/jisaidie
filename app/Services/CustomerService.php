@@ -278,7 +278,7 @@ class CustomerService extends ApiGuardController{
                         $expiryDate = $dateDisbursed->copy()->addDays(60);
                         $loan->days_left = $dateDisbursed->diff($expiryDate)->days;
                         $loan->expiry = $expiryDate->format('F d, Y');
-                        $loan->balance = $loan->total-$loan->paid;
+                        $loan->balance = (int)$loan->total-(int)$loan->paid;
                         $loan->state = $loan->status;
                         if($loan->status==config('app.loanStatus')['disbursed'] || $loan->status==config('app.loanStatus')['locked']|| $loan->status==config('app.loanStatus')['paid']){
                              $loanSummary['total_disbursed']+=$loan->amount_requested;
