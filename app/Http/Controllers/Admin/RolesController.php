@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Role;
 use Illuminate\Http\Request;
 use Session;
+use Illuminate\Support\Facades\DB;
 
 class RolesController extends Controller
 {
@@ -67,8 +68,12 @@ class RolesController extends Controller
     public function show($id)
     {
         $role = Role::findOrFail($id);
-
-        return view('admin.roles.show', compact('role'));
+        $permissions = DB::table('permission_role')
+                    ->join('permissions','permissions.id','=','permission_role.permission_id')
+                    ->select('permissions.name as permission_name')
+                    ->where('role_id',$role->id)->get();
+        
+        return view('admin.roles.show', compact('role','permissions'));
     }
 
     /**

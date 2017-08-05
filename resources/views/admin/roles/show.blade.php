@@ -31,12 +31,20 @@
                             <table class="table table-borderless">
                                 <thead>
                                     <tr>
-                                        <th>ID.</th> <th>Name</th><th>Label</th>
+                                        <th>ID.</th> <th>Name</th><th>Permissions</th><th>Label</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <tr>
-                                        <td>{{ $role->id }}</td> <td> {{ $role->name }} </td><td> {{ $role->label }} </td>
+                                        <td>{{ $role->id }}</td> 
+                                        <td> {{ $role->name }} </td>
+                                        <td><ol>
+                                            @foreach($permissions as $item)
+                                            <li>{{ $item->permission_name }}</li>
+                                            @endforeach
+                                            </ol>
+                                        </td>
+                                        <td> {{ $role->label }} </td>
                                     </tr>
                                 </tbody>
                             </table>
