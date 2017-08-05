@@ -13,6 +13,7 @@ use Session;
 use Charts;
 use Response;
 use DB;
+
 class ReportsController extends Controller
 {
     /**
@@ -22,9 +23,13 @@ class ReportsController extends Controller
      */
     public function index(Request $request)
     {
-     
+              
 		$customers = Customer::get();
-		$Loans = Loan::get();
+		$Loans = DB::table('loans')
+				->join('customers', 'customers.id', '=', 'loans.customer_id')
+				->join('organization', 'organization.id', '=', 'customers.organization_id')
+				->select('loans.*','customers.mobile_number')
+				->get();
 		$organizations = Organization::get();
 		
 		
@@ -84,6 +89,86 @@ class ReportsController extends Controller
 		}
 		
 		
+		$disbursed_total=$pending_total=$serviced_total=$declined_total=0;
+		$disbursed_total_amount=$pending_total_amount=$serviced_total_amount=$declined_total_amount=$serviced_revenue=0;
+		$total_borrowers_array=$disbursed=array();
+		$repeats=array();
+		
+		foreach($Loans as $record){
+			$month_year=date("F-Y",strtotime($record->created_at));
+			$disbursed[$month_year]=$serviced[$month_year]=$pending[$month_year]=$pending[$month_year]=$invoiced[$month_year]=0;
+		}
+		foreach($Loans as $record){
+			
+			
+			$month = date("m",strtotime($record->created_at));
+				
+				$month_year=date("F-Y",strtotime($record->created_at));
+				
+				
+				$total_borrowers_array[trim($record->mobile_number)]=1;
+				switch($record->status){
+				case 2:
+					$pending_total_amount=$pending_total_amount+$record->amount_requested;
+					$pending_total=$pending_total+1;
+					$pending[$month_year]+=$record->amount_requested;
+					break;
+				case 3:
+					$declined_total_amount=$declined_total_amount+$record->amount_requested;
+					$declined_total=$declined_total+1;
+					$declined[$month_year]+=$record->total;
+					break;
+				case 5:
+					
+					$disbursed_total_amount=$disbursed_total_amount+$record->amount_requested;
+					$disbursed_total=$disbursed_total+1;
+					
+					$disbursed[$month_year]+=$record->amount_requested;
+					break;
+				case 6:
+					
+					$serviced_revenue=$serviced_revenue+(($record->amount_processed-$record->amount_requested)+($record->total-$record->amount_processed));
+					$serviced_total_amount=$serviced_total_amount+$record->amount_requested;
+					$serviced_total=$serviced_total+1;
+					$serviced[$month_year]+=$record->total;
+					break;
+				default:
+					break;
+				}
+			    if($record->invoiced){
+					$invoiced_total_amount=$invoiced_total_amount+$record->total;
+					$invoiced_total=$invoiced_total+1;
+					$invoiced[$month_year]+=$record->total;
+				}
+			
+			
+			
+		}
+		
+		$total_borrowers=count($total_borrowers_array);
+			
+		
+		if($serviced_total>0)
+		$rev_per_employee=number_format($serviced_revenue/$total_borrowers,2);
+		else
+		$rev_per_employee=0;
+		
+		if($serviced_total>0)
+		$rev_per_advance=number_format($serviced_revenue/$serviced_total,2);
+		else
+		$rev_per_advance=0;
+		
+		if($serviced_total>0)
+		$advance_per_employee=number_format((($serviced_total_amount)/$total_borrowers),2);
+		else
+		$advance_per_employee=0;
+		
+		if($serviced_total>0)
+		$aver_advance_per_advance=number_format((($serviced_total_amount)/($serviced_total)),2);
+		else
+		$aver_advance_per_advance=0;
+		
+                
 		$active_inactive= Charts::create('pie', 'chartjs')
 				->title(null)
 				->labels(['Active users', 'Inactive Users'])
@@ -127,6 +212,8 @@ class ReportsController extends Controller
 		$loans_analytics['disbursed']=0;
 		$loans_analytics['paid']=0;
 		$loans_analytics['locked']=0;
+                
+                
 		foreach($Loans as $loan){
 			
 			switch($loan->status){
@@ -152,6 +239,9 @@ class ReportsController extends Controller
 			
 		}
 	   
+	   
+	   
+	 
         return view('admin.reports.index', [
 											'years'=>$years,
 											'active_inactive' => $active_inactive,
@@ -162,6 +252,10 @@ class ReportsController extends Controller
 											'loans_analytics' => $loans_analytics,
 											'organizations_array' => array_merge(array('0'=>"Organization"),$organizations_array),
 											'loan_modes' => $loan_modes,
+											
+											'rev_per_advance' => $rev_per_advance,
+											'advance_per_employee' => $advance_per_employee,
+											'aver_advance_per_advance' => $aver_advance_per_advance,
 											
 											]);
     }
@@ -266,6 +360,7 @@ class ReportsController extends Controller
 	   return Response::json(array('series' => $series,'drilldown'=>$drilldown));
 	   
     }
+	
 	public function loanStats(Request $request) {
 		$series=array();
 		$company=$request->input('organization');//company from which to retrieve data
@@ -514,6 +609,328 @@ class ReportsController extends Controller
 		
 		return Response::json($series);
 	}
+	
+	
+	public function loanDataAverages(Request $request){
+		$type=$request->input('type');
+		switch($type){
+			case 'a':
+				
+				return $this->getAverageRevenues($request);
+				break;
+			
+			case 'b':
+				return $this->getAverageRevenueLoans($request);
+				break;
+		
+			case '':
+				return $this->getAverageLoans($request);
+				
+				break;
+		}
+			
+	}
+	
+	public function getAverageRevenues(Request $request){
+		    $series=array();
+			$company=$request->input('organization')?$request->input('organization'):0;//company from which to retrieve data
+			$type=$request->input('type');//the type of loan data in view
+			$year=$request->input('year')?$request->input('year'):date("Y");//year for viewing data
+			
+			$start_date=$year."-01-01 00:00:00";
+			$end_date=$year."-12-31 11:59:59";
+			$average_revenue=array();
+			for($k=1;$k<13;$k++){
+				$average_revenue[$k]=$revenues[$k]=0;
+			}
+			
+			$where=array();
+				if($company){
+				     $wheres = [
+								['loans.status'  ,'=',6],
+								['loans.deleted','=', 0],
+								['loans.created_at' ,'<=', $end_date],
+								['loans.created_at','>=',$start_date],
+								['organization.id' ,'=',$company]
+							   ];
+							
+		
+				}else{
+					 $wheres = [
+								['loans.status'  ,'=',6],
+								['loans.deleted','=', 0],
+								['loans.created_at' ,'<=', $end_date],
+								['loans.created_at','>=',$start_date]
+							   ];
+			
+				}
+				
+				
+				$records = DB::table('loans')
+				->join('customers', 'customers.id', '=', 'loans.customer_id')
+				->leftJoin('organization', 'organization.id', '=', 'customers.organization_id')
+				->where($wheres)
+				->select('loans.*','customers.mobile_number')
+				->get();
+			
+			$total_borrowers_array=array();
+			
+			foreach($records as $record){
+				 
+				 $month = date("m",strtotime($record->created_at));
+				 $total_borrowers_array[(int)$month][trim($record->mobile_number)]=1;
+				 $revenues[(int)$month]+=($record->amount_processed-$record->amount_requested)+($record->total-$record->amount_processed);
+			}
+			
+			
+			foreach($revenues as $key=>$revenue){
+				if(isset($total_borrowers_array[$key])){
+				
+				$average_revenue[$key]=$revenue/count($total_borrowers_array[$key]);
+				
+				}
+			}
+			
+			
+			return Response::json($average_revenue);
+				
+	}
+	public function getAverageLoans(Request $request){
+		    $series=array();
+			$company=$request->input('organization')?$request->input('organization'):0;//company from which to retrieve data
+			$type=$request->input('type');//the type of loan data in view
+			$year=$request->input('year')?$request->input('year'):date("Y");//year for viewing data
+			
+			$start_date=$year."-01-01 00:00:00";
+			$end_date=$year."-12-31 11:59:59";
+			
+			for($k=1;$k<13;$k++){
+				$average_advances[$k]=$advances[$k]=0;
+			}
+			
+			$where=array();
+				if($company){
+				     $wheres = [
+								['loans.status'  ,'=',6],
+								['loans.deleted','=', 0],
+								['loans.created_at' ,'<=', $end_date],
+								['loans.created_at','>=',$start_date],
+								['organization.id' ,'=',$company]
+							   ];
+							
+		
+				}else{
+					 $wheres = [
+								['loans.status'  ,'=',6],
+								['loans.deleted','=', 0],
+								['loans.created_at' ,'<=', $end_date],
+								['loans.created_at','>=',$start_date]
+							   ];
+			
+				}
+				
+				
+				$records = DB::table('loans')
+				->join('customers', 'customers.id', '=', 'loans.customer_id')
+				->leftJoin('organization', 'organization.id', '=', 'customers.organization_id')
+				->where($wheres)
+				->select('loans.*','customers.mobile_number')
+				->get();
+			
+			$total_borrowers_array=array();
+			foreach($records as $record){
+				 
+				 $month = date("m",strtotime($record->created_at));
+				 $total_borrowers_array[(int)$month][trim($record->mobile_number)]=1;
+				 $advances[(int)$month]+=$record->total;
+			}
+			
+			foreach($advances as $key=>$advance){
+				if(isset($total_borrowers_array[$key])){
+				   $average_advances[$key]=$advance/count($total_borrowers_array[$key]);
+			    }
+			}
+			//echo '<pre>';print_r($average_advances);exit;
+			return Response::json($average_advances);
+	}
+	//dashboard methods
+	public function getAverageRevenueLoans(Request $request){
+		    $series=array();
+			$company=$request->input('organization')?$request->input('organization'):0;//company from which to retrieve data
+			$year=$request->input('year')?$request->input('year'):date("Y");//year for viewing data
+			
+			$start_date=$year."-01-01 00:00:00";
+			$end_date=$year."-12-31 11:59:59";
+			$average_serviced_revenue=$advances_count=array();
+			for($k=1;$k<13;$k++){
+				$average_serviced_revenue[$k]=$advances_count[$k]=0;
+			}
+			
+			$where=array();
+				if($company){
+				     $wheres = [
+								['loans.status'  ,'=',6],
+								['loans.deleted','=', 0],
+								['loans.created_at' ,'<=', $end_date],
+								['loans.created_at','>=',$start_date],
+								['organization.id' ,'=',$company]
+							   ];
+							
+		
+				}else{
+					 $wheres = [
+								['loans.status'  ,'=',6],
+								['loans.deleted','=', 0],
+								['loans.created_at' ,'<=', $end_date],
+								['loans.created_at','>=',$start_date]
+							   ];
+			
+				}
+				
+				
+				$records = DB::table('loans')
+				->join('customers', 'customers.id', '=', 'loans.customer_id')
+				->leftJoin('organization', 'organization.id', '=', 'customers.organization_id')
+				->where($wheres)
+				->select('loans.*')
+				->get();
+			
+			$serviced_revenue=$advances_count=array();
+			foreach($records as $record){
+				 $month = date("m",strtotime($record->created_at));
+				 $serviced_revenue[(int)$month]=$advances_count[(int)$month]=0;
+			}
+			foreach($records as $record){
+				 
+				 $month = date("m",strtotime($record->created_at));
+				 if(isset($serviced_revenue[(int)$month])){
+				 $serviced_revenue[(int)$month]=$serviced_revenue[(int)$month]+(($record->amount_processed-$record->amount_requested)+($record->total-$record->amount_processed));
+			     $advances_count[(int)$month]=$advances_count[(int)$month]+1;
+				 }
+			}
+			
+			foreach($serviced_revenue as $month=>$serviced){
+				$average_serviced_revenue[$month]=$serviced_revenue[$month]/$advances_count[$month];
+			}
+		    
+			return Response::json($average_serviced_revenue);
+	}
+	public function getRevenues(){
+		
+			 $series=array();
+			$company=$request->input('organization')?$request->input('organization'):0;//company from which to retrieve data
+			$type=$request->input('type');//the type of loan data in view
+			$year=$request->input('year')?$request->input('year'):date("Y");//year for viewing data
+			
+			$start_date=$year."-01-01 00:00:00";
+			$end_date=$year."-12-31 11:59:59";
+			if($company){
+				     $wheres = [
+								['loans.status'  ,'=',6],
+								['loans.deleted','=', 0],
+								['loans.created_at' ,'<=', $end_date],
+								['loans.created_at','>=',$start_date],
+								['organization.id' ,'=',$company]
+							   ];
+							
+		
+				}else{
+					 $wheres = [
+								['loans.status'  ,'=',6],
+								['loans.deleted','=', 0],
+								['loans.created_at' ,'<=', $end_date],
+								['loans.created_at','>=',$start_date]
+							   ];
+			
+				}
+				
+				
+				$records = DB::table('loans')
+				->join('customers', 'customers.id', '=', 'loans.customer_id')
+				->leftJoin('organization', 'organization.id', '=', 'customers.organization_id')
+				->where($wheres)
+				->select('loans.*')
+				->get();
+			//echo '<pre>';print_r($wheres);exit;
+			
+			$revenues=$processing_fee=$interest=array();
+			
+			for($k=1;$k<13;$k++){
+				$revenues[$k]=$processing_fee[$k]=$interest[$k]=0;
+			}
+			
+			foreach($records as $record){
+				 $month = date("m",strtotime($record->created_on));
+				 $processing_fee[(int)$month]+=$record->amount_processed-$record->amount_requested;
+				 $interest[(int)$month]+=$record->total-$record->amount_processed;
+				 $revenues[(int)$month]+=($record->amount_processed-$record->amount_requested)+($record->total-$record->amount_processed);
+			}
+			
+			$months = array(1 => "Jan", 2 => "Feb", 3 => "Mar", 4 => "Apr", 5 => "May", 6 => "Jun", 7 => "Jul", 8 => "Aug", 9 => "Sep", 10 => "Oct", 11 => "Nov", 12 => "Dec");
+            $html='<table class="table table-bordered table-striped">
+				<thead class="thin-border-bottom">
+				<tr><th class="hidden-480">
+							<i class="ace-icon fa fa-caret-right blue"></i>
+							Label
+					       </th>';
+			foreach ($months as $m) {
+		                $html.=' <th class="hidden-480">
+							<i class="ace-icon fa fa-caret-right blue"></i>
+							'.$m.'
+					       </th>';
+			}
+			$html.='</tr>
+			</thead><tbody><tr></td>
+				<td>
+				<b class="blue">Revenues</b>
+				</td>';
+			
+			foreach($revenues as $revenue){
+				$html.='</td>
+				<td>
+				<b class="blue">KES '.number_format($revenue,2).'</b>
+				</td>';
+			}
+			$html.='</tr><tr></td>
+				<td>
+				<b class="blue">Processing Fee</b>
+				</td>';
+			
+			foreach($processing_fee as $processing){
+				$html.='</td>
+				<td>
+				<b class="blue">KES '.number_format($processing,2).'</b>
+				</td>';
+			}
+			$html.='</tr><tr></td>
+				<td>
+				<b class="blue">Interest</b>
+				</td>';
+			foreach($interest as $int){
+				$html.='</td>
+				<td>
+				<b class="blue">KES '.number_format($int,2).'</b>
+				</td>';
+			}
+			
+			$html.='</tr></tbody>
+				</table>';
+			echo $html;exit;
+	}
+	
+    
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
     /**
      * Show the form for creating a new resource.
      *

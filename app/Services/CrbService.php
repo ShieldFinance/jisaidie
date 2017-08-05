@@ -64,7 +64,7 @@ class CrbService {
 		
 		// execute!
 	 	$curl_response = curl_exec($ch);
-		//echo '<pre>';print_r($curl_response);exit;
+		echo '<pre>';print_r($curl_response);exit;
 		// close the connection, release resources used
 		curl_close($ch);
 		
