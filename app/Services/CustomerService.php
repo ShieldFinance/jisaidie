@@ -278,7 +278,7 @@ class CustomerService extends ApiGuardController{
                         $expiryDate = $dateDisbursed->copy()->addDays(60);
                         $loan->days_left = $dateDisbursed->diff($expiryDate)->days;
                         $loan->expiry = $expiryDate->format('F d, Y');
-                        $loan->balance = $loan->total-$loan->paid;
+                        $loan->balance = (int)$loan->total-(int)$loan->paid;
                         $loan->state = $loan->status;
                         if($loan->status==config('app.loanStatus')['disbursed'] || $loan->status==config('app.loanStatus')['locked']|| $loan->status==config('app.loanStatus')['paid']){
                              $loanSummary['total_disbursed']+=$loan->amount_requested;
@@ -377,10 +377,61 @@ class CustomerService extends ApiGuardController{
         if(isset($payload['mobile_number'])){
             $customer = new Customer();
             $customer = $customer->getCustomerByKey('mobile_number',$payload['mobile_number']);
+            $salary_percentage = Setting::where('setting_name','co_salary_percentage')->first()->setting_value;
+            $maximum_limit  = Setting::where('setting_name','maximum_loan')->first()->setting_value;
             if($customer){
                 $canBorrow = $loanService->customerCanBorrow($customer);
                 $response['can_borrow'] = $canBorrow;
                 $response['profile_status'] = $customer->status;
+                $response['verified'] = $customer->id_verified;
+                if($customer->is_checkoff){
+                    $maximum_limit = ($salary_percentage/100)*$customer->net_salary;
+                }
+                $response['maximum_limit'] = $maximum_limit;
+                //query crb here
+                /*
+                $details = array();
+                $details['first_name'] = $customer->surname;
+                $details['middle_name'] = $customer->other_name;
+                $details['last_name'] = $customer->last_name;
+                $details['id_number'] = $customer->id_number;
+                $app = \App::getFacadeRoot();
+                $crbService = $app->make('Crb');
+                $crbResponse =$crbService->checkCreditScore($details);
+                if(isset($crbResponse['credit_grade'])){
+                    switch($crbResponse["credit_grade"]){
+                        case 'AA';
+                            $application_rate=$application_rate;
+                            break;
+                        case 'BB';
+                            $application_rate=$application_rate;
+                            break;
+                        case 'CC';
+                            $application_rate=$application_rate;
+                            break;
+                        case 'DD';
+                            $application_rate=$application_rate-5;
+                            break;
+                        case 'EE';
+                             $application_rate=$application_rate-5;
+                            break;
+                        case 'FF';
+                            $application_rate=$application_rate-10;
+                            break;
+                        case 'GG';
+                            $application_rate=$application_rate-10;
+                            break;
+                        case 'HH';
+                            $application_rate=$application_rate-10;
+                            break;
+                        case 'II';
+                            $application_rate=$application_rate-17;
+                            break;
+                        case 'YY';
+                            $application_rate=$application_rate-15;
+                            break;
+                        default:
+                }*/
                 $response['response_status']=config('app.responseCodes')['command_successful'];
             }else{
                 $response['response_status']=config('app.responseCodes')['customer_does_not_exist'];

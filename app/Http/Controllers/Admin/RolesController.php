@@ -6,7 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Role;
 use Illuminate\Http\Request;
 use Session;
-
+use Illuminate\Support\Facades\DB;
+use App\Permission;
 class RolesController extends Controller
 {
     /**
@@ -67,8 +68,11 @@ class RolesController extends Controller
     public function show($id)
     {
         $role = Role::findOrFail($id);
-
-        return view('admin.roles.show', compact('role'));
+        $permissions = DB::table('permission_role')
+                    ->join('permissions','permissions.id','=','permission_role.permission_id')
+                    ->select('permissions.name as permission_name','permissions.label as permission_label')
+                    ->where('role_id',$role->id)->get();
+        return view('admin.roles.show', compact('role','permissions'));
     }
 
     /**
@@ -81,8 +85,19 @@ class RolesController extends Controller
     public function edit($id)
     {
         $role = Role::findOrFail($id);
-
-        return view('admin.roles.edit', compact('role'));
+        $selectedPermissions = DB::table('permission_role')
+                    ->join('permissions','permissions.id','=','permission_role.permission_id')
+                    ->select('permissions.name as permission_name','permissions.label as permission_label','permissions.id as permission_id')
+                    ->where('role_id',$role->id)->get();
+        $permissions = Permission::all();
+        foreach($permissions as $key=>$perm){
+            foreach($selectedPermissions as $p){
+                if($perm->id == $p->permission_id){
+                    unset($permissions[$key]);
+                }
+            }
+        }
+        return view('admin.roles.edit', compact('role','permissions','selectedPermissions'));
     }
 
     /**
@@ -96,7 +111,13 @@ class RolesController extends Controller
     public function update($id, Request $request)
     {
         $this->validate($request, ['name' => 'required']);
-
+        $role = Role::with('permissions')->find($id);
+        $role->permissions()->detach();
+        $permissions = $request->input('selected_permissions');
+        foreach ($permissions as $perm_id) {
+            $permission = Permission::find($perm_id);
+            $role->givePermissionTo($permission);
+        }
         $role = Role::findOrFail($id);
         $role->update($request->all());
 

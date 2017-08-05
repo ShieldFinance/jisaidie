@@ -26,7 +26,7 @@ class LoanService{
     public function  create_loan($payload){
         $maximumLoan = floatval($this->setting->where('setting_name','maximum_loan')->first()->setting_value);
         $minimumAmount = floatval($this->setting->where('setting_name','minimum_loan')->first()->setting_value);
-        
+        $salary_percentage = Setting::where('setting_name','co_salary_percentage')->first()->setting_value;
         $responseString='';
         if($payload['amount'] < $minimumAmount){
             $responseString.='The amount applied is less than allowed minimum of '.$minimumAmount."|";
@@ -39,6 +39,10 @@ class LoanService{
             if($customer){
             $loanStatus = $this->customerCanBorrow($customer);
             if($loanStatus['can_borrow']){
+                if($customer->is_checkoff){
+                    $maximumLoan = ($salary_percentage/100)*$customer->net_salary;
+                }
+                
                 if(isset($payload['amount']) && $payload['amount'] >= $minimumAmount && $payload['amount'] <=$maximumLoan){
                     $loan = new Loan();
                     $loan->amount_requested = $payload['amount'];
@@ -77,6 +81,10 @@ class LoanService{
                     }
                     $payload['message_placeholders']['[customer_name]'] = $customerName;
                     $payload['message_placeholders']['[mobile_number]'] = $payload['mobile_number'];
+                }else{
+                    $payload['response_string'] = 'Customer cannot borrow, the requested amount is not within the limit of '.number_format($minimumAmount,2,'.',',').' and '.number_format($maximumLoan,2,'.',',');
+                    $payload['response_status'] = config('app.responseCodes')['loan_rejected'];
+                    $payload['command_status'] = config('app.responseCodes')['command_failed'];
                 }
             }else{
                 $payload['response_string'] = 'Customer cannot borrow, '.$loanStatus['reason'];
