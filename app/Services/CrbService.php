@@ -176,7 +176,7 @@ class CrbService {
 				$dom = new \DOMDocument();
 				$res=str_replace("<?xml version='1.0' encoding='UTF-8'?>","",$curl_response);
 				$dom->loadXML( $res, LIBXML_NOBLANKS|LIBXML_PARSEHUGE );
-			
+                                
 				$response["credit_grade"]= $dom->getElementsbyTagName( 'grade' )->item(0)->nodeValue;
 				$response["credit_score"]= $dom->getElementsbyTagName( 'positiveScore' )->item(0)->nodeValue;
 				

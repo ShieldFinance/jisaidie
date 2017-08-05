@@ -71,8 +71,13 @@ class MessagesController extends Controller
 		]);
         $requestData = $request->all();
         $recepients = $requestData['recipient'];
+        $customers = Customer::whereIn('mobile_number', $recepients)->get();
         $data = array();
-        foreach($recepients as $recepient){
+        foreach($customers as $customer){
+            $recepient = $customer->mobile_number;
+            if($requestData['type']=='email'){
+                $recepient = $customer->email;
+            }
             $data[] = [
 			'subject' => $requestData['subject'],
 			'message' => $requestData['message'],
