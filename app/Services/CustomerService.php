@@ -116,12 +116,23 @@ class CustomerService extends ApiGuardController{
     public function update_customer_profile($payload){
         try{
             $customer = Customer::where('mobile_number', $payload['mobile_number'])->first();
-           
             if(count($customer)){
+                //let check if id already exists
+                $c = Customer::where('id_number', $payload['id_number'])->first();
+                if($c && strlen($c->id_number) && $c->mobile_number!=$payload['id_number']){
+                    //this is a duplicate id
+                    $payload['response_string'] ="ID number already registered";
+                    $payload['command_status'] = config('app.responseCodes')['command_failed'];
+                    $payload['response_status'] =config('app.responseCodes')['customer_profile_not_updated'];
                 
+                    return $payload;
+                }
                 foreach($payload as $key=>$value){
                     if(Schema::hasColumn('customers', $key))
                     {
+                     //once id is verified, do not update
+                     if($key=='id_number' && $customer->id_verified)
+                         continue;
                      $customer->$key = $value;
                     }
                 }
@@ -134,16 +145,16 @@ class CustomerService extends ApiGuardController{
                     }
                 }
                 $payload['customer'] =  $this->response->withItem($customer, new CustomerTransformer());
-                $payload['response_string'] ="Customer Details Updated";
+                $payload['response_string'] ="Profile Updated";
                 $payload['response_status'] =config('app.responseCodes')['customer_profile_updated'];
                 $payload['command_status'] = config('app.responseCodes')['command_successful'];
             }else{
-                $payload['response_string'] ="Customer Does not exist";
+                $payload['response_string'] ="Profile Does not exist";
                 $payload['response_status'] ='96';
                 $payload['command_status'] = config('app.responseCodes')['command_failed'];
             }
         } catch (Exception $ex) {
-            $payload['response_string'] ="Error updating customer";
+            $payload['response_string'] ="Error updating profile";
             $payload['command_status'] = config('app.responseCodes')['command_failed'];
             $payload['response_status'] =config('app.responseCodes')['customer_profile_not_updated'];
         }
@@ -189,7 +200,7 @@ class CustomerService extends ApiGuardController{
                 $payload['message_placeholders']['[customer_name]']=$customer->surname;
             }else{
                 $responseStatus =config('app.responseCodes')['activation_code_not_updated'];
-                $responseString ="Customer not found";
+                $responseString ="Profile not found";
                 $commandStatus = config('app.responseCodes')['command_failed'];
             }
         }
@@ -278,14 +289,16 @@ class CustomerService extends ApiGuardController{
                         $expiryDate = $dateDisbursed->copy()->addDays(60);
                         $loan->days_left = $dateDisbursed->diff($expiryDate)->days;
                         $loan->expiry = $expiryDate->format('F d, Y');
-                        $loan->balance = (int)$loan->total-(int)$loan->paid;
+                        $loan->balance = (float)$loan->total-(float)$loan->paid;
+                        $loan->balance = number_format($loan->balance,2,'.',',');
                         $loan->state = $loan->status;
                         if($loan->status==config('app.loanStatus')['disbursed'] || $loan->status==config('app.loanStatus')['locked']|| $loan->status==config('app.loanStatus')['paid']){
                              $loanSummary['total_disbursed']+=$loan->amount_requested;
                              $loanSummary['total_loans'] += $loan->total;
                         }
-                        $loan->amount_requested=number_format($loan->amount_requested,0,'.',',');
-                        $loan->total=number_format($loan->total,0,'.',',');
+                        $loan->amount_requested=number_format($loan->amount_requested,2,'.',',');
+                        $loan->amount_processed=number_format((float)$loan->amount_processed,2,'.',',');
+                        $loan->total=number_format($loan->total,2,'.',',');
                     }
                     
                     $loanSummary['total_balance']=$loanSummary['total_loans']-$loanSummary['total_paid'];
@@ -293,9 +306,10 @@ class CustomerService extends ApiGuardController{
                 
             }
         }
-        $loanSummary['total_disbursed'] = number_format($loanSummary['total_disbursed'],0,'.',',');
-        $loanSummary['total_paid']  = number_format($loanSummary['total_paid'],0,'.',',');
-        $loanSummary['total_balance'] = number_format($loanSummary['total_balance'],0,'.',',');
+        $loanSummary['total_disbursed'] = number_format($loanSummary['total_disbursed'],2,'.',',');
+        $loanSummary['total_paid']  = number_format($loanSummary['total_paid'],2,'.',',');
+        $loanSummary['total_balance'] = number_format($loanSummary['total_balance'],2,'.',',');
+        $loanSummary['total_loans'] = number_format($loanSummary['total_loans'],2,'.',',');
         $response['summary']=$loanSummary;
         $response['loans']=$loans;
         return $response;
@@ -378,17 +392,18 @@ class CustomerService extends ApiGuardController{
             $customer = new Customer();
             $customer = $customer->getCustomerByKey('mobile_number',$payload['mobile_number']);
             $salary_percentage = Setting::where('setting_name','co_salary_percentage')->first()->setting_value;
-            $maximum_limit  = Setting::where('setting_name','maximum_loan')->first()->setting_value;
+            $maximumAmount  = Setting::where('setting_name','maximum_loan')->first()->setting_value;
+            $minimumAmount = floatval(Setting::where('setting_name','minimum_loan')->first()->setting_value);
+            $toc = Setting::where('setting_name','terms_and_conditions')->first()->setting_value;
             if($customer){
                 $canBorrow = $loanService->customerCanBorrow($customer);
                 $response['can_borrow'] = $canBorrow;
                 $response['profile_status'] = $customer->status;
                 $response['verified'] = $customer->id_verified;
-                if($customer->is_checkoff){
-                    $maximum_limit = ($salary_percentage/100)*$customer->net_salary;
-                }
-                $response['maximum_limit'] = $maximum_limit;
-                //query crb here
+                $response['toc_link'] = $toc;
+                $maximumAmount = 500;//default
+                
+                //query crb here. Below is just sample code, modify accordingly
                 /*
                 $details = array();
                 $details['first_name'] = $customer->surname;
@@ -432,6 +447,8 @@ class CustomerService extends ApiGuardController{
                             break;
                         default:
                 }*/
+                $response['maximum_amount'] = $maximumAmount;
+                $response['minimum_amount'] = $minimumAmount;
                 $response['response_status']=config('app.responseCodes')['command_successful'];
             }else{
                 $response['response_status']=config('app.responseCodes')['customer_does_not_exist'];

@@ -78,7 +78,17 @@ $(function(){
                                 <thead>
                                     <tr>
 
-                                        <th><input type="checkbox"  id="selectall" />ID</th><th>Mobile Number</th><th>Account Number</th><th>Email</th><th>Surname</th><th>Last name</th><th>Other Name</th><th>Status</th><th>Actions</th>
+                                        <th><input type="checkbox"  id="selectall" /></th>
+                                        <th>ID</th>
+                                        <th>Mobile Number</th>
+                                        <th>Account Number</th>
+                                        <th>Email</th>
+                                        <th>Surname</th>
+                                        <th>Last name</th>
+                                        <th>Other Name</th>
+                                        <th>Organization</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
 
                                     </tr>
                                 </thead>

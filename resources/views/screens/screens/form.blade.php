@@ -13,7 +13,7 @@
 </div><div class="form-group {{ $errors->has('icon') ? 'has-error' : ''}}">
     {!! Form::label('icon', 'Icon', ['class' => 'col-md-4 control-label']) !!}
     <div class="col-md-6">
-        {!! Form::file('icon', null, ['class' => 'form-control']) !!}
+        {!! Form::text('icon', null, ['class' => 'form-control']) !!}
         {!! $errors->first('icon', '<p class="help-block">:message</p>') !!}
     </div>
 </div><div class="form-group {{ $errors->has('order') ? 'has-error' : ''}}">
@@ -25,7 +25,7 @@
 </div><div class="form-group {{ $errors->has('status') ? 'has-error' : ''}}">
     {!! Form::label('status', 'Status', ['class' => 'col-md-4 control-label']) !!}
     <div class="col-md-6">
-        {!! Form::number('status', null, ['class' => 'form-control', 'required' => 'required']) !!}
+        {!! Form::select('status', array(0=>'Inactive',1=>'Active'), ['class' => 'form-control', 'required' => 'required']) !!}
         {!! $errors->first('status', '<p class="help-block">:message</p>') !!}
     </div>
 </div>

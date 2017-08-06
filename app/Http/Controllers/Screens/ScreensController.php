@@ -114,11 +114,6 @@ class ScreensController extends Controller
 			'status' => 'required'
 		]);
         $requestData = $request->all();
-        $iconPath = '';
-        if ($request->hasFile('icon')) {
-         $iconPath = $request->icon->store('images','public');
-         $requestData['icon']=$iconPath;
-        }
         
         $screen = Screen::findOrFail($id);
         $screen->update($requestData);
