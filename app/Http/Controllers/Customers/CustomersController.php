@@ -154,14 +154,16 @@ class CustomersController extends Controller {
             $messagingService->sendMessage(array('message_id' => $messaging->id, 'type' => $messaging->type));
         }
 
-        Session::flash('flash_message', 'Customer activated!');
+        Session::flash('flash_message', 'Profile activated!');
 
         return redirect('admin/customers');
     }
 
     public function deactivate(Request $request) {
         $customer_id = $request->get('customer_id');
-        $response = Customer::find($customer_id)->update(['status' => 0]);
+        $customer = Customer::find($customer_id);
+        $customer->status = 0;
+        $customer->save();
         $message = ResponseTemplate::find(14);
         $messaging = new Message([
             'subject' => $message->subject,
@@ -179,7 +181,7 @@ class CustomersController extends Controller {
             $messagingService->sendMessage(array('message_id' => $messaging->id, 'type' => $messaging->type));
         }
 
-        Session::flash('flash_message', 'Customer activated!');
+        Session::flash('flash_message', 'Profile deactivated!');
 
         return redirect('admin/customers');
     }

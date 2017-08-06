@@ -116,9 +116,17 @@ class CustomerService extends ApiGuardController{
     public function update_customer_profile($payload){
         try{
             $customer = Customer::where('mobile_number', $payload['mobile_number'])->first();
-           
             if(count($customer)){
+                //let check if id already exists
+                $c = Customer::where('id_number', $payload['id_number'])->first();
+                if($c && strlen($c->id_number) && $c->mobile_number!=$payload['id_number']){
+                    //this is a duplicate id
+                    $payload['response_string'] ="ID number already registered";
+                    $payload['command_status'] = config('app.responseCodes')['command_failed'];
+                    $payload['response_status'] =config('app.responseCodes')['customer_profile_not_updated'];
                 
+                    return $payload;
+                }
                 foreach($payload as $key=>$value){
                     if(Schema::hasColumn('customers', $key))
                     {
@@ -137,16 +145,16 @@ class CustomerService extends ApiGuardController{
                     }
                 }
                 $payload['customer'] =  $this->response->withItem($customer, new CustomerTransformer());
-                $payload['response_string'] ="Customer Details Updated";
+                $payload['response_string'] ="Profile Updated";
                 $payload['response_status'] =config('app.responseCodes')['customer_profile_updated'];
                 $payload['command_status'] = config('app.responseCodes')['command_successful'];
             }else{
-                $payload['response_string'] ="Customer Does not exist";
+                $payload['response_string'] ="Profile Does not exist";
                 $payload['response_status'] ='96';
                 $payload['command_status'] = config('app.responseCodes')['command_failed'];
             }
         } catch (Exception $ex) {
-            $payload['response_string'] ="Error updating customer";
+            $payload['response_string'] ="Error updating profile";
             $payload['command_status'] = config('app.responseCodes')['command_failed'];
             $payload['response_status'] =config('app.responseCodes')['customer_profile_not_updated'];
         }
@@ -192,7 +200,7 @@ class CustomerService extends ApiGuardController{
                 $payload['message_placeholders']['[customer_name]']=$customer->surname;
             }else{
                 $responseStatus =config('app.responseCodes')['activation_code_not_updated'];
-                $responseString ="Customer not found";
+                $responseString ="Profile not found";
                 $commandStatus = config('app.responseCodes')['command_failed'];
             }
         }
