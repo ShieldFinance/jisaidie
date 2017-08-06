@@ -178,6 +178,74 @@ $(document).ready(function() {
 		$('#locked-year').append($('<option />').val(i).html(i));
 	}
     
+   
+   //averages start here
+   
+   //serviced event triggers i.e on modal shown, on dropdown change and on year change
+	 $('#modal-advances-loan-borrower-month').on('shown.bs.modal', function (e) {
+		getDataAverages('a','container_loan_borrower',"Monthly Loan/Borrower","#filter_company_loan_borrower","#loan-borrower-year");
+		
+	 });
+	 $( "#filter_company_loan_borrower" ).change(function() {
+	  getDataAverages('a','container_loan_borrower',"Monthly Loan/Borrower","#filter_company_loan_borrower","#loan-borrower-year");
+			
+	 });
+	 $( "#loan-borrower-year" ).change(function() {
+		getDataAverages('a','container_loan_borrower',"Monthly Loan/Borrower","#filter_company_loan_borrower","#loan-borrower-year");
+		
+		
+	 });
+	//datepicker plugin
+
+	for (i = new Date().getFullYear(); i > 2013; i--)
+	{
+		$('#loan-borrower-year').append($('<option />').val(i).html(i));
+	}
+  
+  
+   
+	 $('#modal-advances-revenue-borrower-month').on('shown.bs.modal', function (e) {
+		getDataAverages('b','container_revenue_borrower',"Monthly Revenue/Borrower","#filter_company_revenue_borrower","#revenue-borrower-year");
+		
+	 });
+	 $( "#filter_company_revenue_borrower" ).change(function() {
+		getDataAverages('b','container_revenue_borrower',"Monthly Revenue/Borrower","#filter_company_revenue_borrower","#revenue-borrower-year");
+		
+	 });
+	 $( "#revenue-borrower-year" ).change(function() {
+		getDataAverages('b','container_revenue_borrower',"Monthly Revenue/Borrower","#filter_company_revenue_borrower","#revenue-borrower-year");
+		
+	 });
+	//datepicker plugin
+
+	for (i = new Date().getFullYear(); i > 2013; i--)
+	{
+		$('#revenue_borrower_year').append($('<option />').val(i).html(i));
+	}
+  
+  
+   $('#modal-advances-revenue-loan-month').on('shown.bs.modal', function (e) {
+		getDataAverages('c','container_revenue_loan',"Monthly Revenue/loan","#filter_company_revenue_loan","#revenue-loan-year");
+		
+	 });
+	 $( "#filter_company_revenue_loan" ).change(function() {
+		getDataAverages('c','container_revenue_loan',"Monthly Revenue/loan","#filter_company_revenue_loan","#revenue-loan-year");
+		
+	 });
+	 $( "#revenue-loan-year" ).change(function() {
+		getDataAverages('c','container_revenue_loan',"Monthly Revenue/loan","#filter_company_revenue_loan","#revenue-loan-year");
+		
+	 });
+	//datepicker plugin
+
+	for (i = new Date().getFullYear(); i > 2013; i--)
+	{
+		$('#revenue_loan_year').append($('<option />').val(i).html(i));
+	}
+   
+   
+   
+   
     
 	 
     
@@ -203,6 +271,25 @@ function showLockedAdvances(){
 		$('#modal-advances-locked-month').modal();
 		  
 }
+
+
+//averages start here
+function showLoanBorrowers(){
+		$('#modal-advances-loan-borrower-month').modal();
+		  
+}
+function showRevenueBorrowers(){
+		$('#modal-advances-revenue-borrower-month').modal();
+		  
+}
+function showRevenueLoans(){
+		$('#modal-advances-revenue-loan-month').modal();
+		  
+}
+
+
+
+
 function getData(type,container,title,organization_filter,year_filter){
 		organization=$(organization_filter+" option:selected" ).val();//company id
 		year=$(year_filter+" option:selected" ).val();//company id//data year
@@ -228,6 +315,34 @@ function getData(type,container,title,organization_filter,year_filter){
 				  series.push(v);
 				});
 			   plotData(container,title,source,series)
+	     	  }
+		})
+}
+function getDataAverages(type,container,title,organization_filter,year_filter){
+		organization=$(organization_filter+" option:selected" ).val();//company id
+		year=$(year_filter+" option:selected" ).val();//company id//data year
+		source=$( organization_filter+" option:selected" ).text();;//company name
+		$.ajax({
+		      url: './loanDataAverages',
+	          type: "POST",
+	          cache: false,
+			  data: {
+			  type: type,
+			  organization: organization,
+			  year: year
+			  },
+			  dataType: "json",
+			  beforeSend: function( data ) {
+				
+			  },
+			  success: function (data) {
+			    data = $.parseJSON(JSON.stringify(data));
+				var series = [];
+				$.each(data, function (i,v)
+				{
+				  series.push(v);
+				});
+			   plotAveData(container,title,source,series)
 	     	  }
 		})
 }
@@ -273,6 +388,66 @@ Highcharts.chart(container, {
             }
         },
         colors:['#8DC853'],
+        tooltip: {
+            headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+            pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+                '<td style="padding:0"><b>{point.y:.1f} KES</b></td></tr>',
+            footerFormat: '</table>',
+            shared: true,
+            useHTML: true
+        },
+        plotOptions: {
+            column: {
+                pointPadding: 0.2,
+                borderWidth: 0
+            }
+        },
+        series: [{
+            name: 'Month',
+            data:series
+
+        }]
+    });
+}
+function plotAveData(container,title,source,series){
+	
+	
+Highcharts.chart(container, {
+        chart: {
+            type: 'column'
+        },
+        title: {
+            text:title
+        },
+        subtitle: {
+            text: 'Source: '+source
+        },
+        
+        xAxis: {
+            
+            categories: [
+                'Jan',
+                'Feb',
+                'Mar',
+                'Apr',
+                'May',
+                'Jun',
+                'Jul',
+                'Aug',
+                'Sep',
+                'Oct',
+                'Nov',
+                'Dec'
+            ],
+            crosshair: true
+        },
+        yAxis: {
+            min: 0,
+            title: {
+                text: 'Amount (KES)'
+            }
+        },
+        colors:['#602D91'],
         tooltip: {
             headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
             pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +

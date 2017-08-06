@@ -184,43 +184,43 @@
                         <div class="panel-body">
                         
                             <div class="col-md-4 col-sm-8 col-xs-12">
-                                   <div class="info-box">
+                                   <div class="info-box" onclick="showLoanBorrowers()">
                                      <span class="info-box-icon bg-purple"><i class="fa fa-percent"></i></span>
                          
                                      <div class="info-box-content">
                                        <span class="info-box-text">Loan/Borrower</span>
-                                       <span class="info-box-number">KES <small>0</small></span>
+                                       <span class="info-box-number">KES <small>{!!$advance_per_employee!!}</small></span>
                                      </div>
                                      <!-- /.info-box-content -->
                                    </div>
                                    <!-- /.info-box -->
                             </div>
                             <div class="col-md-4 col-sm-8 col-xs-12">
-                                   <div class="info-box">
+                                   <div class="info-box" onclick="showRevenueBorrowers()">
                                      <span class="info-box-icon bg-purple"><i class="fa fa-percent"></i></span>
                          
                                      <div class="info-box-content">
                                        <span class="info-box-text">Revenue/Borrower</span>
-                                       <span class="info-box-number">KES <small>0</small></span>
+                                       <span class="info-box-number">KES <small>{!!$rev_per_advance!!}</small></span>
                                      </div>
                                      <!-- /.info-box-content -->
                                    </div>
                                    <!-- /.info-box -->
                             </div>
                             <div class="col-md-4 col-sm-8 col-xs-12">
-                                   <div class="info-box">
+                                   <div class="info-box" onclick="showRevenueLoans()">
                                      <span class="info-box-icon bg-purple"><i class="fa fa-percent"></i></span>
                          
                                      <div class="info-box-content">
                                        <span class="info-box-text">Revenue/Loan</span>
-                                       <span class="info-box-number">KES <small>0</small></span>
+                                       <span class="info-box-number">KES <small>{!!$rev_per_advance!!}</small></span>
                                      </div>
                                      <!-- /.info-box-content -->
                                    </div>
                                    <!-- /.info-box -->
                             </div>
-                        
-                          
+                    
+											
                         </div>
                     </div>
                  </div>
@@ -515,6 +515,180 @@
                  <div class="modal-body">
                 
                     <div id="container_locked" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+                 
+                 </div>
+                 <div class="modal-footer">
+                
+                 <button class="btn btn-sm pull-right" data-dismiss="modal">
+                     <i class="ace-icon fa fa-times"></i>
+                     Close
+                 </button>	
+                 </div>
+               </div>
+            </div>
+</div>
+<!-- modal for loan-borrower advances-->
+<div id="modal-advances-loan-borrower-month" class="modal" tabindex="-1">
+            <div class="modal-dialog"  style="width:1200px !important; ">
+               <div class="modal-content">
+                 <div class="modal-header">
+                     <button class="close" data-dismiss="modal" type="button">×</button>
+                     <div class="row">
+                        <div class="col-xs-2 col-sm-4">
+                            <h4 class="widget-title lighter">
+                            <i class="ace-icon fa fa-arrow-up orange"></i>
+                           Average Loan per borrower
+                            </h4>
+                        </div>
+                        <div class="col-xs-10 col-sm-8">
+                          
+                               
+                                 <div class="row">
+                                        <div class="col-md-4 col-sm-8 col-xs-12">
+                                          
+                                          Year:  <select name="loan-borrower-year" id="loan-borrower-year"></select>
+                                           
+                                        </div>
+                                        <div class="col-md-4 col-sm-8 col-xs-12">
+                                          
+                                         Organization:   {!!Form::select('filter_company_loan_borrower',$organizations_array, null, array( 'id' => 'filter_company_loan_borrower'))!!}
+                                           
+                                        </div>
+                                        <div class="col-md-4 col-sm-8 col-xs-12">
+                                          
+                                         Type:   {!!Form::select('filter_mode_loan_borrower',$loan_modes, null, array( 'id' => 'filter_mode_loan_borrower'))!!}
+                                           
+                                        </div>
+                                            
+                                 </div>
+                                
+                        </div>
+                    </div>
+                 
+                 
+                 
+                 
+                 </div>
+                 
+                 <div class="modal-body">
+                
+                    <div id="container_loan_borrower" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+                 
+                 </div>
+                 <div class="modal-footer">
+                
+                 <button class="btn btn-sm pull-right" data-dismiss="modal">
+                     <i class="ace-icon fa fa-times"></i>
+                     Close
+                 </button>	
+                 </div>
+               </div>
+            </div>
+</div>
+<!-- modal for revenue-borrower advances-->
+<div id="modal-advances-revenue-borrower-month" class="modal" tabindex="-1">
+            <div class="modal-dialog"  style="width:1200px !important; ">
+               <div class="modal-content">
+                 <div class="modal-header">
+                     <button class="close" data-dismiss="modal" type="button">×</button>
+                     <div class="row">
+                        <div class="col-xs-2 col-sm-4">
+                            <h4 class="widget-title lighter">
+                            <i class="ace-icon fa fa-arrow-up orange"></i>
+                            Average Revenue per borrower
+                            </h4>
+                        </div>
+                        <div class="col-xs-10 col-sm-8">
+                          
+                               
+                                 <div class="row">
+                                        <div class="col-md-4 col-sm-8 col-xs-12">
+                                          
+                                          Year:  <select name="revenue-borrower-year" id="revenue-borrower-year"></select>
+                                           
+                                        </div>
+                                        <div class="col-md-4 col-sm-8 col-xs-12">
+                                          
+                                         Organization:   {!!Form::select('filter_company_revenue_borrower',$organizations_array, null, array( 'id' => 'filter_company_locked'))!!}
+                                           
+                                        </div>
+                                        <div class="col-md-4 col-sm-8 col-xs-12">
+                                          
+                                         Type:   {!!Form::select('filter_mode_revenue_borrower',$loan_modes, null, array( 'id' => 'filter_mode_locked'))!!}
+                                           
+                                        </div>
+                                            
+                                 </div>
+                                
+                        </div>
+                    </div>
+                 
+                 
+                 
+                 
+                 </div>
+                 
+                 <div class="modal-body">
+                
+                    <div id="container_revenue_borrower" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+                 
+                 </div>
+                 <div class="modal-footer">
+                
+                 <button class="btn btn-sm pull-right" data-dismiss="modal">
+                     <i class="ace-icon fa fa-times"></i>
+                     Close
+                 </button>	
+                 </div>
+               </div>
+            </div>
+</div>
+<!-- modal for revenue-loan advances-->
+<div id="modal-advances-revenue-loan-month" class="modal" tabindex="-1">
+            <div class="modal-dialog"  style="width:1200px !important; ">
+               <div class="modal-content">
+                 <div class="modal-header">
+                     <button class="close" data-dismiss="modal" type="button">×</button>
+                     <div class="row">
+                        <div class="col-xs-2 col-sm-4">
+                            <h4 class="widget-title lighter">
+                            <i class="ace-icon fa fa-arrow-up orange"></i>
+                           Average Revenue per loan
+                            </h4>
+                        </div>
+                        <div class="col-xs-10 col-sm-8">
+                          
+                               
+                                 <div class="row">
+                                        <div class="col-md-4 col-sm-8 col-xs-12">
+                                          
+                                          Year:  <select name="revenue_loan" id="revenue_loan"></select>
+                                           
+                                        </div>
+                                        <div class="col-md-4 col-sm-8 col-xs-12">
+                                          
+                                         Organization:   {!!Form::select('filter_company_revenue_loan',$organizations_array, null, array( 'id' => 'filter_company_revenue_loan'))!!}
+                                           
+                                        </div>
+                                        <div class="col-md-4 col-sm-8 col-xs-12">
+                                          
+                                         Type:   {!!Form::select('filter_mode_revenue_loan',$loan_modes, null, array( 'id' => 'filter_mode_revenue_loan'))!!}
+                                           
+                                        </div>
+                                            
+                                 </div>
+                                
+                        </div>
+                    </div>
+                 
+                 
+                 
+                 
+                 </div>
+                 
+                 <div class="modal-body">
+                
+                    <div id="container_revenue_loan" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
                  
                  </div>
                  <div class="modal-footer">

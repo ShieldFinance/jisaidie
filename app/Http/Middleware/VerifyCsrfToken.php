@@ -16,6 +16,6 @@ class VerifyCsrfToken extends BaseVerifier
         'ussd/process',
         'admin/userRegistration',
         'admin/loanData',
-        
-    ];
+        'admin/loanDataAverages',
+        ];
 }
