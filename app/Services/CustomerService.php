@@ -122,6 +122,9 @@ class CustomerService extends ApiGuardController{
                 foreach($payload as $key=>$value){
                     if(Schema::hasColumn('customers', $key))
                     {
+                     //once id is verified, do not update
+                     if($key=='id_number' && $customer->id_verified)
+                         continue;
                      $customer->$key = $value;
                     }
                 }
