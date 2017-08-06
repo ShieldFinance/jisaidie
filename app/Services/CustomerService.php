@@ -383,11 +383,13 @@ class CustomerService extends ApiGuardController{
             $salary_percentage = Setting::where('setting_name','co_salary_percentage')->first()->setting_value;
             $maximumAmount  = Setting::where('setting_name','maximum_loan')->first()->setting_value;
             $minimumAmount = floatval(Setting::where('setting_name','minimum_loan')->first()->setting_value);
+            $toc = Setting::where('setting_name','terms_and_conditions')->first()->setting_value;
             if($customer){
                 $canBorrow = $loanService->customerCanBorrow($customer);
                 $response['can_borrow'] = $canBorrow;
                 $response['profile_status'] = $customer->status;
                 $response['verified'] = $customer->id_verified;
+                $response['toc_link'] = $toc;
                 if($customer->is_checkoff){
                     $maximum_limit = ($salary_percentage/100)*$customer->net_salary;
                 }
