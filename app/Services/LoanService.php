@@ -177,12 +177,14 @@ class LoanService{
             $updated = Loan::whereIn('id', $payload['loan_id'])->update(array('status' => config('app.loanStatus')['approved']));
              
             if($updated){
-                $payload['send_loan'] = true;
-                $loan->status = config('app.loanStatus')['disbursed'];
-                $loan->save();
+                $payload['send_loan'] = false;
                 $payload['response_string'] = 'Loan Disbursement reversed';
                 $payload['response_status'] = config('app.responseCodes')['command_successful'];
                 $payload['command_status'] = config('app.responseCodes')['command_successful'];
+            }else{
+                $payload['response_string'] = 'Successfully disbursed loans cannot be reversed';
+                $payload['response_status'] = config('app.responseCodes')['command_failed'];
+                $payload['command_status'] = config('app.responseCodes')['command_failed'];
             }
         }else{
             $payload['response_string'] = 'Loan id not specified';
