@@ -22,7 +22,7 @@
             <select name="from[]" id="search" class="form-control" size="8" multiple="multiple">
                 <?php if(!empty($customers)){?>
                 <?php foreach($customers as $customer){?>
-                <option value="{{$customer->mobile_number}}">{{$customer->mobile_number}}</option>
+                <option value="{{$customer->mobile_number}}">{{$customer->surname.' '.$customer->last_name.' ('.$customer->mobile_number.' , '.$customer->email.')'}}</option>
                 <?php } ?>
                 <?php } ?>
             </select>
