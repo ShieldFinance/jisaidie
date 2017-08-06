@@ -391,9 +391,8 @@ class CustomerService extends ApiGuardController{
         if(isset($payload['mobile_number'])){
             $customer = new Customer();
             $customer = $customer->getCustomerByKey('mobile_number',$payload['mobile_number']);
-            $salary_percentage = Setting::where('setting_name','co_salary_percentage')->first()->setting_value;
-            $maximumAmount  = Setting::where('setting_name','maximum_loan')->first()->setting_value;
-            $minimumAmount = floatval(Setting::where('setting_name','minimum_loan')->first()->setting_value);
+            $maximumAmount  = Setting::where('setting_name','nco_maximum_amount')->first()->setting_value;
+            $minimumAmount = floatval(Setting::where('setting_name','nco_minimum_amount')->first()->setting_value);
             $toc = Setting::where('setting_name','terms_and_conditions')->first()->setting_value;
             if($customer){
                 $canBorrow = $loanService->customerCanBorrow($customer);

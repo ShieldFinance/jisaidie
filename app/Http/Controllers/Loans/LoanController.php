@@ -108,8 +108,8 @@ class LoanController extends Controller
                  $loans = DB::table('loans')
                 ->join('customers as c', 'c.id', '=', 'loans.customer_id')
                 ->join('organization', 'organization.id', '=', 'c.organization_id')
-                ->where(['id','>',0])
-                ->select('loans.*','c.mobile_number')
+                ->where([['loans.id','>',0]])
+                ->select('loans.*','c.mobile_number','c.email','c.id_number',DB::raw('CONCAT(c.surname, " ", c.last_name) AS customer_name'))
                 ->orderBy('id','desc')
                 ->paginate($perPage);
                  $request->session()->put('loans', $loans);
@@ -150,7 +150,7 @@ class LoanController extends Controller
                 ->join('customers as c', 'c.id', '=', 'loans.customer_id')
                 ->leftjoin('organization', 'organization.id', '=', 'c.organization_id')
                 ->where([['loans.id','>',0]])
-                ->select('loans.*','c.mobile_number')
+                ->select('loans.*','c.mobile_number','c.email','c.id_number',DB::raw('CONCAT(c.surname, " ", c.last_name) AS customer_name'))
                 ->orderBy('loans.id','desc')
                 ->paginate($perPage);
         if(strlen($flashMessage)){
