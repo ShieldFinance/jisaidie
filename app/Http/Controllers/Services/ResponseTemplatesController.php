@@ -47,10 +47,11 @@ class ResponseTemplatesController extends Controller
     public function create()
     {
         $servs = Service::all();
-        $services = array();
+        $services = array(0=>'Select a service');
         foreach($servs as $service){
             $services[$service->id]=$service->name;
         }
+        
         return view('admin.response-templates.create',compact('services'));
     }
 
@@ -105,7 +106,7 @@ class ResponseTemplatesController extends Controller
     {
         $responsetemplate = ResponseTemplate::findOrFail($id);
         $servs = Service::all();
-        $services = array();
+        $services = array(0=>'Select a service');
         foreach($servs as $service){
             $services[$service->id]=$service->name;
         }

@@ -281,14 +281,16 @@ class CustomerService extends ApiGuardController{
                         $expiryDate = $dateDisbursed->copy()->addDays(60);
                         $loan->days_left = $dateDisbursed->diff($expiryDate)->days;
                         $loan->expiry = $expiryDate->format('F d, Y');
-                        $loan->balance = (int)$loan->total-(int)$loan->paid;
+                        $loan->balance = (float)$loan->total-(float)$loan->paid;
+                        $loan->balance = number_format($loan->balance,2,'.',',');
                         $loan->state = $loan->status;
                         if($loan->status==config('app.loanStatus')['disbursed'] || $loan->status==config('app.loanStatus')['locked']|| $loan->status==config('app.loanStatus')['paid']){
                              $loanSummary['total_disbursed']+=$loan->amount_requested;
                              $loanSummary['total_loans'] += $loan->total;
                         }
-                        $loan->amount_requested=number_format($loan->amount_requested,0,'.',',');
-                        $loan->total=number_format($loan->total,0,'.',',');
+                        $loan->amount_requested=number_format($loan->amount_requested,2,'.',',');
+                        $loan->amount_processed=number_format((float)$loan->amount_processed,2,'.',',');
+                        $loan->total=number_format($loan->total,2,'.',',');
                     }
                     
                     $loanSummary['total_balance']=$loanSummary['total_loans']-$loanSummary['total_paid'];
@@ -296,9 +298,10 @@ class CustomerService extends ApiGuardController{
                 
             }
         }
-        $loanSummary['total_disbursed'] = number_format($loanSummary['total_disbursed'],0,'.',',');
-        $loanSummary['total_paid']  = number_format($loanSummary['total_paid'],0,'.',',');
-        $loanSummary['total_balance'] = number_format($loanSummary['total_balance'],0,'.',',');
+        $loanSummary['total_disbursed'] = number_format($loanSummary['total_disbursed'],2,'.',',');
+        $loanSummary['total_paid']  = number_format($loanSummary['total_paid'],2,'.',',');
+        $loanSummary['total_balance'] = number_format($loanSummary['total_balance'],2,'.',',');
+        $loanSummary['total_loans'] = number_format($loanSummary['total_loans'],2,'.',',');
         $response['summary']=$loanSummary;
         $response['loans']=$loans;
         return $response;
@@ -390,9 +393,7 @@ class CustomerService extends ApiGuardController{
                 $response['profile_status'] = $customer->status;
                 $response['verified'] = $customer->id_verified;
                 $response['toc_link'] = $toc;
-                if($customer->is_checkoff){
-                    $maximum_limit = ($salary_percentage/100)*$customer->net_salary;
-                }
+                $maximumAmount = 500;//default
                 
                 //query crb here. Below is just sample code, modify accordingly
                 /*

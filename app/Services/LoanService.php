@@ -486,7 +486,11 @@ class LoanService{
                 $loanBalance= 0;
                 $loanPaid = 0;
                 $loanTotal=0;
-                $loan->balance=$loan->total -$loan->paid;
+                $loan->balance=(float)$loan->total -(float)$loan->paid;
+                $loan->balance = number_format($loan->balance,2,'.',',');
+                $loan->amount_processed = number_format($loan->amount_processed,2,'.',',');
+                $loan->total = number_format($loan->total,2,'.',',');
+                $loan->paid = number_format($loan->paid,2,'.',',');
                 $dateDisbursed = new Carbon($loan->date_disbursed);
                 $loan->sent_at = $dateDisbursed->format('F d, Y');
                 $response['loan'] = $loan;
