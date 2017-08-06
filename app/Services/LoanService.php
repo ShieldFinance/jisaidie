@@ -533,7 +533,7 @@ class LoanService{
             $fees = floatval($this->setting->where('setting_name',$charges)->first()->setting_value);
             $fees = ($fees/100)*$loan->amount_requested;
             $fees+=$fixedCost;
-            $loan->amount_processed = ceil($fees);
+            $loan->amount_processed = ceil($fees)+$loan->amount_requested;
             $loan->total = $loan->amount_processed;
             $loan->daily_interest = $interestToday;
             $loan->fees = $fees;
