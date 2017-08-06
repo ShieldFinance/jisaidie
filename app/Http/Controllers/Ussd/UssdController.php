@@ -490,7 +490,7 @@ class UssdController extends Controller
 						}
 				
 			   }else{
-				$response  = "CON  Kindly enter amount that is atleast ".Setting::where('setting_name', 'co_minimum_mount')->first()->setting_value." and less than or equal to KES.".($account->net_salary/2)." . \n";
+				$response  = "CON  Kindly enter amount that is atleast ".Setting::where('setting_name', 'co_minimum_amount')->first()->setting_value." and less than or equal to KES.".($account->net_salary/2)." . \n";
 				$response .= "00. Back \n";
 				$response .= "000. Exit \n";
 			   }
