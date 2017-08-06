@@ -119,7 +119,7 @@ class CustomerService extends ApiGuardController{
             if(count($customer)){
                 //let check if id already exists
                 $c = Customer::where('id_number', $payload['id_number'])->first();
-                if($c && strlen($c->id_number) && $c->mobile_number!=$payload['id_number']){
+                if($c && strlen($c->id_number) && $c->mobile_number!=$customer->mobile_number){
                     //this is a duplicate id
                     $payload['response_string'] ="ID number already registered";
                     $payload['command_status'] = config('app.responseCodes')['command_failed'];
