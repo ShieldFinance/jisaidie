@@ -381,7 +381,8 @@ class CustomerService extends ApiGuardController{
             $customer = new Customer();
             $customer = $customer->getCustomerByKey('mobile_number',$payload['mobile_number']);
             $salary_percentage = Setting::where('setting_name','co_salary_percentage')->first()->setting_value;
-            $maximum_limit  = Setting::where('setting_name','maximum_loan')->first()->setting_value;
+            $maximumAmount  = Setting::where('setting_name','maximum_loan')->first()->setting_value;
+            $minimumAmount = floatval(Setting::where('setting_name','minimum_loan')->first()->setting_value);
             if($customer){
                 $canBorrow = $loanService->customerCanBorrow($customer);
                 $response['can_borrow'] = $canBorrow;
@@ -390,8 +391,8 @@ class CustomerService extends ApiGuardController{
                 if($customer->is_checkoff){
                     $maximum_limit = ($salary_percentage/100)*$customer->net_salary;
                 }
-                $response['maximum_limit'] = $maximum_limit;
-                //query crb here
+                
+                //query crb here. Below is just sample code, modify accordingly
                 /*
                 $details = array();
                 $details['first_name'] = $customer->surname;
@@ -435,6 +436,8 @@ class CustomerService extends ApiGuardController{
                             break;
                         default:
                 }*/
+                $response['maximum_amount'] = $maximumAmount;
+                $response['minimum_amount'] = $minimumAmount;
                 $response['response_status']=config('app.responseCodes')['command_successful'];
             }else{
                 $response['response_status']=config('app.responseCodes')['customer_does_not_exist'];
