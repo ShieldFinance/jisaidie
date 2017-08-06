@@ -239,8 +239,13 @@ class ReportsController extends Controller
 			
 		}
 	   
-	   
-	   
+	
+        $results = DB::select( DB::raw("SELECT customers.id FROM customers
+                            INNER JOIN loans ON (customers.id = loans.customer_id)
+                            where loans.id in (select id from loans
+                            group by id having count(*) > 1)") );
+        
+        //echo '<pre>';print_r($results);exit;
 	 
         return view('admin.reports.index', [
 											'years'=>$years,
