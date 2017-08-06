@@ -12,10 +12,15 @@
     </div>
 </div><div class="form-group {{ $errors->has('type') ? 'has-error' : ''}}">
     {!! Form::label('type', 'Type', ['class' => 'col-md-4 control-label']) !!}
-    <div class="col-md-6">
-        {!! Form::select('type', array('sms' => 'SMS', 'email' => 'Email','inapp' => 'In App'), ['class' => 'form-control', 'required' => 'required']) !!}
-        {!! $errors->first('type', '<p class="help-block">:message</p>') !!}
+    <div class='col-md-6'>
+        {!! Form::label('type', 'SMS') !!}
+       {!! Form::checkbox('type[]', 'sms',null) !!}
+       {!! Form::label('type', 'EMAIL') !!}
+       {!! Form::checkbox('type[]', 'email',null) !!}
+       {!! Form::label('type', 'IN APP') !!}
+       {!! Form::checkbox('type[]', 'inapp',null) !!}
     </div>
+   
 </div>
     <div class="row">
         <div class="col-xs-5">

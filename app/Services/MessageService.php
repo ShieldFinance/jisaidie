@@ -126,28 +126,32 @@ class MessageService {
         $device = CustomerDevice::where('customer_id',$customer->id)
         ->orderBy('id','desc')
         ->first();
-      
-        $deviceTokens =array($device->registration_token);
-        $push->setMessage([
-            'notification' => [
-                    'title'=>$payload['subject'],
-                    'body'=>$payload['message'],
-                    'sound' => 'default',
-                    'icon'=>'ic_logo'
-                    ],
-             'data' => [
-                      'title'=>$payload['subject'],
-                    ]
-           
-            ])
-        ->setDevicesToken($deviceTokens);
-        $response = $push->send()->getFeedback();
-        
-        $data['status'] = $response->success?'Success':'failed';
-        if($response->failure){
+        if($device){
+            $deviceTokens =array($device->registration_token);
+            $push->setMessage([
+                'notification' => [
+                        'title'=>$payload['subject'],
+                        'body'=>$payload['message'],
+                        'sound' => 'default',
+                        'icon'=>'ic_logo'
+                        ],
+                 'data' => [
+                          'title'=>$payload['subject'],
+                        ]
+
+                ])
+            ->setDevicesToken($deviceTokens);
+            $response = $push->send()->getFeedback();
+
+            $data['status'] = $response->success?'Success':'failed';
+            if($response->failure){
+                $data['status']='failed';
+            }
+            $data['attempts']=1;
+        }else{
             $data['status']='failed';
+            $data['attempts']=1;
         }
-        $data['attempts']=1;
         return $data;
     }
 
