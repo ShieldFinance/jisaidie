@@ -181,7 +181,7 @@ $(function(){
                                             {!! Form::close() !!}
                                              @endif
                                              
-                                            @if($item->id_verified==0)  
+                                            @if($item->id_verified==2 || $item->id_verified==3)  
                                             {!! Form::open([
                                                 'method'=>'POST',
                                                 'url' => ['admin/customers/verify'],

@@ -34,13 +34,11 @@ class CrbService {
 		   'Content-Type:text/xml;charset=UTF-8',
 		   
 		);
-					
-						// set post fields
-		$curl_req='
-			  <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:q0="http://ws.crbws.transunion.ke.co/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-				<soapenv:Body>
-				  <q0:getProduct102>
-					<username>WS_SIC1</username>
+		
+		$curl_req='<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:q0="http://ws.crbws.transunion.ke.co/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+			  <soapenv:Body>
+				<q0:getProduct102>
+				<username>WS_SIC1</username>
 					<password>Tuvwxz</password>
 					<code>2151</code>
 					<infinityCode>1328KE46406</infinityCode>
@@ -49,11 +47,11 @@ class CrbService {
 					<nationalID>'.$payload["id_number"].'</nationalID>
 					<reportSector>1</reportSector>
 					<reportReason>2</reportReason>
-				  </q0:getProduct102>
-				</soapenv:Body>
-			  </soapenv:Envelope>
-			  ';
-		
+				</q0:getProduct102>
+			  </soapenv:Body>
+			</soapenv:Envelope>';
+			
+			
 		$ch = curl_init($endpoint);
 		curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
@@ -64,7 +62,7 @@ class CrbService {
 		
 		// execute!
 	 	$curl_response = curl_exec($ch);
-		echo '<pre>';print_r($curl_response);exit;
+		//echo '<pre>';print_r($curl_response);print_r($payload);exit;
 		// close the connection, release resources used
 		curl_close($ch);
 		
