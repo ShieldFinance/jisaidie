@@ -233,6 +233,7 @@ class LoanController extends Controller
                 'Date disbursed',
             );
             $data[]=$headers;
+            $loan_ids = array();
             foreach($loans as $loan){
                 $l = array();
                 $l['mobile_number'] = $loan->mobile_number;
@@ -243,7 +244,11 @@ class LoanController extends Controller
                 $l['status'] = array_search ($loan->status, config('app.loanStatus'));
                 $l['date_disbursed'] = $loan->date_disbursed;
                 $data[] = $l;
+                $loan_ids[] = $loan->id;
             }
+             
+            $updated = Loan::whereIn('id', $loan_ids)->update(array('invoiced' => 1));
+            
             $excel->sheet('Loan', function($sheet) use ($data) {
 
                    $sheet->fromArray($data,null,'A1',false,false);
