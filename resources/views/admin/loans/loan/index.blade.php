@@ -200,7 +200,29 @@ $(document).on('click', function (e) {
     </div>
 <div style="margin-top:5px; ">
     <button type="submit" class="btn btn-primary"><i class="fa fa-search"></i> Search</button>
-    <button type="submit" class="btn btn-default pull-right"><i class="fa fa-search"></i> Clear</button>
+    <button type="submit" class="btn btn-default pull-right"><i class="fa fa-stop"></i> Clear</button>
+
+</div>
+{!! Form::close() !!}
+</div> 
+
+<div id="invoicePopover" class="hide">
+{!! Form::open(['method' => 'GET', 'url' => '/admin/loan', 'class' => 'search_form', 'role' => 'search'])  !!}
+   
+ <div class="input-group">
+      <label for="">Organization</label>
+     <select class="form-control" name="invoice_organization">
+         <option value=''>Select</option>
+         <?php if(isset($organizations)){ ?>
+          @foreach($organizations as $organization)
+         <option value='{{$organization->id}}'>{{$organization->name}}</option>
+         @endforeach
+         <?php } ?>
+     </select>
+    </div>
+<div style="margin-top:5px; ">
+    <button type="submit" class="btn btn-primary"><i class="fa fa-download"></i> Download invoice</button>
+   
 
 </div>
 {!! Form::close() !!}

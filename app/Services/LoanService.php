@@ -437,6 +437,12 @@ class LoanService{
         $payload['command_status'] = $commandStatus;
         return $payload;
     }
+    public function service_loans($payload){
+        if(isset($payload['loan_ids'])){
+            
+        }
+        return $payload;
+    }
     public function send_notification($payload){
         $responseString = '';
         $responseStatus = '';

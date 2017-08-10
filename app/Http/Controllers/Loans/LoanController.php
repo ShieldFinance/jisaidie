@@ -31,7 +31,10 @@ class LoanController extends Controller
         $action_buttons = $this->getActionButtons();
         $organizations = \App\Http\Models\Organization::all();
         $wheres = array();
-        
+        $invoice_organization = $request->get('invoice_organization');
+        if($invoice_organization){
+            $this->printInvoice($invoice_organization);
+        }
         if(!empty($organization_id)){
             $wheres[] =  ['organization.id' ,'=',$organization_id];        
         }
@@ -127,6 +130,10 @@ class LoanController extends Controller
                 $successMessage = "Loans reversed";
                 $checkStatus = config('app.responseCodes')['loan_disbursed_reversed'];
             }
+            if($action=='PrintInvoice' && $user->can('can_invoice')){
+                $canProcess = false;
+                $this->printInvoice($request);
+            }
             if($action=='ExportLoans' && $user->can('can_export_loans')) {
                 $canProcess = false;
                 $this->export($request);
@@ -202,6 +209,59 @@ class LoanController extends Controller
             });
 
         })->download('xls');
+    }
+    
+    public function printInvoice($organizationId){
+        $organization = \App\Http\Models\Organization::find($organizationId);
+        $loans = DB::table('loans')
+                ->join('customers as c', 'c.id', '=', 'loans.customer_id')
+                ->leftjoin('organization', 'organization.id', '=', 'c.organization_id')
+                ->where([['organization.id','=',$organizationId],['loans.status','=',config('app.loanStatus')['disbursed']]])
+                ->select('loans.*','organization.name as organization_name','c.mobile_number','c.email','c.id_number',DB::raw('CONCAT(c.surname, " ", c.last_name) AS customer_name'))
+                ->orderBy('loans.id','desc')
+                ->get();
+        if(count($loans)){
+            Excel::create($this->removeWhiteSpace($organization->name,'-').'-invoice-'.date('Y-m-d'), function($excel) use($loans,$organization) {
+            $data = array();
+            $headers = array(
+                'Mobile Number',
+                'Name',
+                'Id Number',
+                'Organization',
+                'Total',
+                'Status',
+                'Date disbursed',
+            );
+            $data[]=$headers;
+            foreach($loans as $loan){
+                $l = array();
+                $l['mobile_number'] = $loan->mobile_number;
+                $l['name'] = $loan->customer_name;
+                $l['id_number'] = $loan->id_number;
+                $l['organization'] = $loan->organization_name;
+                $l['total'] = $loan->total;
+                $l['status'] = array_search ($loan->status, config('app.loanStatus'));
+                $l['date_disbursed'] = $loan->date_disbursed;
+                $data[] = $l;
+            }
+            $excel->sheet('Loan', function($sheet) use ($data) {
+
+                   $sheet->fromArray($data,null,'A1',false,false);
+
+                });
+
+            })->download('xls');
+        }else{
+            Session::flash('flash_message', 'No loans to invoice for this organization');
+        }
+    }
+    
+    function removeWhiteSpace($str, $sep='-')
+    {
+            $res = strtolower($str);
+            $res = preg_replace('/[^[:alnum:]]/', ' ', $res);
+            $res = preg_replace('/[[:space:]]+/', $sep, $res);
+            return trim($res, $sep);
     }
 
     /**
@@ -332,9 +392,17 @@ ACTIONS;
 ACTIONS;
             }
             
+            if($user->can('can_invoice') || $userIsAdmin) {
+                $action_buttons.=<<<ACTIONS
+                      <a href="javascript:void(0)" rel="popover"  data-popover-content="#invoicePopover" class="btn btn-info btn-sm" title="Invoice">
+                            <i class="fa fa-download" aria-hidden="true"></i> Invoice
+                        </a>
+ACTIONS;
+            }
+            
             if($user->can('can_export_loans') || $userIsAdmin) {
                 $action_buttons.=<<<ACTIONS
-                      <a href="javascript:void(0)" data-service='ExportLoans' class="btn btn-info btn-sm process_loan" title="Export Loans">
+                      <a href="javascript:void(0)" data-service='ExportLoans'  class="btn btn-info btn-sm process_loan" title="Export Loans">
                             <i class="fa fa-download" aria-hidden="true"></i> Export to excel
                         </a>
 ACTIONS;
