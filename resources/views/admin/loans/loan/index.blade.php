@@ -21,7 +21,7 @@ $(function(){
 
 	});
         
-         $(".process_loan").click(function(){
+         $(".process_loan").click(function(e){
             var selectedvalue = [];
             if ($(':checkbox:checked').length > 0) {
               $(':checkbox:checked').each(function (i) {
@@ -29,19 +29,30 @@ $(function(){
 
               });
               $("#service").val($(this).data('service'));
-              //$("#page").load("ajax_file.php?t_id="+selectedvalue);//this will pass as string and method will be GET
-              //or
-              $("#selected_loans").val(selectedvalue);//this will pass as array and method will be POST
-              $('.loans_form').submit();
+              $(".selected_loans").val(selectedvalue);//this will pass as array and method will be POST
+              var form = $(e.target).data('form');
+              $('.'+form).submit();
              }else if($(this).data('service')=='ExportLoans'){
                   $("#service").val($(this).data('service'));
                  $('.loans_form').submit();
-             }else{
+             }else if(typeof($(this).data('service'))!='undefined'){
                  alert("Please select at least one item from the list")
+                 return false;
              }
              
              
         });
+        
+        $('.service_type').on('click',function(){
+            var selected = $('input[name="service_type"]:checked').val();
+            if(selected=='service_document'){
+                $('.service_file').removeClass('hide')
+            }else{
+                if(!$('.service_file').hasClass('hide')){
+                    $('.service_file').addClass('hide')
+                }
+            }
+        })
        
        $('[rel="popover"]').popover({
         container: 'body',
@@ -110,7 +121,7 @@ $(document).on('click', function (e) {
                         <br/>
                         <br/>
                           {!! Form::open(['method' => 'POST', 'url' => '/admin/loans/process_loan', 'class' => 'navbar-form navbar-right loans_form'])  !!}
-                             <input type="hidden" name="loans" value="" id="selected_loans"/>
+                             <input type="hidden" name="loans" value="" class="selected_loans"/>
                              <input type="hidden" name="service" value="" id="service"/>
                            {!! Form::close() !!}
                         <div class="table-responsive">
@@ -226,5 +237,32 @@ $(document).on('click', function (e) {
 
 </div>
 {!! Form::close() !!}
-</div
+</div>
+
+<div id="serviceLoan" class="hide">
+{!! Form::open(['method' => 'POST', 'url' => '/admin/loan', 'class' => 'service_form', 'role' => 'search','files'=>'true'])  !!}
+   
+ <div class="input-group">
+     <input type="radio" value="service_selected" class="service_type" name="service_type" >
+      <label for="">Service selected loans</label>
+      
+    </div>
+<div class="input-group">
+     <input type="radio" value="service_document" class="service_type" name="service_type" >
+      <label for="">Upload a document (excel)</label>
+      
+    </div>
+<div class="input-group hide service_file">
+     <input  type="file" name="service_file" >
+     
+      
+    </div>
+<div style="margin-top:5px; ">
+    <button data-form="service_form"  type="submit" class="btn btn-primary process_loan"><i class="fa fa-check"></i> Service Loans</button>
+   
+
+</div>
+<input type="hidden" name="loans" value="" class="selected_loans"/>
+{!! Form::close() !!}
+</div>
 @endsection

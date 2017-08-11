@@ -9,11 +9,13 @@ use App\Http\Models\Loan;
 use App\Http\Models\Customer;
 use App\Http\Models\Message;
 use App\Http\Models\ResponseTemplate;
+use \App\Http\Models\Transaction;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use Session;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use App\Helpers\RepaymentsImport;
 class LoanController extends Controller
 {
     /**
@@ -32,8 +34,12 @@ class LoanController extends Controller
         $organizations = \App\Http\Models\Organization::all();
         $wheres = array();
         $invoice_organization = $request->get('invoice_organization');
+        $service_type = $request->get('service_type');
         if($invoice_organization){
             $this->printInvoice($invoice_organization);
+        }
+        if($service_type){
+            $this->serviceLoans($request);
         }
         if(!empty($organization_id)){
             $wheres[] =  ['organization.id' ,'=',$organization_id];        
@@ -211,7 +217,109 @@ class LoanController extends Controller
         })->download('xls');
     }
     
+    public function serviceLoans(Request $request){
+        $user = Auth::user();
+        $userIsAdmin =  Auth::user()->hasRole('Super Admin');
+        if($user->can('service_loans') || $userIsAdmin){
+            $serviceTye = $request->input('service_type');
+            
+            if($serviceTye=='service_selected'){
+                $loan_ids = $request->input('loans');
+                $loan_ids = explode(',', $loan_ids);
+                if(!empty($loan_ids)){
+                    foreach($loan_ids as $key=>$loan_id){
+                        if($loan_id=='on'){
+                            unset($loan_ids[$key]);
+                        }
+                    }
+                    Loan::whereIn('id',$loan_ids)->update(array('status'=>config('app.loanStatus')['paid'],'paid'=>DB::raw("`total`")));
+                    Session::flash('flash_message', 'Loans serviced');
+                    $rqst = array('action'=>'ServiceLoan','request'=>$loan_ids);
+                    $transaction = new Transaction(['service_id'=>20,'request'=>json_encode($rqst),'status'=>'completed']);
+                    $transaction->profile = $user->id;
+                    $transaction->save();
+                }else{
+                    Session::flash('flash_message', 'No record selected');
+                }
+            }elseif($serviceTye=='service_document'){
+                if ($request->hasFile('service_file')) {
+                    $path = $request->service_file->store('documents');
+                    $rqst = array('action'=>'ServiceLoan','request'=>$path);
+                    $transaction = new Transaction(['service_id'=>20,'request'=>json_encode($rqst),'status'=>'completed']);
+                    $transaction->profile = $user->id;
+                    $transaction->save();
+                    Excel::load(storage_path().'/app/'.$path, function($reader) {
+                        // Getting all results
+                        $results = $reader->get();  
+                        $invalidAccounts = array();
+                        $noActiveLoans = array();
+                        $processed = 0;
+                        foreach($results as $row){
+                            $customer = Customer::where('id_number',$row->id_number)->first();
+                             if($customer){
+                                 
+                                $loan = Loan::where([['customer_id','=',$customer->id],['status','=',config('app.loanStatus')['disbursed']]])->first();
+                                
+                                if($loan){
+                                    $balance = (float)$loan->total - (float)$loan->paid;
+                                    $amount = (float)$row->amount;
+                                    $amountTodeduct = 0;
+                                    if($balance > $amount){
+                                        $loan->paid+=$amount;
+                                        
+                                    }else{
+                                        //just deduct the balance and put the rest to witholding_balance
+                                        $loan->paid+=$balance;
+                                        $customer->withholding_balance+=$amount-$balance;
+                                        $loan->status = config('app.loanStatus')['paid'];
+                                        $customer->save();
+                                    }
+                                    $loan->save();
+                                    $processed++;
+                                }else{
+                                    $noActiveLoans[]=$row->id_number;
+                                }
+                            }else{
+                                $invalidAccounts[]=$row->id_number;
+                            }
+                        }
+                        $message ='';
+                        if($processed > 0){
+                            $message.=$processed." loans serviced<br>";
+                        }
+                        if(!empty($invalidAccounts)){
+                            $message .="The following accounts do not exist.<br><ol>";
+                            foreach($invalidAccounts as $id_number){
+                               $message.='<li>'.$id_number.'</li>'; 
+                            }
+                            $message.='</ol><br>';
+                            
+                        }
+                        if(!empty($noActiveLoans)){
+                            $message .="The following accounts have no active loans.<br><ol>";
+                            foreach($noActiveLoans as $id_number){
+                               $message.='<li>'.$id_number.'</li>'; 
+                            }
+                            $message.'</ol>';
+                            
+                        }
+                        if(strlen($message)){
+                            Session::flash('flash_message', $message);
+                        }
+                    });
+                }else{
+                    Session::flash('flash_message', 'Please select a valid excel file');
+                }
+            }
+            
+        }else{
+            Session::flash('flash_message', 'You do not have permission to perform this action');
+        }
+    }
+    
     public function printInvoice($organizationId){
+        $user = Auth::user();
+        if($user->can('can_invoice')){
         $organization = \App\Http\Models\Organization::find($organizationId);
         $loans = DB::table('loans')
                 ->join('customers as c', 'c.id', '=', 'loans.customer_id')
@@ -258,6 +366,9 @@ class LoanController extends Controller
             })->download('xls');
         }else{
             Session::flash('flash_message', 'No loans to invoice for this organization');
+        }
+        }else{
+            Session::flash('flash_message', 'You do not have permission to perform this action');
         }
     }
     
@@ -367,7 +478,7 @@ class LoanController extends Controller
         
             if($user->can('can_approve_loan') || $userIsAdmin) {
                 $action_buttons.=<<<ACTIONS
-                        <a href="javascript:void(0)" data-service='ApproveLoan' class="btn btn-success btn-sm process_loan" title="Approve selected loans">
+                        <a data-form="loans_form" href="javascript:void(0)" data-service='ApproveLoan' class="btn btn-success btn-sm process_loan" title="Approve selected loans">
                                 <i class="fa fa-check" aria-hidden="true"></i> Approve
                             </a>
 ACTIONS;
@@ -375,7 +486,7 @@ ACTIONS;
             
             if($user->can('can_reject_loan') || $userIsAdmin) {
                 $action_buttons.=<<<ACTIONS
-                       <a href="javascript:void(0)" data-service='RejectLoanApplication' class="btn btn-danger btn-sm process_loan" title="Reject selected loans">
+                       <a data-form="loans_form" href="javascript:void(0)" data-service='RejectLoanApplication' class="btn btn-danger btn-sm process_loan" title="Reject selected loans">
                             <i class="fa fa-close" aria-hidden="true"></i> Reject
                         </a>
 ACTIONS;
@@ -383,7 +494,7 @@ ACTIONS;
             
             if($user->can('can_disburse_loan') || $userIsAdmin) {
                 $action_buttons.=<<<ACTIONS
-                       <a href="javascript:void(0)" data-service='DisburseLoan' class="btn btn-primary btn-sm process_loan" title="Send loan to client">
+                       <a data-form="loans_form" href="javascript:void(0)" data-service='DisburseLoan' class="btn btn-primary btn-sm process_loan" title="Send loan to client">
                             <i class="fa fa-send" aria-hidden="true"></i> Disburse
                         </a>
 ACTIONS;
@@ -391,7 +502,7 @@ ACTIONS;
             
             if($user->can('can_reverse_disbursal') || $userIsAdmin) {
                 $action_buttons.=<<<ACTIONS
-                       <a href="javascript:void(0)" data-service='ReverseDisburseLoan' class="btn btn-warning btn-sm process_loan" title="Change loan to approved status">
+                       <a data-form="loans_form" href="javascript:void(0)" data-service='ReverseDisburseLoan' class="btn btn-warning btn-sm process_loan" title="Change loan to approved status">
                             <i class="fa fa-undo" aria-hidden="true"></i> Reverse to approved
                         </a>
 ACTIONS;
@@ -404,7 +515,13 @@ ACTIONS;
                         </a>
 ACTIONS;
             }
-            
+            if($user->can('can_service_loan') || $userIsAdmin) {
+                $action_buttons.=<<<ACTIONS
+                      <a href="javascript:void(0)" rel="popover"  data-popover-content="#serviceLoan" class="btn btn-info btn-sm " title="Service Loans">
+                            <i class="fa fa-check" aria-hidden="true"></i> Service Loan
+                        </a>
+ACTIONS;
+            }
             if($user->can('can_export_loans') || $userIsAdmin) {
                 $action_buttons.=<<<ACTIONS
                       <a href="javascript:void(0)" data-service='ExportLoans'  class="btn btn-info btn-sm process_loan" title="Export Loans">
