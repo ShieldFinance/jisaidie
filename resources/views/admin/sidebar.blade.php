@@ -10,11 +10,15 @@
                 <div class="panel-body">
                     <ul class="nav" role="tablist">
                         @foreach($section->items as $menu)
-                            <li role="presentation">
-                                <a href="{{ url($menu->url) }}">
-                                    {{ $menu->title }}
-                                </a>
-                            </li>
+                            @if(isset($menu->viewPerm))
+                                @can($menu->viewPerm)
+                                    <li role="presentation">
+                                        <a href="{{ url($menu->url) }}">
+                                            {{ $menu->title }}
+                                        </a>
+                                    </li>
+                                @endcan
+                            @endif
                         @endforeach
                     </ul>
                 </div>

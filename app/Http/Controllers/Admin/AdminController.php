@@ -7,6 +7,7 @@ use App\Permission;
 use App\Role;
 use Illuminate\Http\Request;
 use Session;
+use File;
 
 class AdminController extends Controller
 {
