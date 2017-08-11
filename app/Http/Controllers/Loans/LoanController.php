@@ -34,7 +34,6 @@ class LoanController extends Controller
         $organizations = \App\Http\Models\Organization::all();
         $wheres = array();
         $invoice_organization = $request->get('invoice_organization');
-        $service_type = $request->get('service_type');
         $downloadSample = $request->get('download_sample');
         if($downloadSample){
             $this->downloadServiceSample();
@@ -42,9 +41,7 @@ class LoanController extends Controller
         if($invoice_organization){
             $this->printInvoice($invoice_organization);
         }
-        if($service_type){
-            $this->serviceLoans($request);
-        }
+        
         if(!empty($organization_id)){
             $wheres[] =  ['organization.id' ,'=',$organization_id];        
         }
@@ -244,7 +241,6 @@ class LoanController extends Controller
         $userIsAdmin =  Auth::user()->hasRole('Super Admin');
         if($user->can('service_loans') || $userIsAdmin){
             $serviceTye = $request->input('service_type');
-            
             if($serviceTye=='service_selected'){
                 $loan_ids = $request->input('loans');
                 $loan_ids = explode(',', $loan_ids);
@@ -337,6 +333,7 @@ class LoanController extends Controller
         }else{
             Session::flash('flash_message', 'You do not have permission to perform this action');
         }
+        return redirect('admin/loan');
     }
     
     public function printInvoice($organizationId){

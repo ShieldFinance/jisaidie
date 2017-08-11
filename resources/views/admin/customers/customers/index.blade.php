@@ -83,7 +83,7 @@ $(function(){
                                         <th>Mobile Number</th>
                                         <th>Account Number</th>
                                         <th>Email</th>
-                                        <th>Surname</th>
+                                        <th>First Name</th>
                                         <th>Last name</th>
                                         <th>Other Name</th>
                                         <th>Organization</th>
