@@ -86,7 +86,7 @@
             <div class="container">
                 <div class="alert alert-success">
                     <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-                    {{ Session::get('flash_message') }}
+                    {!! Session::get('flash_message') !!}
                 </div>
             </div>
         @endif

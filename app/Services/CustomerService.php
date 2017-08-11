@@ -119,7 +119,7 @@ class CustomerService extends ApiGuardController{
             if(count($customer)){
                 //let check if id already exists
                 $c = Customer::where('id_number', $payload['id_number'])->first();
-                if($c && strlen($c->id_number) && $c->mobile_number!=$payload['id_number']){
+                if($c && strlen($c->id_number) && $c->mobile_number!=$customer->mobile_number){
                     //this is a duplicate id
                     $payload['response_string'] ="ID number already registered";
                     $payload['command_status'] = config('app.responseCodes')['command_failed'];
@@ -194,7 +194,7 @@ class CustomerService extends ApiGuardController{
                 $commandStatus = config('app.responseCodes')['command_successful'];
                 $payload['send_notification'] = true;
                 $payload['send_now']=true;
-                $payload['message_type'] = 'inapp';
+                $payload['message_type'] = 'sms';
                 $payload['msisdn'] = $customer->mobile_number;
                 $payload['message_placeholders']['[activation_code]']=$payload['activation_code'];
                 $payload['message_placeholders']['[customer_name]']=$customer->surname;
@@ -391,9 +391,8 @@ class CustomerService extends ApiGuardController{
         if(isset($payload['mobile_number'])){
             $customer = new Customer();
             $customer = $customer->getCustomerByKey('mobile_number',$payload['mobile_number']);
-            $salary_percentage = Setting::where('setting_name','co_salary_percentage')->first()->setting_value;
-            $maximumAmount  = Setting::where('setting_name','maximum_loan')->first()->setting_value;
-            $minimumAmount = floatval(Setting::where('setting_name','minimum_loan')->first()->setting_value);
+            $maximumAmount  = Setting::where('setting_name','nco_maximum_amount')->first()->setting_value;
+            $minimumAmount = floatval(Setting::where('setting_name','nco_minimum_amount')->first()->setting_value);
             $toc = Setting::where('setting_name','terms_and_conditions')->first()->setting_value;
             if($customer){
                 $canBorrow = $loanService->customerCanBorrow($customer);

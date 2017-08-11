@@ -549,7 +549,8 @@ class UssdController extends Controller
 			}else{
 		  
 		  
-				  if($apiResponse['can_borrow']['loan']->status==6 || $apiResponse['can_borrow']['loan']->status==3 ){//if loan is serviced or loan is rejected 3
+				  if(!isset($apiResponse['can_borrow']['loan']) || 
+                                          (isset($apiResponse['can_borrow']['loan']) && ($apiResponse['can_borrow']['loan']->status==6 || $apiResponse['can_borrow']['loan']->status==3 ))){//if loan is serviced or loan is rejected 3
 					$data = array(
 					'level' =>2,
 					'action' =>1
@@ -563,12 +564,12 @@ class UssdController extends Controller
 				  $response .= "00. Back \n";
 				  $response .= "000. Exit \n";
 				  
-				}else if($lastLoandata[0]->status<=2 ){
-					$response  = "CON Dear Customer, your previous advance of KES ".number_format($lastLoandata[0]->amount_requested,2)." is still pending approval from your Employer \n";
+				}else if($apiResponse['can_borrow']['loan']->status<=2 ){
+					$response  = "CON Dear Customer, your previous advance of KES ".number_format($apiResponse['can_borrow']['loan']->amount_requested,2)." is still pending approval from your Employer \n";
 					$response .= "00. Back \n";
 					$response .= "000. Exit \n";
 				}else{
-					$response  = "CON Dear customer, you already have an outstanding advance of KES ".number_format($lastLoandata[0]->total,2).". Kindly pay this amount to qualify for another advance. \n";
+					$response  = "CON Dear customer, you already have an outstanding advance of KES ".number_format($apiResponse['can_borrow']['loan']->total,2).". Kindly pay this amount to qualify for another advance. \n";
 					$response .= "00. Back \n";
 					$response .= "000. Exit \n";
 				}

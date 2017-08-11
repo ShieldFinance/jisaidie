@@ -24,8 +24,8 @@ class LoanService{
      * @return payload
      */
     public function  create_loan($payload){
-        $maximumLoan = floatval($this->setting->where('setting_name','maximum_loan')->first()->setting_value);
-        $minimumAmount = floatval($this->setting->where('setting_name','minimum_loan')->first()->setting_value);
+        $maximumLoan = floatval($this->setting->where('setting_name',$payload['type'].'_maximum_amount')->first()->setting_value);
+        $minimumAmount = floatval($this->setting->where('setting_name',$payload['type'].'_minimum_amount')->first()->setting_value);
         $salary_percentage = Setting::where('setting_name','co_salary_percentage')->first()->setting_value;
         $responseString='';
         if($payload['amount'] < $minimumAmount){
@@ -177,12 +177,14 @@ class LoanService{
             $updated = Loan::whereIn('id', $payload['loan_id'])->update(array('status' => config('app.loanStatus')['approved']));
              
             if($updated){
-                $payload['send_loan'] = true;
-                $loan->status = config('app.loanStatus')['disbursed'];
-                $loan->save();
+                $payload['send_loan'] = false;
                 $payload['response_string'] = 'Loan Disbursement reversed';
                 $payload['response_status'] = config('app.responseCodes')['command_successful'];
                 $payload['command_status'] = config('app.responseCodes')['command_successful'];
+            }else{
+                $payload['response_string'] = 'Successfully disbursed loans cannot be reversed';
+                $payload['response_status'] = config('app.responseCodes')['command_failed'];
+                $payload['command_status'] = config('app.responseCodes')['command_failed'];
             }
         }else{
             $payload['response_string'] = 'Loan id not specified';
@@ -437,6 +439,12 @@ class LoanService{
         $payload['command_status'] = $commandStatus;
         return $payload;
     }
+    public function service_loans($payload){
+        if(isset($payload['loan_ids'])){
+            
+        }
+        return $payload;
+    }
     public function send_notification($payload){
         $responseString = '';
         $responseStatus = '';
@@ -510,6 +518,10 @@ class LoanService{
                 $response['reason'] = '';
             }
             
+        }else{
+            //customer has no active loans
+            $response['can_borrow'] = true;
+            $response['reason'] = 'Profile is inactive';
         }
         
         return $response;
@@ -517,18 +529,20 @@ class LoanService{
     public function applyCharges($loan){
         $fees = 0;
         $charges = 'nco_processing_fee';//default fee is for the non check off customers
-        if($loan->customer->organization_id){
+        if($loan->type=='co'){
             $charges = 'co_processing_fee';
         }
         $interest =  	floatval($this->setting->where('setting_name','loan_interest_rate')->first()->setting_value);
         $dailyInterest = ($interest/3000);
         $interestToday = $dailyInterest * $loan->amount_requested;
+        $fixedCost = floatval($this->setting->where('setting_name',$loan->type.'_fixed_loan_cost')->first()->setting_value);
         //if this is a new loan apply one off fees
         if($loan->total==0 && $loan->status==config('app.loanStatus')['approved']){
             $fees = floatval($this->setting->where('setting_name',$charges)->first()->setting_value);
-            //$fixedCost =  	floatval($this->setting->where('setting_name','fixed_loan_cost')->first()->setting_value);
-            $loan->amount_processed = ceil($fees+$loan->amount_requested);
-            $loan->total = ceil($loan->amount_processed + $interestToday);
+            $fees = ($fees/100)*$loan->amount_requested;
+            $fees+=$fixedCost;
+            $loan->amount_processed = ceil($fees)+$loan->amount_requested;
+            $loan->total = $loan->amount_processed;
             $loan->daily_interest = $interestToday;
             $loan->fees = $fees;
         }else{

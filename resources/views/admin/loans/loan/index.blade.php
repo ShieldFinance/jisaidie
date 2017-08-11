@@ -21,7 +21,7 @@ $(function(){
 
 	});
         
-         $(".process_loan").click(function(){
+         $(".process_loan").click(function(e){
             var selectedvalue = [];
             if ($(':checkbox:checked').length > 0) {
               $(':checkbox:checked').each(function (i) {
@@ -29,19 +29,30 @@ $(function(){
 
               });
               $("#service").val($(this).data('service'));
-              //$("#page").load("ajax_file.php?t_id="+selectedvalue);//this will pass as string and method will be GET
-              //or
-              $("#selected_loans").val(selectedvalue);//this will pass as array and method will be POST
-              $('.loans_form').submit();
+              $(".selected_loans").val(selectedvalue);//this will pass as array and method will be POST
+              var form = $(e.target).data('form');
+              $('.'+form).submit();
              }else if($(this).data('service')=='ExportLoans'){
                   $("#service").val($(this).data('service'));
                  $('.loans_form').submit();
-             }else{
+             }else if(typeof($(this).data('service'))!='undefined'){
                  alert("Please select at least one item from the list")
+                 return false;
              }
              
              
         });
+        
+        $('.service_type').on('click',function(){
+            var selected = $('input[name="service_type"]:checked').val();
+            if(selected=='service_document'){
+                $('.service_file').removeClass('hide')
+            }else{
+                if(!$('.service_file').hasClass('hide')){
+                    $('.service_file').addClass('hide')
+                }
+            }
+        })
        
        $('[rel="popover"]').popover({
         container: 'body',
@@ -110,7 +121,7 @@ $(document).on('click', function (e) {
                         <br/>
                         <br/>
                           {!! Form::open(['method' => 'POST', 'url' => '/admin/loans/process_loan', 'class' => 'navbar-form navbar-right loans_form'])  !!}
-                             <input type="hidden" name="loans" value="" id="selected_loans"/>
+                             <input type="hidden" name="loans" value="" class="selected_loans"/>
                              <input type="hidden" name="service" value="" id="service"/>
                            {!! Form::close() !!}
                         <div class="table-responsive">
@@ -125,7 +136,9 @@ $(document).on('click', function (e) {
                                         <th>Amount Requested</th>
                                         <th>Amount Processed</th>
                                         <th>Total</th>
+                                        <th>Balance</th>
                                         <th>Status</th>
+                                        <th>Date Disbursed</th>
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
@@ -144,7 +157,9 @@ $(document).on('click', function (e) {
                                         <td>{{ $item->amount_requested }}</td>
                                         <td>{{ $item->amount_processed }}</td>
                                         <td>{{ number_format($item->total,2,'.',',')}}</td>
+                                        <td>{{ number_format($item->total-$item->paid,2,'.',',')}}</td>
                                         <td>{{ array_search ($item->status, config('app.loanStatus')) }}</td>
+                                        <td>{{ date('d, M Y H:i:s',strtotime($item->date_disbursed)) }}</td>
                                         <td>
                                             <a href="{{ url('/admin/loan/' . $item->id) }}" title="View Loan"><button class="btn btn-info btn-xs"><i class="fa fa-eye" aria-hidden="true"></i> View</button></a>
                                             
@@ -200,9 +215,60 @@ $(document).on('click', function (e) {
     </div>
 <div style="margin-top:5px; ">
     <button type="submit" class="btn btn-primary"><i class="fa fa-search"></i> Search</button>
-    <button type="submit" class="btn btn-default pull-right"><i class="fa fa-search"></i> Clear</button>
+    <button type="submit" class="btn btn-default pull-right"><i class="fa fa-stop"></i> Clear</button>
 
 </div>
 {!! Form::close() !!}
-</div
+</div> 
+
+<div id="invoicePopover" class="hide">
+{!! Form::open(['method' => 'GET', 'url' => '/admin/loan', 'class' => 'search_form', 'role' => 'search'])  !!}
+   
+ <div class="input-group">
+      <label for="">Organization</label>
+     <select class="form-control" name="invoice_organization">
+         <option value=''>Select</option>
+         <?php if(isset($organizations)){ ?>
+          @foreach($organizations as $organization)
+         <option value='{{$organization->id}}'>{{$organization->name}}</option>
+         @endforeach
+         <?php } ?>
+     </select>
+    </div>
+<div style="margin-top:5px; ">
+    <button type="submit" class="btn btn-primary"><i class="fa fa-download"></i> Download invoice</button>
+   
+
+</div>
+{!! Form::close() !!}
+</div>
+
+<div id="serviceLoan" class="hide">
+{!! Form::open(['method' => 'POST', 'url' => '/admin/loan', 'class' => 'service_form', 'role' => 'search','files'=>'true'])  !!}
+   
+ <div class="input-group">
+     <input type="radio" value="service_selected" class="service_type" name="service_type" >
+      <label for="">Service selected loans</label>
+      
+    </div>
+<div class="input-group">
+     <input type="radio" value="service_document" class="service_type" name="service_type" >
+      <label for="">Upload a document (excel)</label>
+      
+    </div>
+<div class='hide service_file'>
+<div class="input-group">
+     <input  type="file" name="service_file" >
+</div>
+
+    <a href='/admin/loan/?download_sample=1'>Download sample</a>
+</div>
+<div style="margin-top:5px; ">
+    <button data-form="service_form"  type="submit" class="btn btn-primary process_loan"><i class="fa fa-check"></i> Service Loans</button>
+   
+
+</div>
+<input type="hidden" name="loans" value="" class="selected_loans"/>
+{!! Form::close() !!}
+</div>
 @endsection
