@@ -519,7 +519,7 @@ class LoanService{
             }
             
         }else{
-            $response['can_borrow'] = true;
+            $response['can_borrow'] = false;
             $response['reason'] = 'Profile is inactive';
         }
         
