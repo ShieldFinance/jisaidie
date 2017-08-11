@@ -37,7 +37,8 @@ class RolesController extends Controller
      */
     public function create()
     {
-        return view('admin.roles.create');
+        $permissions = Permission::all();
+        return view('admin.roles.create',compact('permissions'));
     }
 
     /**
@@ -51,8 +52,13 @@ class RolesController extends Controller
     {
         $this->validate($request, ['name' => 'required']);
 
-        Role::create($request->all());
-
+        $role = Role::create($request->all());
+        $role->permissions()->detach();
+        $permissions = $request->input('selected_permissions');
+        foreach ($permissions as $perm_id) {
+            $permission = Permission::find($perm_id);
+            $role->givePermissionTo($permission);
+        }
         Session::flash('flash_message', 'Role added!');
 
         return redirect('admin/roles');

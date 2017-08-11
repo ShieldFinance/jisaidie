@@ -136,7 +136,9 @@ $(document).on('click', function (e) {
                                         <th>Amount Requested</th>
                                         <th>Amount Processed</th>
                                         <th>Total</th>
+                                        <th>Balance</th>
                                         <th>Status</th>
+                                        <th>Date Disbursed</th>
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
@@ -155,7 +157,9 @@ $(document).on('click', function (e) {
                                         <td>{{ $item->amount_requested }}</td>
                                         <td>{{ $item->amount_processed }}</td>
                                         <td>{{ number_format($item->total,2,'.',',')}}</td>
+                                        <td>{{ number_format($item->total-$item->paid,2,'.',',')}}</td>
                                         <td>{{ array_search ($item->status, config('app.loanStatus')) }}</td>
+                                        <td>{{ date('d, M Y H:i:s',strtotime($item->date_disbursed)) }}</td>
                                         <td>
                                             <a href="{{ url('/admin/loan/' . $item->id) }}" title="View Loan"><button class="btn btn-info btn-xs"><i class="fa fa-eye" aria-hidden="true"></i> View</button></a>
                                             

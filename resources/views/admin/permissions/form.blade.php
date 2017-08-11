@@ -12,14 +12,7 @@
         {!! $errors->first('label', '<p class="help-block">:message</p>') !!}
     </div>
 </div>
-<div class="col-md-6">
-        <select class="permissions form-control" id="permissions" name="permissions[]" multiple="multiple">
-            @foreach($permissions as $permission)
-            <option value="{{ $permission->name }}">{{ $permission->label }}</option>
-            @endforeach()
-        </select>
-        {!! $errors->first('label', '<p class="help-block">:message</p>') !!}
-</div>
+
 <div class="form-group">
     <div class="col-md-offset-4 col-md-4">
         {!! Form::submit(isset($submitButtonText) ? $submitButtonText : 'Create', ['class' => 'btn btn-primary']) !!}

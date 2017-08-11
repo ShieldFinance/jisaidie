@@ -194,7 +194,7 @@ class CustomerService extends ApiGuardController{
                 $commandStatus = config('app.responseCodes')['command_successful'];
                 $payload['send_notification'] = true;
                 $payload['send_now']=true;
-                $payload['message_type'] = 'inapp';
+                $payload['message_type'] = 'sms';
                 $payload['msisdn'] = $customer->mobile_number;
                 $payload['message_placeholders']['[activation_code]']=$payload['activation_code'];
                 $payload['message_placeholders']['[customer_name]']=$customer->surname;
