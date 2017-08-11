@@ -1,1 +1,79 @@
-{"menus":[{"section":"User Manager","items":[{"title":"Users","url":"\/admin\/users"},{"title":"Roles","url":"\/admin\/roles"},{"title":"Permissions","url":"\/admin\/permissions"}]},{"section":"Modules","items":[{"title":"Settings","url":"\/admin\/settings"},{"title":"Services","url":"\/admin\/services"},{"title":"Customers","url":"\/admin\/customers"},{"title":"CustomerDevice","url":"\/admin\/customer-device"},{"title":"Transactions","url":"\/admin\/transactions"},{"title":"Screens","url":"\/admin\/screens"},{"title":"Loan","url":"\/admin\/loan"},{"title":"Payments","url":"\/admin\/payments"},{"title":"ResponseTemplates","url":"\/admin\/response-templates"},{"title":"Messages","url":"\/admin\/messages"},{"title":"Reports","url":"\/admin\/reports"},{"title":"Ussd queries","url":"\/ussd\/ussd"},{"title":"Organizations","url":"\/Organization\/organizations"}]}]}
+{
+	"menus": [{
+		"section": "User Manager",
+		"items": [{
+			"title": "Users",
+			"url": "\/admin\/users",
+		    "viewPerm":"can_view_users"
+		}, {
+			"title": "Roles",
+			"url": "\/admin\/roles",
+		  "viewPerm":"can_view_roles"
+		}, {
+			"title": "Permissions",
+			"url": "\/admin\/permissions",
+		  "viewPerm":"can_view_permissions"
+		}]
+	}, {
+		"section": "Modules",
+		"items": [{
+			"title": "Settings",
+			"url": "\/admin\/settings",
+		  "viewPerm":"can_access_settings"
+		}, {
+			"title": "Services",
+			"url": "\/admin\/services",
+		  "viewPerm":"can_view_services"
+		}, 
+                 {
+			"title": "Service Commands",
+			"url": "\/admin\/service-commands",
+		  "viewPerm":"can_view_service_commands"
+		},
+                {
+			"title": "Customers",
+			"url": "\/admin\/customers",
+		  "viewPerm":"can_view_customers"
+		}, {
+			"title": "CustomerDevice",
+			"url": "\/admin\/customer-device",
+		   "viewPerm":"can_view_devices"
+		}, {
+			"title": "Transactions",
+			"url": "\/admin\/transactions",
+		  "viewPerm":"can_view_transactions"
+		}, {
+			"title": "Screens",
+			"url": "\/admin\/screens",
+		  "viewPerm":"can_view_screens"
+		}, {
+			"title": "Loan",
+			"url": "\/admin\/loan",
+		  "viewPerm":"can_view_loans"
+		}, {
+			"title": "Payments",
+			"url": "\/admin\/payments",
+		   "viewPerm":"can_view_payments"
+		}, {
+			"title": "ResponseTemplates",
+			"url": "\/admin\/response-templates",
+		  "viewPerm":"can_view_templates"
+		}, {
+			"title": "Messages",
+			"url": "\/admin\/messages",
+		   	"viewPerm":"can_view_messages"
+		}, {
+			"title": "Reports",
+			"url": "\/admin\/reports",
+		  "viewPerm":"can_view_reports"
+		}, {
+			"title": "Ussd queries",
+			"url": "\/ussd\/ussd",
+		   "viewPerm":"can_view_ussdqueries"
+		}, {
+			"title": "Organizations",
+			"url": "\/Organization\/organizations",
+		   "viewPerm":"can_view_organizations"
+		}]
+	}]
+}
