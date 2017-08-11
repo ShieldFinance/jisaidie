@@ -252,11 +252,13 @@ $(document).on('click', function (e) {
       <label for="">Upload a document (excel)</label>
       
     </div>
-<div class="input-group hide service_file">
+<div class='hide service_file'>
+<div class="input-group">
      <input  type="file" name="service_file" >
-     
-      
-    </div>
+</div>
+
+    <a href='/admin/loan/?download_sample=1'>Download sample</a>
+</div>
 <div style="margin-top:5px; ">
     <button data-form="service_form"  type="submit" class="btn btn-primary process_loan"><i class="fa fa-check"></i> Service Loans</button>
    

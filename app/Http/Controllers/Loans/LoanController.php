@@ -35,6 +35,10 @@ class LoanController extends Controller
         $wheres = array();
         $invoice_organization = $request->get('invoice_organization');
         $service_type = $request->get('service_type');
+        $downloadSample = $request->get('download_sample');
+        if($downloadSample){
+            $this->downloadServiceSample();
+        }
         if($invoice_organization){
             $this->printInvoice($invoice_organization);
         }
@@ -216,7 +220,25 @@ class LoanController extends Controller
 
         })->download('xls');
     }
-    
+    public function downloadServiceSample(){
+        Excel::create('sample-'.date('Y-m-d'), function($excel) {
+        $data = array();
+        $headers = array(
+            'id number',
+            'name',
+            'amount'
+        );
+        $data[]=$headers;
+        $data[]=['11111111','John Doe','1000'];
+        $data[]=['22222222','Jane Doe','1500'];
+        $excel->sheet('Sheet1', function($sheet) use ($data) {
+
+               $sheet->fromArray($data,null,'A1',false,false);
+
+            });
+
+        })->download('xlsx');
+    }
     public function serviceLoans(Request $request){
         $user = Auth::user();
         $userIsAdmin =  Auth::user()->hasRole('Super Admin');
