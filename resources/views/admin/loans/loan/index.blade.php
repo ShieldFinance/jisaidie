@@ -54,6 +54,9 @@ $(function(){
             }
         })
        
+       
+
+
        $('[rel="popover"]').popover({
         container: 'body',
         html: true,
@@ -177,7 +180,7 @@ $(document).on('click', function (e) {
         </div>
     </div>
 <div id="myPopover" class="hide">
-{!! Form::open(['method' => 'GET', 'url' => '/admin/loan', 'class' => 'search_form', 'role' => 'search'])  !!}
+{!! Form::open(['method' => 'GET', 'url' => '/admin/loan','id'=>'search_form', 'class' => 'search_form', 'role' => 'search'])  !!}
     <div class="input-group">
         <input type="text" class="form-control" name="search" placeholder="Search...">
         
@@ -215,8 +218,7 @@ $(document).on('click', function (e) {
     </div>
 <div style="margin-top:5px; ">
     <button type="submit" class="btn btn-primary"><i class="fa fa-search"></i> Search</button>
-    <button type="submit" class="btn btn-default pull-right"><i class="fa fa-stop"></i> Clear</button>
-
+   
 </div>
 {!! Form::close() !!}
 </div> 
@@ -244,7 +246,7 @@ $(document).on('click', function (e) {
 </div>
 
 <div id="serviceLoan" class="hide">
-{!! Form::open(['method' => 'POST', 'url' => '/admin/loan', 'class' => 'service_form', 'role' => 'search','files'=>'true'])  !!}
+{!! Form::open(['method' => 'POST', 'url' => '/admin/service_loan', 'class' => 'service_form', 'role' => 'search','files'=>'true'])  !!}
    
  <div class="input-group">
      <input type="radio" value="service_selected" class="service_type" name="service_type" >

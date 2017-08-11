@@ -10,10 +10,11 @@ use File;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Session;
+use Illuminate\Support\Facades\Route;
 class Controller extends BaseController
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
-    public function __construct(Request $request) {
+    public function __construct() {
         $this->middleware(function ($request, $next) {
             $menus = [];
             $user = Auth::user();

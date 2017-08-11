@@ -519,7 +519,6 @@ class LoanService{
             }
             
         }else{
-            //customer has no active loans
             $response['can_borrow'] = true;
             $response['reason'] = 'Profile is inactive';
         }
