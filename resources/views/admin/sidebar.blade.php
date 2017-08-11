@@ -1,5 +1,5 @@
-<div class="col-md-3">
-
+<div class="col-sm-2 col-md-2 col-lg-2">
+ <nav class="navbar navbar-default navbar-fixed-side">
     @foreach($laravelAdminMenus->menus as $section)
         @if($section->items)
             <div class="panel panel-default panel-flush">
@@ -21,4 +21,5 @@
             </div>
         @endif
     @endforeach
+ </nav>
 </div>
