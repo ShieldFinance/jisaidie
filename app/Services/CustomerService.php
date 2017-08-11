@@ -321,7 +321,7 @@ class CustomerService extends ApiGuardController{
         $commandStatus = config('app.responseCodes')['command_failed'];
         $responseProcessor = new ResponseTemplatesController();
         $response = array();
-        $response['mobile_number']=isset($payload['mobile_number']);
+        $response['mobile_number']=$payload['mobile_number'];
         if(isset($payload['send_notification']) && $payload['send_notification']){
            $payload['msisdn'] = $payload['mobile_number'];
            $sent = $responseProcessor->processResponse($payload);
