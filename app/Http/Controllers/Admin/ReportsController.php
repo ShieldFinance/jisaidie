@@ -96,7 +96,7 @@ class ReportsController extends Controller
 		
 		foreach($Loans as $record){
 			$month_year=date("F-Y",strtotime($record->created_at));
-			$disbursed[$month_year]=$serviced[$month_year]=$pending[$month_year]=$pending[$month_year]=$invoiced[$month_year]=0;
+			$disbursed[$month_year]=$serviced[$month_year]=$pending[$month_year]=$pending[$month_year]=$invoiced[$month_year]=$declined[$month_year]=0;
 		}
 		foreach($Loans as $record){
 			
