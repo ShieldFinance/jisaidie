@@ -10,6 +10,7 @@ use App\Http\Models\Loan;
 use Illuminate\Http\Request;
 use Session;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 
 class PaymentsController extends Controller
 {
@@ -32,7 +33,10 @@ class PaymentsController extends Controller
                                 ->orderBy('id','desc')
 				->paginate($perPage);
         } else {
-            $payments = Payment::orderBy('id','desc')->paginate($perPage);
+            $payments = DB::table('payments')
+                    ->leftJoin('customers as c', 'c.mobile_number', '=', 'payments.mobile_number')
+                    ->select('payments.*','c.mobile_number','c.email','c.id_number',DB::raw('CONCAT(c.surname, " ", c.last_name) AS customer_name'))
+                    ->orderBy('id','desc')->paginate($perPage);
         }
 
         return view('payments.payments.index', compact('payments'));

@@ -30,29 +30,33 @@
                             <table class="table table-borderless">
                                 <thead>
                                     <tr>
-                                        <th>ID</th><th>Amount</th><th>Curreny</th><th>Reference</th><th>Actions</th>
+                                        <th>#</th>
+                                        <th>Amount</th>
+                                        <th>Currency</th>
+                                        <th>Customer</th>
+                                        <th>AT ref</th>
+                                        <th>Provider ref</th>
+                                        <th>Date</th>
+                                        <th>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                 @foreach($payments as $item)
                                     <tr>
-                                        <td>{{ $item->id }}</td>
-                                        <td>{{ $item->amount }}</td><td>{{ $item->curreny }}</td><td>{{ $item->reference }}</td>
+                                        <td>{{ $loop->iteration }}</td>
+                                        <td>{{ number_format($item->amount,2,'.',',') }}</td>
+                                        <td>{{ $item->currency }}</td>
+                                        <td>
+                                            <b>Phone:</b> {{ $item->mobile_number }}<br>
+                                            <b>Email:</b> {{ $item->email}}<br>
+                                            <b>Id No.</b> {{ $item->id_number}} 
+                                        </td>
+                                        <td>{{ $item->reference }}</td>
+                                        <td>{{ $item->provider_reference }}</td>
+                                        <td>{{ $item->transaction_date }}</td>
                                         <td>
                                             <a href="{{ url('/admin/payments/' . $item->id) }}" title="View Payment"><button class="btn btn-info btn-xs"><i class="fa fa-eye" aria-hidden="true"></i> View</button></a>
-                                            <a href="{{ url('/admin/payments/' . $item->id . '/edit') }}" title="Edit Payment"><button class="btn btn-primary btn-xs"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</button></a>
-                                            {!! Form::open([
-                                                'method'=>'DELETE',
-                                                'url' => ['/admin/payments', $item->id],
-                                                'style' => 'display:inline'
-                                            ]) !!}
-                                                {!! Form::button('<i class="fa fa-trash-o" aria-hidden="true"></i> Delete', array(
-                                                        'type' => 'submit',
-                                                        'class' => 'btn btn-danger btn-xs',
-                                                        'title' => 'Delete Payment',
-                                                        'onclick'=>'return confirm("Confirm delete?")'
-                                                )) !!}
-                                            {!! Form::close() !!}
+                                            
                                         </td>
                                     </tr>
                                 @endforeach
