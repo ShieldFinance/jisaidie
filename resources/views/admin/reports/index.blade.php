@@ -8,7 +8,7 @@
             {!! Charts::assets() !!}
             
             
-            <div class="col-md-10">
+            <div class="col-md-10 pull-right">
             
                
                 <div class="col-md-6">
@@ -38,7 +38,7 @@
                 </div>
             
             </div>
-            <div class="col-md-9">
+            <div class="col-md-10 pull-right">
                <div class="col-md-6">
                 
                     <div class="panel panel-default">
@@ -66,7 +66,7 @@
                 
             
             </div>
-            <div class="col-md-9">
+            <div class="col-md-10 pull-right">
             
                 <div class="col-md-6">
                 
@@ -83,7 +83,7 @@
                 
             
             </div>
-            <div class="col-md-9 pull-right">
+            <div class="col-md-10 pull-right">
             
                  <div class="col-md-12">
                     <div class="panel panel-default">
@@ -100,7 +100,7 @@
             
             </div>
                 
-            <div class="col-md-9 pull-right">
+            <div class="col-md-10 pull-right">
             
                  <div class="col-md-12">
                     <div class="panel panel-default">
@@ -176,7 +176,7 @@
                 
             
             </div>
-            <div class="col-md-9 pull-right">
+            <div class="col-md-10 pull-right">
             
                  <div class="col-md-12">
                     <div class="panel panel-default">
