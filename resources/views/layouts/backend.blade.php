@@ -75,6 +75,7 @@
                                             {{ csrf_field() }}
                                         </form>
                                     </li>
+                                    <li><a href="{{ url('/admin/users/'.Auth::user()->id) }}">Profile</a></li>
                                 </ul>
                             </li>
                         @endif
