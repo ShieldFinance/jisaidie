@@ -8,7 +8,7 @@
             {!! Charts::assets() !!}
             
             
-            <div class="col-md-9">
+            <div class="col-md-10">
             
                
                 <div class="col-md-6">
