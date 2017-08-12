@@ -380,12 +380,16 @@ ACTIONS;
         $customer_status = array_flip(config('app.customerStatus'));
         $organizations = array('0' => 'Select an organization');
         $orgs = Organization::all();
+        $customer = array();
+         $customer['is_checkoff']=0;
+             $customer['organization_id']=0;
+             $customer['status']=0;
         if (!empty($orgs)) {
             foreach ($orgs as $org) {
                 $organizations[$org->id] = $org->name;
             }
         }
-        return view('admin/customers.customers.create', compact('customer_status', 'organizations'));
+        return view('admin/customers.customers.create', compact('customer_status', 'organizations','customer'));
     }
 
     /**

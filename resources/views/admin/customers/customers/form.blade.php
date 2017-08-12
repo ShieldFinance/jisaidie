@@ -49,13 +49,13 @@
 </div><div class="form-group {{ $errors->has('is_checkoff') ? 'has-error' : ''}}">
     {!! Form::label('is_checkoff', 'Is Checkoff', ['class' => 'col-md-4 control-label']) !!}
     <div class="col-md-6"> 
-        {!! Form::select('is_checkoff', array('1' => 'Yes', '0' => 'No'),$customer['is_checkoff'],['class' => 'form-control']) !!}
+        {!! Form::select('is_checkoff', array('1' => 'Yes', '0' => 'No'),isset($customer)?$customer['is_checkoff']:null,['class' => 'form-control']) !!}
         {!! $errors->first('is_checkoff', '<p class="help-block">:message</p>') !!}
     </div>
 </div><div class="form-group {{ $errors->has('status') ? 'has-error' : ''}}">
     {!! Form::label('status', 'Status', ['class' => 'col-md-4 control-label']) !!}
     <div class="col-md-6">
-         {!! Form::select('status', $customer_status,$customer['status'],['class' => 'form-control']) !!}
+         {!! Form::select('status', $customer_status,isset($customer)?$customer['status']:null,['class' => 'form-control']) !!}
         {!! $errors->first('status', '<p class="help-block">:message</p>') !!}
         
     </div>
