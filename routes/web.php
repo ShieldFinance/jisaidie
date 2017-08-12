@@ -35,6 +35,7 @@ Route::resource('admin/settings', 'Setting\\SettingsController');
 Route::resource('admin/services', 'Services\\ServicesController');
 Route::resource('admin/service-commands', 'ServiceCommands\\ServiceCommandsController');
 Route::resource('admin/customers', 'Customers\\CustomersController');
+Route::post('admin/import_customers', 'Customers\\CustomersController@importCustomers');
 Route::resource('admin/customer-device', 'CustomerDevice\\CustomerDeviceController');
 Route::resource('admin/transactions', 'Transaction\\TransactionsController');
 Route::resource('admin/screens', 'Screens\\ScreensController');

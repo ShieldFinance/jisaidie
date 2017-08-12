@@ -266,5 +266,36 @@ $(function(){
     <button type="submit" class="btn btn-default pull-right"><i class="fa fa-search"></i> Clear</button>
 </div>
 {!! Form::close() !!}
-</div
+</div>
+
+<div id="customerImport" class="hide">
+{!! Form::open(['method' => 'POST', 'url' => '/admin/import_customers', 'class' => 'import_customers_form', 'role' => 'search','files'=>'true'])  !!}
+
+<div class=''>
+    <div class="input-group">
+
+      <label for="">Organization</label>
+      <select required="required" class="form-control" name="organization_id">
+         <option value=''>Select</option>
+         <?php if(isset($organizations)){ ?>
+          @foreach($organizations as $organization)
+         <option value='{{$organization->id}}'>{{$organization->name}}</option>
+         @endforeach
+         <?php } ?>
+     </select>
+    </div>
+<div class="input-group">
+     <label for="">Upload a document (excel)</label>
+     <input  type="file" name="customers" >
+</div>
+
+    <a href='/admin/customer/?download_sample=1'>Download sample</a>
+</div>
+<div style="margin-top:5px; ">
+    <button data-form="service_form"  type="submit" class="btn btn-primary process_loan"><i class="fa fa-check"></i> Import</button>
+   
+
+</div>
+{!! Form::close() !!}
+</div>
 @endsection

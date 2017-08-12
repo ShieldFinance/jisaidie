@@ -11,10 +11,12 @@ use App\Http\Models\Customer;
 use App\Http\Models\CustomerDevice;
 use App\Http\Models\Message;
 use App\Http\Models\Organization;
+use App\Http\Models\Transaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 use Session;
+use Carbon\Carbon;
 
 class CustomersController extends Controller {
 
@@ -63,7 +65,51 @@ class CustomersController extends Controller {
         $request->session()->put('customers', $customers);
         return view('admin/customers.customers.index', compact('customers', 'action_buttons', 'organizations'));
     }
-
+    public function importCustomers(Request $request){
+        $user = Auth::user();
+        $userIsAdmin =  Auth::user()->hasRole('Super Admin');
+        $organizationId = $request->input('organization_id');
+        if($organizationId){
+            if ($request->hasFile('customers')) {
+                $path = $request->customers->store('customers');
+                $rqst = array('action'=>'ImportCustomers','request'=>$path);
+                $transaction = new Transaction(['service_id'=>21,'request'=>json_encode($rqst),'status'=>'completed']);
+                $transaction->profile = $user->id;
+                $transaction->save();
+                Excel::load(storage_path().'/app/'.$path, function($reader) use($organizationId) {
+                    // Getting all results
+                    $results = $reader->get(); 
+                    $customers = array();
+                    foreach($results as $row){
+                       $customer = [
+                           'surname'=>$row->first_name,
+                           'other_name'=>$row->other_name,
+                           'last_name'=>$row->last_name,
+                           'mobile_number'=>$row->mobile_number,
+                           'employee_number'=>$row->employee_number,
+                           'id_number'=>$row->id_number,
+                           'net_salary'=>$row->net_salary,
+                           'email'=>$row->email,
+                           'gender'=>$row->gender,
+                           'is_checkoff'=>1,
+                           'id_verified'=>1,
+                           'created_at'=>Carbon::now()->toDateTimeString(),
+                           'organization_id'=>$organizationId,
+                           'status'=>config('app.customerStatus')['active']
+                       ]; 
+                       $customers[] =  $customer;
+                    }
+                    Customer::insert($customers);
+                    Session::flash('flash_message', 'Customers imported');
+                });
+            }else{
+                Session::flash('flash_message', 'Please select a valid excel file');
+            }
+        }else{
+            Session::flash('flash_message', 'Please select an organization');
+        }
+        return redirect('admin/customers');
+    }
     public function export(Request $request) {
         Excel::create('Customers-' . date('Y-m-d'), function($excel) use($request) {
             $customers = $request->session()->get('customers');
@@ -272,6 +318,14 @@ ACTIONS;
                 $action_buttons.=<<<ACTIONS
                       <a href="javascript:void(0)" data-action='ExportCustomer' class="btn btn-info btn-sm export_customer" title="Export Customers">
                             <i class="fa fa-download" aria-hidden="true"></i> Export to excel
+                        </a>
+ACTIONS;
+            }
+            
+            if($user->can('can_add_customer') || $userIsAdmin) {
+                $action_buttons.=<<<ACTIONS
+                      <a href="javascript:void(0)" rel="popover"  data-popover-content="#customerImport" class="btn btn-info btn-sm " title="Import customers">
+                            <i class="fa fa-check" aria-hidden="true"></i> Import Customers
                         </a>
 ACTIONS;
             }
