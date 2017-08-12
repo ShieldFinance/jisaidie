@@ -36,6 +36,10 @@ class CustomersController extends Controller {
         $keyword = $request->get('search');
         $organization_id = $request->get('search_organization');
         $status = $request->get('search_status');
+        $downloadSample = $request->get('download_sample');
+        if($downloadSample){
+            $this->downloadImportSample();
+        }
         $wheres = array();
         $customers = DB::table('customers');
         if (!empty($organization_id)) {
@@ -64,6 +68,32 @@ class CustomersController extends Controller {
                 ->paginate($perPage);
         $request->session()->put('customers', $customers);
         return view('admin/customers.customers.index', compact('customers', 'action_buttons', 'organizations'));
+    }
+    public function downloadImportSample(){
+        Excel::create('sample-'.date('Y-m-d'), function($excel) {
+        $data = array();
+        $headers = array(
+            'mobile number',
+            'first name',
+            'last name',
+            'other name',
+            'email',
+            'net salary',
+            'id number',
+            'employee number',
+            'gender'
+        );
+        $data[]=$headers;
+        $data[]=['254722222222','John','Doe','Kimonye','jon.doe@example.com','50000','12345678','0000','Male'];
+        $data[]=['254722222223','Jane','Doe','Kimonye','jane.doe@example.com','60000','12345679','0001','Female'];
+     
+        $excel->sheet('Sheet1', function($sheet) use ($data) {
+
+               $sheet->fromArray($data,null,'A1',false,false);
+
+            });
+
+        })->download('xlsx');
     }
     public function importCustomers(Request $request){
         $user = Auth::user();

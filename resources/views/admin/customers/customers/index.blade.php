@@ -289,7 +289,7 @@ $(function(){
      <input  type="file" name="customers" >
 </div>
 
-    <a href='/admin/customer/?download_sample=1'>Download sample</a>
+    <a href='/admin/customers/?download_sample=1'>Download sample</a>
 </div>
 <div style="margin-top:5px; ">
     <button data-form="service_form"  type="submit" class="btn btn-primary process_loan"><i class="fa fa-check"></i> Import</button>
