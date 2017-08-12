@@ -46,8 +46,8 @@ class Handler extends ExceptionHandler
     {
         if ($exception instanceof \Illuminate\Database\QueryException) {
             return response()->view('errors.database', [], 500);
-        }else{
-           // return response()->view('errors.default', [], 500);
+        }elseif($exception instanceof \ErrorException){
+           return response()->view('errors.default', [], 500);
         }
         return parent::render($request, $exception);
     }

@@ -406,6 +406,10 @@ class LoanController extends Controller
      */
     public function create()
     {
+        if(Auth::user()->hasRole('Viewer')){
+            Session::flash('flash_message', 'You do not have access to this resource');
+            return redirect('admin');
+        }
         return view('admin/loans.loan.create');
     }
 
@@ -457,6 +461,10 @@ class LoanController extends Controller
      */
     public function edit($id)
     {
+        if(Auth::user()->hasRole('Viewer')){
+            Session::flash('flash_message', 'You do not have access to this resource');
+            return redirect('admin');
+        }
         $loan = Loan::findOrFail($id);
 
         return view('admin/loans.loan.edit', compact('loan'));

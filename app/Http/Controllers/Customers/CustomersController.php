@@ -377,6 +377,10 @@ ACTIONS;
      * @return \Illuminate\View\View
      */
     public function create() {
+        if(Auth::user()->hasRole('Viewer')){
+            Session::flash('flash_message', 'You do not have access to this resource');
+            return redirect('admin');
+        }
         $customer_status = array_flip(config('app.customerStatus'));
         $organizations = array('0' => 'Select an organization');
         $orgs = Organization::all();
@@ -437,6 +441,10 @@ ACTIONS;
      * @return \Illuminate\View\View
      */
     public function edit($id) {
+        if(Auth::user()->hasRole('Viewer')){
+            Session::flash('flash_message', 'You do not have access to this resource');
+            return redirect('admin');
+        }
         $customer = Customer::findOrFail($id);
         $customer_status = array_flip(config('app.customerStatus'));
         $organizations = array('0' => 'Select an organization');

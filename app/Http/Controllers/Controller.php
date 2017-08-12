@@ -31,6 +31,7 @@ class Controller extends BaseController
                                 Session::flash('flash_message', 'You do not have access to this resource');
                                 return redirect('admin');
                             }
+                            
                             break;
                         }
                        }

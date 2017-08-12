@@ -7,6 +7,7 @@ use App\Role;
 use App\User;
 use Illuminate\Http\Request;
 use Session;
+use Illuminate\Support\Facades\Auth;
 
 class UsersController extends Controller
 {
@@ -37,6 +38,10 @@ class UsersController extends Controller
      */
     public function create()
     {
+        if(Auth::user()->hasRole('Viewer')){
+            Session::flash('flash_message', 'You do not have access to this resource');
+            return redirect('admin');
+        }
         $roles = Role::select('id', 'name', 'label')->get();
         $roles = $roles->pluck('label', 'name');
 
@@ -90,6 +95,10 @@ class UsersController extends Controller
      */
     public function edit($id)
     {
+        if(Auth::user()->hasRole('Viewer')){
+            Session::flash('flash_message', 'You do not have access to this resource');
+            return redirect('admin');
+        }
         $roles = Role::select('id', 'name', 'label')->get();
         $roles = $roles->pluck('label', 'name');
 
