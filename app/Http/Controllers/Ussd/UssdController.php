@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Ussd;
 
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
-
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Session;
 use App\Http\Models\Ussd;
@@ -29,6 +29,8 @@ class UssdController extends Controller
 
         if (!empty($keyword)) {
             $ussd = Ussd::where('id', 'LIKE', "%$keyword%")
+                                ->leftjoin('customers as c', 'c.mobile_number', '=', 'ussd.phoneNumber')
+                                ->select('ussd.*','c.mobile_number','c.email','c.id_number',DB::raw('CONCAT(c.surname, " ", c.last_name) AS customer_name'))
 				->orWhere('sessionId', 'LIKE', "%$keyword%")
 				->orWhere('serviceCode', 'LIKE', "%$keyword%")
 				->orWhere('pin_verified', 'LIKE', "%$keyword%")
@@ -50,7 +52,9 @@ class UssdController extends Controller
 				->orWhere('text', 'LIKE', "%$keyword%")
 				->paginate($perPage);
         } else {
-            $ussd = Ussd::paginate($perPage);
+            $ussd = Ussd::leftjoin('customers as c', 'c.mobile_number', '=', 'ussds.phoneNumber')
+                         ->select('ussds.*','c.mobile_number','c.email','c.id_number',DB::raw('CONCAT(c.surname, " ", c.last_name) AS customer_name'))
+                         ->paginate($perPage);
         }
 
         return view('ussd.ussd.index', compact('ussd'));
