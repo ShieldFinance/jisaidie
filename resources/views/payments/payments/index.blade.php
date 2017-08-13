@@ -47,6 +47,7 @@
                                         <td>{{ number_format($item->amount,2,'.',',') }}</td>
                                         <td>{{ $item->currency }}</td>
                                         <td>
+                                            <b>Name:</b>{{ $item->customer_name }}<br>
                                             <b>Phone:</b> {{ $item->mobile_number }}<br>
                                             <b>Email:</b> {{ $item->email}}<br>
                                             <b>Id No.</b> {{ $item->id_number}} 
