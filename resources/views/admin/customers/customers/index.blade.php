@@ -130,6 +130,7 @@ $(function(){
                                         
                                         <td>
                                             <a href="{{ url('/admin/customers/' . $item->id) }}" title="View Customer"><button class="btn btn-info btn-xs"><i class="fa fa-eye" aria-hidden="true"></i> View</button></a>
+                                            @if(!Auth::user()->hasRole('Viewer'))
                                             <a href="{{ url('/admin/customers/' . $item->id . '/edit') }}" title="Edit Customer"><button class="btn btn-primary btn-xs"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</button></a>
                                            
                                             {!! Form::open([
@@ -216,7 +217,7 @@ $(function(){
                                                 <input name="_method" type="hidden" value="POST">
                                                 <input type="hidden" name="customer_id" value="{{ $item->id }}">
                                             {!! Form::close() !!}
-                                            
+                                            @endif
                                         </td>
                                     </tr>
                                 @endforeach

@@ -9,9 +9,11 @@
                 <div class="panel panel-default">
                     <div class="panel-heading">Settings</div>
                     <div class="panel-body">
-                        <a href="{{ url('/admin/settings/create') }}" class="btn btn-success btn-sm" title="Add New Setting">
+                        @can('can_add_settings')
+                        <a href="{{ url('/admin/settings/create') }}" class="btn btn-success btn-sm hide" title="Add New Setting">
                             <i class="fa fa-plus" aria-hidden="true"></i> Add New
                         </a>
+                        @endcan
 
                         {!! Form::open(['method' => 'GET', 'url' => '/admin/settings', 'class' => 'navbar-form navbar-right', 'role' => 'search'])  !!}
                         <div class="input-group">
@@ -39,7 +41,8 @@
                                         <td>{{ $item->id }}</td>
                                         <td>{{ $item->setting_name }}</td><td>{{ $item->setting_value }}</td><td>{{ $item->setting_description }}</td>
                                         <td>
-                                            <a href="{{ url('/admin/settings/' . $item->id) }}" title="View Setting"><button class="btn btn-info btn-xs"><i class="fa fa-eye" aria-hidden="true"></i> View</button></a>
+                                           <!-- <a href="{{ url('/admin/settings/' . $item->id) }}" title="View Setting"><button class="btn btn-info btn-xs"><i class="fa fa-eye" aria-hidden="true"></i> View</button></a>-->
+                                            @if(!Auth::user()->hasRole('Viewer'))
                                             <a href="{{ url('/admin/settings/' . $item->id . '/edit') }}" title="Edit Setting"><button class="btn btn-primary btn-xs"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</button></a>
                                             {!! Form::open([
                                                 'method'=>'DELETE',
@@ -53,6 +56,7 @@
                                                         'onclick'=>'return confirm("Confirm delete?")'
                                                 )) !!}
                                             {!! Form::close() !!}
+                                            @endif
                                         </td>
                                     </tr>
                                 @endforeach
