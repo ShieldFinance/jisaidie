@@ -9,9 +9,11 @@
                 <div class="panel panel-default">
                     <div class="panel-heading">Users</div>
                     <div class="panel-body">
+                        @can('can_add_user')
                         <a href="{{ url('/admin/users/create') }}" class="btn btn-success btn-sm" title="Add New User">
                             <i class="fa fa-plus" aria-hidden="true"></i> Add New
                         </a>
+                        @endcan
 
                         {!! Form::open(['method' => 'GET', 'url' => '/admin/users', 'class' => 'navbar-form navbar-right', 'role' => 'search'])  !!}
                         <div class="input-group">

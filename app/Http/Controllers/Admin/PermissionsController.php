@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Permission;
 use Illuminate\Http\Request;
 use Session;
-
+use Illuminate\Support\Facades\Auth;
+use App\Role;
+use Illuminate\Support\Facades\DB;
 class PermissionsController extends Controller
 {
     /**
@@ -49,11 +51,24 @@ class PermissionsController extends Controller
     public function store(Request $request)
     {
         $this->validate($request, ['name' => 'required']);
-
-        Permission::create($request->all());
-
+        
+        $permission = Permission::create($request->all());
+        $role = Role::find(1);//get the super admin role
+        $permissions = DB::table('permission_role')->where('role_id',1)->get();
+        if($permissions){
+            $roleHasPermission  = false;
+            foreach($permissions as $perm){
+                if($perm->permission_id==$permission->id){
+                    $roleHasPermission = true;
+                    break;
+                }
+            }
+            if(!$roleHasPermission){
+                $role->givePermissionTo($permission);
+            }
+        }
         Session::flash('flash_message', 'Permission added!');
-
+        
         return redirect('admin/permissions');
     }
 
@@ -99,7 +114,20 @@ class PermissionsController extends Controller
 
         $permission = Permission::findOrFail($id);
         $permission->update($request->all());
-
+        $role = Role::find(1);//get the super admin role
+        $permissions = DB::table('permission_role')->where('role_id',1)->get();
+        if($permissions->count()){
+            $roleHasPermission  = false;
+            foreach($permissions as $perm){
+                if($perm->permission_id==$permission->id){
+                    $roleHasPermission = true;
+                    break;
+                }
+            }
+            if(!$roleHasPermission){
+                $role->givePermissionTo($permission);
+            }
+        }
         Session::flash('flash_message', 'Permission updated!');
 
         return redirect('admin/permissions');

@@ -10,7 +10,7 @@
                     <div class="panel-heading">Settings</div>
                     <div class="panel-body">
                         @can('can_add_settings')
-                        <a href="{{ url('/admin/settings/create') }}" class="btn btn-success btn-sm hide" title="Add New Setting">
+                        <a href="{{ url('/admin/settings/create') }}" class="btn btn-success btn-sm" title="Add New Setting">
                             <i class="fa fa-plus" aria-hidden="true"></i> Add New
                         </a>
                         @endcan
