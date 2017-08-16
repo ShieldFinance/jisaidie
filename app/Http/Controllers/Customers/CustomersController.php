@@ -171,7 +171,7 @@ class CustomersController extends Controller {
                 unset($c['activation_code']);
                 unset($c['company_name']);
                 unset($c['id']);
-                $c['status'] = array_search($c['status'], config('app.loanStatus'));
+                $c['status'] = array_search($c['status'], config('app.customerStatus'));
                 $c['organization_id'] = $customer->company_name;
                 $data[] = $c;
             }
