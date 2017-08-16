@@ -54,7 +54,7 @@
                                         </td>
                                         <td>{{ $item->reference }}</td>
                                         <td>{{ $item->provider_reference }}</td>
-                                        <td>{{ $item->transaction_date }}</td>
+                                        <td>{{ $item->created_at }}</td>
                                         <td>
                                             <a href="{{ url('/admin/payments/' . $item->id) }}" title="View Payment"><button class="btn btn-info btn-xs"><i class="fa fa-eye" aria-hidden="true"></i> View</button></a>
                                             

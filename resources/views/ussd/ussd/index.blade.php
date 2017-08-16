@@ -35,6 +35,7 @@
                                         <th>Customer</th>
                                         <th>SessionId</th>
                                         <th>ServiceCode</th>
+                                        <th>Date</th>
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
@@ -46,6 +47,7 @@
                                         <td>{{ $item->customer_name }}</td>
                                         <td>{{ $item->sessionId }}</td>
                                         <td>{{ $item->serviceCode }}</td>
+                                        <td>{{ $item->created_at }} </td>
                                         <td>
                                             <a href="{{ url('/ussd/ussd/' . $item->id) }}" title="View Ussd"><button class="btn btn-info btn-xs"><i class="fa fa-eye" aria-hidden="true"></i> View</button></a>
                                             <a href="{{ url('/ussd/ussd/' . $item->id . '/edit') }}" title="Edit Ussd"><button class="btn btn-primary btn-xs"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</button></a>
