@@ -15,7 +15,7 @@ use App\Mail\AppEmail;
 use Edujugon\PushNotification\PushNotification;
 use App\Http\Models\CustomerDevice;
 use App\Http\Models\Customer;
-
+use Illuminate\Support\Facades\Log;
 class CrbService {
 
     /**
@@ -66,6 +66,7 @@ class CrbService {
 
         // execute!
         $curl_response = curl_exec($ch);
+         Log::info($curl_response);
         //echo '<pre>';print_r($curl_response);print_r($payload);exit;
         // close the connection, release resources used
         curl_close($ch);
@@ -173,7 +174,7 @@ class CrbService {
         curl_setopt($ch, CURLOPT_POSTFIELDS, $curl_req);
         // execute!
         $curl_response = curl_exec($ch);
-
+        Log::info($curl_response);
         // close the connection, release resources used
         curl_close($ch);
 
