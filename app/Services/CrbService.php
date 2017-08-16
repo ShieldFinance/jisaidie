@@ -15,7 +15,7 @@ use App\Mail\AppEmail;
 use Edujugon\PushNotification\PushNotification;
 use App\Http\Models\CustomerDevice;
 use App\Http\Models\Customer;
-
+use Illuminate\Support\Facades\Log;
 class CrbService {
 
     /**
@@ -30,6 +30,11 @@ class CrbService {
         $username = Setting::where('setting_name', 'crb_username')->first()->setting_value;
         $password = Setting::where('setting_name', 'crb_password')->first()->setting_value;
         $endpoint = Setting::where('setting_name', 'crb_endpoint')->first()->setting_value;
+        
+        $crb_msg_username = Setting::where('setting_name', 'crb_msg_username')->first()->setting_value;
+        $crb_msg_password = Setting::where('setting_name', 'crb_msg_password')->first()->setting_value;
+        $crb_msg_acc_code = Setting::where('setting_name', 'crb_msg_acc_code')->first()->setting_value;
+        $crb_msg_infinity_code = Setting::where('setting_name', 'crb_msg_infinity_code')->first()->setting_value;
         $headers = array(
             'SOAPAction:urn:getProduct102',
             'Content-Type:text/xml;charset=UTF-8',
@@ -38,10 +43,10 @@ class CrbService {
         $curl_req = '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:q0="http://ws.crbws.transunion.ke.co/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 			  <soapenv:Body>
 				<q0:getProduct102>
-				<username>WS_DUN1</username>
-					<password>zbEfik</password>
-					<code>2114</code>
-					<infinityCode>ke123456789</infinityCode>
+				        <username>'.$crb_msg_username.'</username>
+					<password>'.$crb_msg_password.'</password>
+					<code>'.$crb_msg_acc_code.'</code>
+					<infinityCode>'.$crb_msg_infinity_code.'</infinityCode>
 					<name1>' . $payload["first_name"] . '</name1>
 					<name2>' . $payload["middle_name"] . ' ' . $payload["last_name"] . '</name2>
 					<nationalID>' . $payload["id_number"] . '</nationalID>
@@ -61,6 +66,7 @@ class CrbService {
 
         // execute!
         $curl_response = curl_exec($ch);
+         Log::info($curl_response);
         //echo '<pre>';print_r($curl_response);print_r($payload);exit;
         // close the connection, release resources used
         curl_close($ch);
@@ -128,6 +134,11 @@ class CrbService {
         $username = Setting::where('setting_name', 'crb_username')->first()->setting_value;
         $password = Setting::where('setting_name', 'crb_password')->first()->setting_value;
         $endpoint = Setting::where('setting_name', 'crb_endpoint')->first()->setting_value;
+        
+        $crb_msg_username = Setting::where('setting_name', 'crb_msg_username')->first()->setting_value;
+        $crb_msg_password = Setting::where('setting_name', 'crb_msg_password')->first()->setting_value;
+        $crb_msg_acc_code = Setting::where('setting_name', 'crb_msg_acc_code')->first()->setting_value;
+        $crb_msg_infinity_code = Setting::where('setting_name', 'crb_msg_infinity_code')->first()->setting_value;
         $headers = array(
             'SOAPAction:urn:getProduct115',
             'Content-Type:text/xml;charset=UTF-8',
@@ -138,10 +149,10 @@ class CrbService {
                      <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:q0="http://ws.crbws.transunion.ke.co/"    xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
                        <soapenv:Body>
                          <q0:getProduct115>
-                           <username>WS_SIC1</username>
-                           <password>Tuvwxz</password>
-                           <code>2151</code>
-                           <infinityCode>1328KE46406</infinityCode>
+                           <username>'.$crb_msg_username.'</username>
+					<password>'.$crb_msg_password.'</password>
+					<code>'.$crb_msg_acc_code.'</code>
+					<infinityCode>'.$crb_msg_infinity_code.'</infinityCode>
                             <name1>' . $payload["first_name"] . '</name1>
 							<name2>' . $payload["middle_name"] . ' ' . $payload["last_name"] . '</name2>
 							<nationalID>' . $payload["id_number"] . '</nationalID>
@@ -163,7 +174,7 @@ class CrbService {
         curl_setopt($ch, CURLOPT_POSTFIELDS, $curl_req);
         // execute!
         $curl_response = curl_exec($ch);
-
+        Log::info($curl_response);
         // close the connection, release resources used
         curl_close($ch);
 
@@ -200,6 +211,11 @@ class CrbService {
         $username = Setting::where('setting_name', 'crb_username')->first()->setting_value;
         $password = Setting::where('setting_name', 'crb_password')->first()->setting_value;
         $endpoint = Setting::where('setting_name', 'crb_endpoint')->first()->setting_value;
+        
+        $crb_msg_username = Setting::where('setting_name', 'crb_msg_username')->first()->setting_value;
+        $crb_msg_password = Setting::where('setting_name', 'crb_msg_password')->first()->setting_value;
+        $crb_msg_acc_code = Setting::where('setting_name', 'crb_msg_acc_code')->first()->setting_value;
+        $crb_msg_infinity_code = Setting::where('setting_name', 'crb_msg_infinity_code')->first()->setting_value;
 
         $headers = array(
             'SOAPAction:urn:getProduct102',
@@ -211,10 +227,10 @@ class CrbService {
 			  <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:q0="http://ws.crbws.transunion.ke.co/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 				<soapenv:Body>
 				  <q0:getCreditBal>
-					<username>WS_SIC1</username>
-					<password>Tuvwxz</password>
-					<code>2151</code>
-					<infinityCode>1328KE46406</infinityCode>
+					<username>'.$crb_msg_username.'</username>
+					<password>'.$crb_msg_password.'</password>
+					<code>'.$crb_msg_acc_code.'</code>
+					<infinityCode>'.$crb_msg_infinity_code.'</infinityCode>
 				  </q0:getCreditBal>
 				</soapenv:Body>
 			  </soapenv:Envelope>

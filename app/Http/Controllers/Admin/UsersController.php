@@ -95,7 +95,8 @@ class UsersController extends Controller
      */
     public function edit($id)
     {
-        if(Auth::user()->hasRole('Viewer')){
+        
+        if(Auth::user()->hasRole('Viewer') && Auth::id()!=$id){
             Session::flash('flash_message', 'You do not have access to this resource');
             return redirect('admin');
         }
