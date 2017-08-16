@@ -35,6 +35,8 @@ class CustomersController extends Controller {
         $perPage = 25;
         $keyword = $request->get('search');
         $organization_id = $request->get('search_organization');
+        $search_date_from = $request->get('search_date_from');
+        $search_date_to = $request->get('search_date_to');
         $status = $request->get('search_status');
         $downloadSample = $request->get('download_sample');
         if($downloadSample){
@@ -55,6 +57,18 @@ class CustomersController extends Controller {
         }
         if (!empty($status)) {
             $wheres[] = ['customers.status', '=', $status];
+        }
+        if(!empty($search_date_from)){
+            $time = strtotime($search_date_from);
+            $timeFrom = date('Y-m-d H:i:s',$time);
+            if(!empty($search_date_to)){
+                $time = strtotime($search_date_to);
+                $timeTo = date('Y-m-d H:i:s',$time);
+                $wheres[]=['customers.created_at','>=',$timeFrom];
+                $wheres[]=['customers.created_at','<=', $timeTo];
+            }else{
+                Session::flash('flash_message','You must specify both start and end date');
+            }
         }
         $customers = $customers->leftjoin('organization', 'organization.id', '=', 'organization_id');
         if (!empty($wheres)) {
@@ -359,9 +373,64 @@ ACTIONS;
                         </a>
 ACTIONS;
             }
+$organizations = Organization::all();
+$select = '<select class="form-control" name="search_organization">
+         <option value="">Select</option>';
+         if(isset($organizations)){
+          foreach($organizations as $organization){
+         $select.='<option value="'.$organization->id.'">"'.$organization->name.'</option>';
+          }
+         } 
+    $select.=" </select>";
+$status = '<option value="'.config('app.customerStatus')['new'].'">New</option>
+         <option value="'.config('app.customerStatus')['active'].'">Actve</option>
+         <option value="'.config('app.customerStatus')['suspended'].'">Suspended</option>
+         <option value="'.config('app.customerStatus')['deleted'].'">deleted</option>
+          <option value="'.config('app.customerStatus')['locked'].'">Locked</option>
+          <option value="'.config('app.customerStatus')['one_time_pin'].'">One Time pin</option>
+          <option value="'.config('app.customerStatus')['activation_code'].'">Activation code</option>';
+$html = <<<popover
+        <div id="popover-content" class="">
+<form method="GET" action="/admin/customers" class="search_form" role="search">
+    <div class="input-group">
+        <input type="text" class="form-control" name="search" placeholder="Search...">
+        
+    </div>
+ <div class="input-group">
 
+      <label for="">Organization</label>
+     $select
+    </div>
+<div class="input-group">
+    <label for="">Status</label>
+     <select class="form-control" name="search_status">
+         <option value="">Select</option>
+         $status
+     </select>
+    </div>
+<div class="form-group">
+    <label>Date From</label>
+    <div class="input-group">
+        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+        <input type="text" name="search_date_from" id="date_from" class="form-control">
+    </div>
+</div>
+<div class="form-group">
+    <label>Date To</label>
+     <div class="input-group">
+         <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+        <input type="text" name="search_date_to" id="date_to" class="form-control">
+     </div>
+</div>
+<div style="margin-top:5px; ">
+    <button type="submit" class="btn btn-primary"><i class="fa fa-search"></i> Search</button>
+    <button type="submit" class="btn btn-default pull-right"><i class="fa fa-search"></i> Clear</button>
+</div>
+</form>
+</div>
+popover;
             $action_buttons.=<<<ACTIONS
-                      <span class='dropdown'> <a href="#" rel="popover" data-popover-content="#myPopover">
+                      <span class='dropdown'> <a href="#" id="filter_popover" data-toggle="popover" data-trigger="click" data-placement="bottom" data-container="body" data-html="true" data-content='$html'>
                             <i class="fa fa-filter" aria-hidden="true"></i> Filter
                         </a></span>
                 	

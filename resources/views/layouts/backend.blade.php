@@ -13,10 +13,16 @@
         <!-- Styles -->
         <link href="/css/app.css" rel="stylesheet">
             <link href="/css/style.css" rel="stylesheet">
-            <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.4/js/bootstrap-select.min.js"></script>
             
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+        <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css">
+        <link href="{{ asset('/css/custom-theme/jquery-ui-1.9.2.custom.css') }}" rel="stylesheet">
+          <link href="{{ asset('/css/bootstrap-datetimepicker.min.css') }}" rel="stylesheet">
         <script src="{{ asset('/js/jquery.1.9.1.js') }}" type="text/javascript"></script>
+        <script src="{{ asset('/js/bootstrap.min.js') }}" type="text/javascript"></script>
+        <script src="{{ asset('/js/moment.min.js') }}" type="text/javascript"></script>
+        <script src="{{ asset('/js/jquery-ui-1.9.2.custom.min.js') }}" type="text/javascript"></script>
+        <script src="{{ asset('/js/bootstrap-datetimepicker.min.js') }}" type="text/javascript"></script>
         <script src="{{ asset('/js/multiselect.js') }}" type="text/javascript"></script>
         <script src="{{ asset('/js/main.js') }}" type="text/javascript"></script>
         <!-- Scripts -->
@@ -25,6 +31,7 @@
                 'csrfToken' => csrf_token(),
             ]); ?>
         </script>
+        
     </head>
     <body>
         <nav class="navbar navbar-default navbar-fixed-top">
