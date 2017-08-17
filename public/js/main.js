@@ -15,9 +15,9 @@ jQuery(document).ready(function ($) {
         html: true
     }).on('shown.bs.popover', function () {
         //datepicker 
-        $('#date_from').datetimepicker();
+        $('#date_from').datetimepicker({'useCurrent':false});
 
-        $('#date_to').datetimepicker();
+        $('#date_to').datetimepicker({'useCurrent':false});
 
     });
   
@@ -25,6 +25,72 @@ jQuery(document).ready(function ($) {
             $('#service').val('ExportPayments');
             $('.payments_form').submit();
         }) 
+        
+        
+	// add multiple select / deselect functionality
+	$("#selectall").click(function () {
+            $('.loan_cbx').attr('checked', this.checked);
+	});
+
+	// if all checkbox are selected, check the selectall checkbox
+	// and viceversa
+	$(".loan_cbx").click(function(){
+
+		if($(".loan_cbx").length == $(".loan_cbx:checked").length) {
+			$("#selectall").attr("checked", "checked");
+		} else {
+			$("#selectall").removeAttr("checked");
+		}
+
+	});
+        
+         $(".process_loan").click(function(e){
+            var selectedvalue = [];
+            if ($(':checkbox:checked').length > 0) {
+              $(':checkbox:checked').each(function (i) {
+                  selectedvalue[i] = $(this).val();
+
+              });
+              $("#service").val($(this).data('service'));
+              $(".selected_loans").val(selectedvalue);//this will pass as array and method will be POST
+              var form = $(e.target).data('form');
+              $('.'+form).submit();
+             }else if($(this).data('service')=='ExportLoans'){
+                  $("#service").val($(this).data('service'));
+                 $('.loans_form').submit();
+             }else if(typeof($(this).data('service'))!='undefined'){
+                 alert("Please select at least one item from the list")
+                 return false;
+             }
+             
+             
+        });
+        
+        $('.service_type').on('click',function(){
+            var selected = $('input[name="service_type"]:checked').val();
+            if(selected=='service_document'){
+                $('.service_file').removeClass('hide')
+            }else{
+                if(!$('.service_file').hasClass('hide')){
+                    $('.service_file').addClass('hide')
+                }
+            }
+        })
+       
+       
+
+
+       $('[rel="popover"]').popover({
+        container: 'body',
+        html: true,
+        placement:'bottom',
+        content: function () {
+            var clone = $($(this).data('popover-content')).clone(true).removeClass('hide');
+            return clone;
+        }
+    }).click(function(e) {
+        e.preventDefault();
+    });
 });
 
 

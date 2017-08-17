@@ -4,70 +4,6 @@
 <script type="javascript">
 $(function(){
 
-	// add multiple select / deselect functionality
-	$("#selectall").click(function () {
-            $('.loan_cbx').attr('checked', this.checked);
-	});
-
-	// if all checkbox are selected, check the selectall checkbox
-	// and viceversa
-	$(".loan_cbx").click(function(){
-
-		if($(".loan_cbx").length == $(".loan_cbx:checked").length) {
-			$("#selectall").attr("checked", "checked");
-		} else {
-			$("#selectall").removeAttr("checked");
-		}
-
-	});
-        
-         $(".process_loan").click(function(e){
-            var selectedvalue = [];
-            if ($(':checkbox:checked').length > 0) {
-              $(':checkbox:checked').each(function (i) {
-                  selectedvalue[i] = $(this).val();
-
-              });
-              $("#service").val($(this).data('service'));
-              $(".selected_loans").val(selectedvalue);//this will pass as array and method will be POST
-              var form = $(e.target).data('form');
-              $('.'+form).submit();
-             }else if($(this).data('service')=='ExportLoans'){
-                  $("#service").val($(this).data('service'));
-                 $('.loans_form').submit();
-             }else if(typeof($(this).data('service'))!='undefined'){
-                 alert("Please select at least one item from the list")
-                 return false;
-             }
-             
-             
-        });
-        
-        $('.service_type').on('click',function(){
-            var selected = $('input[name="service_type"]:checked').val();
-            if(selected=='service_document'){
-                $('.service_file').removeClass('hide')
-            }else{
-                if(!$('.service_file').hasClass('hide')){
-                    $('.service_file').addClass('hide')
-                }
-            }
-        })
-       
-       
-
-
-       $('[rel="popover"]').popover({
-        container: 'body',
-        html: true,
-        placement:'bottom',
-        content: function () {
-            var clone = $($(this).data('popover-content')).clone(true).removeClass('hide');
-            return clone;
-        }
-    }).click(function(e) {
-        e.preventDefault();
-    });
        });
        
        $(document).ready(function () {
@@ -141,7 +77,6 @@ $(document).on('click', function (e) {
                                         <th>Total</th>
                                         <th>Balance</th>
                                         <th>Status</th>
-                                        <th>Type</th>
                                         <th>Date Disbursed</th>
                                         <th>Actions</th>
                                     </tr>
@@ -180,66 +115,10 @@ $(document).on('click', function (e) {
             </div>
         </div>
     </div>
-<div id="myPopover" class="hide">
-{!! Form::open(['method' => 'GET', 'url' => '/admin/loan','id'=>'search_form', 'class' => 'search_form', 'role' => 'search'])  !!}
-    <div class="input-group">
-        <input type="text" class="form-control" name="search" placeholder="Search...">
-        
-    </div>
- <div class="input-group">
-      <label for="">Organization</label>
-     <select class="form-control" name="search_organization">
-         <option value=''>Select</option>
-         <?php if(isset($organizations)){ ?>
-          @foreach($organizations as $organization)
-         <option value='{{$organization->id}}'>{{$organization->name}}</option>
-         @endforeach
-         <?php } ?>
-     </select>
-    </div>
-<div class="input-group">
-    <label for="">Loan type</label>
-     <select class="form-control" name="search_type">
-         <option value="">Select</option>
-         <option value='co'>Checkoff</option>
-         <option value='nco'>Non Checkoff</option>
-     </select>
-    </div>
-<div class="input-group">
-    <label for="">Loan Status</label>
-     <select class="form-control" name="search_status">
-         <option value="">Select</option>
-         <option value="{{ config('app.loanStatus')['pending']}}">Pending</option>
-         <option value='{{ config('app.loanStatus')['approved']}}'>Approved</option>
-         <option value='{{ config('app.loanStatus')['disbursed']}}'>Disbursed</option>
-         <option value='{{ config('app.loanStatus')['rejected']}}'>Rejected</option>
-          <option value='{{ config('app.loanStatus')['locked']}}'>Locked</option>
-          <option value='{{ config('app.loanStatus')['paid']}}'>Paid</option>
-     </select>
-    </div>
-<div class="form-group">
-    <label>Date From</label>
-    <div class="input-group">
-        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
-        <input type="text" name="search_date_from" id="date_from" class="form-control">
-    </div>
-</div>
-<div class="form-group">
-    <label>Date To</label>
-     <div class="input-group">
-         <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
-        <input type="text" name="search_date_to" id="date_to" class="form-control">
-     </div>
-</div>
-<div style="margin-top:5px; ">
-    <button type="submit" class="btn btn-primary"><i class="fa fa-search"></i> Search</button>
-   
-</div>
-{!! Form::close() !!}
-</div> 
+
 
 <div id="invoicePopover" class="hide">
-{!! Form::open(['method' => 'GET', 'url' => '/admin/loan', 'class' => 'search_form', 'role' => 'search'])  !!}
+{!! Form::open(['method' => 'GET', 'url' => '/admin/loan', 'class' => '', 'role' => 'search'])  !!}
    
  <div class="input-group">
       <label for="">Organization</label>

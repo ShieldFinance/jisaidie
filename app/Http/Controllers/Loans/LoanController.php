@@ -259,7 +259,7 @@ class LoanController extends Controller
             if($serviceTye=='service_selected'){
                 $loan_ids = $request->input('loans');
                 $loan_ids = explode(',', $loan_ids);
-                if(!empty($loan_ids)){
+                if(!empty($loan_ids) && $loan_ids[0]!=''){
                     foreach($loan_ids as $key=>$loan_id){
                         if($loan_id=='on'){
                             unset($loan_ids[$key]);
