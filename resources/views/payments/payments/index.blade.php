@@ -9,20 +9,8 @@
                 <div class="panel panel-default">
                     <div class="panel-heading">Payments</div>
                     <div class="panel-body">
-                        <a href="{{ url('/admin/payments/create') }}" class="btn btn-success btn-sm" title="Add New Payment">
-                            <i class="fa fa-plus" aria-hidden="true"></i> Add New
-                        </a>
+                        {!! $action_buttons !!}
 
-                        {!! Form::open(['method' => 'GET', 'url' => '/admin/payments', 'class' => 'navbar-form navbar-right', 'role' => 'search'])  !!}
-                        <div class="input-group">
-                            <input type="text" class="form-control" name="search" placeholder="Search...">
-                            <span class="input-group-btn">
-                                <button class="btn btn-default" type="submit">
-                                    <i class="fa fa-search"></i>
-                                </button>
-                            </span>
-                        </div>
-                        {!! Form::close() !!}
 
                         <br/>
                         <br/>

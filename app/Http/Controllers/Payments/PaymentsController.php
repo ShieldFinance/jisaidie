@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Session;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class PaymentsController extends Controller
 {
@@ -23,23 +24,53 @@ class PaymentsController extends Controller
     {
         $keyword = $request->get('search');
         $perPage = 25;
-
+        $action_buttons = $this->getActionButtons();
+        $search_date_from = $request->get('search_date_from');
+        $search_date_to = $request->get('search_date_to');
+        $wheres = array();
+        $orWheres = array();
         if (!empty($keyword)) {
-            $payments = Payment::where('amount', 'LIKE', "%$keyword%")
-				->orWhere('curreny', 'LIKE', "%$keyword%")
-				->orWhere('reference', 'LIKE', "%$keyword%")
-				->orWhere('gateway', 'LIKE', "%$keyword%")
-				->orWhere('loan_id', 'LIKE', "%$keyword%")
-                                ->orderBy('id','desc')
-				->paginate($perPage);
-        } else {
+            $orWheres[] =  ['payments.reference' ,'LIKE',"%$keyword%"];
+            $orWheres[] =  ['payments.loan_id' ,'=',$keyword];
+            $orWheres[] =  ['payments.mobile_number' ,'LIKE',"%$keyword%"];
+            $orWheres[] =  ['payments.provider_reference' ,'LIKE',"%$keyword%"];
             $payments = DB::table('payments')
-                    ->leftJoin('customers as c', 'c.mobile_number', '=', 'payments.mobile_number')
-                    ->select('payments.*','c.mobile_number','c.email','c.id_number',DB::raw('CONCAT(c.surname, " ", c.last_name) AS customer_name'))
-                    ->orderBy('id','desc')->paginate($perPage);
+                ->leftJoin('customers as c', 'c.mobile_number', '=', 'payments.mobile_number')
+                ->where('payments.mobile_number' ,'LIKE',"%$keyword%")
+                ->orWhere('payments.reference' ,'LIKE',"%$keyword%")
+                ->orWhere('payments.provider_reference' ,'LIKE',"%$keyword%")
+                ->select('payments.*','c.mobile_number','c.email','c.id_number',DB::raw('CONCAT(c.surname, " ", c.last_name) AS customer_name'))
+                ->orderBy('id','desc')->paginate($perPage);
+            return view('payments.payments.index', compact('payments','action_buttons'));
+        } 
+        if(!empty($search_date_from)){
+            $time = strtotime($search_date_from);
+            $timeFrom = date('Y-m-d H:i:s',$time);
+            if(!empty($search_date_to)){
+                $time = strtotime($search_date_to);
+                $timeTo = date('Y-m-d H:i:s',$time);
+                $wheres[]=['payments.created_at','>=',$timeFrom];
+                $wheres[]=['payments.created_at','<=', $timeTo];
+            }else{
+                Session::flash('flash_message','You must specify both start and end date');
+            }
         }
+        if(empty($wheres)){
+            $wheres[] = ['payments.id','>',0];
+        }
+        $payments = DB::table('payments')
+                ->leftJoin('customers as c', 'c.mobile_number', '=', 'payments.mobile_number');
+        if(!empty($wheres)){
+         $payments  =  $payments->where($wheres);
+        }
+        if(!empty($orWheres)){
+         $payments  =  $payments->orWhere($orWheres);
+        }
+                $payments  =  $payments->select('payments.*','c.mobile_number','c.email','c.id_number',DB::raw('CONCAT(c.surname, " ", c.last_name) AS customer_name'));
+                $payments  =  $payments->orderBy('id','desc')->paginate($perPage);
+        
 
-        return view('payments.payments.index', compact('payments'));
+        return view('payments.payments.index', compact('payments','action_buttons'));
     }
 
     /**
@@ -147,7 +178,67 @@ class PaymentsController extends Controller
 
         return redirect('admin/payments');
     }
-    
+     public function getActionButtons() {
+        $user = Auth::user();
+        $action_buttons = '';
+        if ($user) {
+            $userIsAdmin = Auth::user()->hasRole('Super Admin');
+
+            if ($user->can('can_export_payments') || $userIsAdmin) {
+                $action_buttons.=<<<ACTIONS
+                      <a href="javascript:void(0)" data-action='ExportPayments' class="btn btn-info btn-sm export_payments" title="Export Payments">
+                            <i class="fa fa-download" aria-hidden="true"></i> Export to excel
+                        </a>
+ACTIONS;
+            }
+            
+            
+$status = '<option value="Success">Success</option>
+         <option value="Failed">Failed</option>';
+$html = <<<popover
+        <div id="popover-content" class="">
+<form method="GET" action="/admin/payments" class="search_form" role="search">
+    <div class="input-group">
+        <input type="text" class="form-control" name="search" placeholder="Search...">
+        
+    </div>
+<div class="input-group">
+    <label for="">Status</label>
+     <select class="form-control" name="search_status">
+         <option value="">Select</option>
+         $status
+     </select>
+    </div>
+<div class="form-group">
+    <label>Date From</label>
+    <div class="input-group">
+        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+        <input type="text" name="search_date_from" id="date_from" class="form-control">
+    </div>
+</div>
+<div class="form-group">
+    <label>Date To</label>
+     <div class="input-group">
+         <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+        <input type="text" name="search_date_to" id="date_to" class="form-control">
+     </div>
+</div>
+<div style="margin-top:5px; ">
+    <button type="submit" class="btn btn-primary"><i class="fa fa-search"></i> Search</button>
+</div>
+</form>
+</div>
+popover;
+            $action_buttons.=<<<ACTIONS
+                      <span class='dropdown'> <a href="#" id="filter_popover" data-toggle="popover" data-trigger="click" data-placement="bottom" data-container="body" data-html="true" data-content='$html'>
+                            <i class="fa fa-filter" aria-hidden="true"></i> Filter
+                        </a></span>
+                	
+ACTIONS;
+
+            return $action_buttons;
+        }
+    }
     public function receivePayment(Request $request){
         $data  = $request->json()->all();
         try{
