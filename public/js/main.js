@@ -20,6 +20,11 @@ jQuery(document).ready(function ($) {
         $('#date_to').datetimepicker();
 
     });
+  
+   $('.export_payments').click(function(){
+            $('#service').val('ExportPayments');
+            $('.payments_form').submit();
+        }) 
 });
 
 

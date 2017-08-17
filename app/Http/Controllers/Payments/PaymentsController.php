@@ -9,6 +9,7 @@ use App\Http\Models\Payment;
 use App\Http\Models\Loan;
 use Illuminate\Http\Request;
 use Session;
+use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -27,6 +28,12 @@ class PaymentsController extends Controller
         $action_buttons = $this->getActionButtons();
         $search_date_from = $request->get('search_date_from');
         $search_date_to = $request->get('search_date_to');
+        $status = $request->get('search_status');
+        $type = $request->get('search_type');
+        $service = $request->get('service');
+        if(!empty($service) && $service=='ExportPayments'){
+            $this->export($request);
+        }
         $wheres = array();
         $orWheres = array();
         if (!empty($keyword)) {
@@ -41,6 +48,7 @@ class PaymentsController extends Controller
                 ->orWhere('payments.provider_reference' ,'LIKE',"%$keyword%")
                 ->select('payments.*','c.mobile_number','c.email','c.id_number',DB::raw('CONCAT(c.surname, " ", c.last_name) AS customer_name'))
                 ->orderBy('id','desc')->paginate($perPage);
+            $request->session()->put('customers', $payments);
             return view('payments.payments.index', compact('payments','action_buttons'));
         } 
         if(!empty($search_date_from)){
@@ -54,6 +62,12 @@ class PaymentsController extends Controller
             }else{
                 Session::flash('flash_message','You must specify both start and end date');
             }
+        }
+        if(!empty($status)){
+            $wheres[] = ['payments.status','=', $status];
+        }
+        if(!empty($type)){
+            $wheres[] = ['payments.type','=', $type];
         }
         if(empty($wheres)){
             $wheres[] = ['payments.id','>',0];
@@ -69,7 +83,7 @@ class PaymentsController extends Controller
                 $payments  =  $payments->select('payments.*','c.mobile_number','c.email','c.id_number',DB::raw('CONCAT(c.surname, " ", c.last_name) AS customer_name'));
                 $payments  =  $payments->orderBy('id','desc')->paginate($perPage);
         
-
+        $request->session()->put('payments', $payments);
         return view('payments.payments.index', compact('payments','action_buttons'));
     }
 
@@ -178,6 +192,40 @@ class PaymentsController extends Controller
 
         return redirect('admin/payments');
     }
+    public function export(Request $request) {
+        Excel::create('Payments-' . date('Y-m-d'), function($excel) use($request) {
+            $payments = $request->session()->get('payments');
+            $data = array();
+            $headers = array(
+                'Amount',
+                'Mobile Number',
+                'Customer Name',
+                'AT Reference',
+                'Provider Reference',
+                'Status',
+                'Type',
+                'Date'
+            );
+            $data[] = $headers;
+            foreach ($payments as $payment) {
+                $c = array();
+                $c['amount'] = $payment->amount;
+                $c['mobile number'] = $payment->mobile_number;
+                $c['customer_name'] = $payment->customer_name;
+                $c['at_reference'] = $payment->reference;
+                $c['provider_reference'] = $payment->provider_reference;
+                $c['status'] = $payment->status;
+                $c['type'] = $payment->type;
+                $c['date'] = $payment->created_at;
+                $data[] = $c;
+            }
+
+            $excel->sheet('Loan', function($sheet) use ($data) {
+
+                $sheet->fromArray($data, null, 'A1', false, false);
+            });
+        })->download('xls');
+    }
      public function getActionButtons() {
         $user = Auth::user();
         $action_buttons = '';
@@ -209,6 +257,14 @@ $html = <<<popover
          $status
      </select>
     </div>
+        <div class="input-group">
+    <label for="">Type</label>
+     <select class="form-control" name="search_type">
+         <option value="">Select</option>
+         <option value="credit">Credit</option>
+        <option value="debit">Debit</option>
+     </select>
+    </div>
 <div class="form-group">
     <label>Date From</label>
     <div class="input-group">
@@ -225,6 +281,7 @@ $html = <<<popover
 </div>
 <div style="margin-top:5px; ">
     <button type="submit" class="btn btn-primary"><i class="fa fa-search"></i> Search</button>
+         <button type="submit" class="btn btn-primary"><i class="fa fa-stop"></i> Clear</button>
 </div>
 </form>
 </div>

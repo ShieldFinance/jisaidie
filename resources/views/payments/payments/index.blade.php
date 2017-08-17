@@ -1,6 +1,7 @@
 @extends('layouts.backend')
 
 @section('content')
+
     <div class="container">
         <div class="row">
             @include('admin.sidebar')
@@ -14,6 +15,9 @@
 
                         <br/>
                         <br/>
+                        {!! Form::open(['method' => 'POST', 'url' => '/admin/payments/export', 'class' => 'navbar-form navbar-right payments_form'])  !!}
+                             <input type="hidden" name="service" value="" id="service"/>
+                           {!! Form::close() !!}
                         <div class="table-responsive">
                             <table class="table table-borderless">
                                 <thead>
@@ -24,6 +28,8 @@
                                         <th>Customer</th>
                                         <th>AT ref</th>
                                         <th>Provider ref</th>
+                                        <th>Status</th>
+                                        <th>Type</th>
                                         <th>Date</th>
                                         <th>Actions</th>
                                     </tr>
@@ -42,9 +48,11 @@
                                         </td>
                                         <td>{{ $item->reference }}</td>
                                         <td>{{ $item->provider_reference }}</td>
+                                        <td>{{ $item->status }}</td>
+                                        <td>{{ $item->type }}</td>
                                         <td>{{ $item->created_at }}</td>
                                         <td>
-                                            <a href="{{ url('/admin/payments/' . $item->id) }}" title="View Payment"><button class="btn btn-info btn-xs"><i class="fa fa-eye" aria-hidden="true"></i> View</button></a>
+                                            <a class="btn btn-info btn-xs" href="{{ url('/admin/payments/' . $item->id) }}" title="View Payment"><i class="fa fa-eye" aria-hidden="true"></i> View</a>
                                             
                                         </td>
                                     </tr>

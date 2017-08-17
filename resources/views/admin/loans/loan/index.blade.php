@@ -141,6 +141,7 @@ $(document).on('click', function (e) {
                                         <th>Total</th>
                                         <th>Balance</th>
                                         <th>Status</th>
+                                        <th>Type</th>
                                         <th>Date Disbursed</th>
                                         <th>Actions</th>
                                     </tr>

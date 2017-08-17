@@ -190,7 +190,7 @@ class CustomersController extends Controller {
                 $data[] = $c;
             }
 
-            $excel->sheet('Loan', function($sheet) use ($data) {
+            $excel->sheet('Customers', function($sheet) use ($data) {
 
                 $sheet->fromArray($data, null, 'A1', false, false);
             });
