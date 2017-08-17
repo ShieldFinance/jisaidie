@@ -41,7 +41,7 @@ $(function(){
         $('.export_customer').click(function(){
             $('.export_customers').submit();
         })
-        /*
+        
         $('[rel="popover"]').popover({
         container: 'body',
         html: true,
@@ -52,7 +52,7 @@ $(function(){
         }
     }).click(function(e) {
         e.preventDefault();
-    });*/
+    });
     
     
        

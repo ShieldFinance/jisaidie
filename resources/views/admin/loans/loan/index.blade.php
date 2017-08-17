@@ -1,7 +1,7 @@
 @extends('layouts.backend')
 
 @section('content')
-<SCRIPT language="javascript">
+<script type="javascript">
 $(function(){
 
 	// add multiple select / deselect functionality
@@ -110,7 +110,7 @@ $(document).on('click', function (e) {
     }
 });
 
-</SCRIPT>
+</script>
     <div class="container">
         <div class="row">
             @include('admin.sidebar')
@@ -164,7 +164,7 @@ $(document).on('click', function (e) {
                                         <td>{{ array_search ($item->status, config('app.loanStatus')) }}</td>
                                         <td>{{ date('d, M Y H:i:s',strtotime($item->date_disbursed)) }}</td>
                                         <td>
-                                            <a href="{{ url('/admin/loan/' . $item->id) }}" title="View Loan"><button class="btn btn-info btn-xs"><i class="fa fa-eye" aria-hidden="true"></i> View</button></a>
+                                            <a href="{{ url('/admin/loan/' . $item->id) }}" title="View Loan"><span class="btn btn-info btn-xs"><i class="fa fa-eye" aria-hidden="true"></i> View</span></a>
                                             
                                         </td>
                                     </tr>
@@ -216,6 +216,20 @@ $(document).on('click', function (e) {
           <option value='{{ config('app.loanStatus')['paid']}}'>Paid</option>
      </select>
     </div>
+<div class="form-group">
+    <label>Date From</label>
+    <div class="input-group">
+        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+        <input type="text" name="search_date_from" id="date_from" class="form-control">
+    </div>
+</div>
+<div class="form-group">
+    <label>Date To</label>
+     <div class="input-group">
+         <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+        <input type="text" name="search_date_to" id="date_to" class="form-control">
+     </div>
+</div>
 <div style="margin-top:5px; ">
     <button type="submit" class="btn btn-primary"><i class="fa fa-search"></i> Search</button>
    

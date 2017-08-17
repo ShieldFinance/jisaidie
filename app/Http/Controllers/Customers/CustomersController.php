@@ -378,7 +378,7 @@ $select = '<select class="form-control" name="search_organization">
          <option value="">Select</option>';
          if(isset($organizations)){
           foreach($organizations as $organization){
-         $select.='<option value="'.$organization->id.'">"'.$organization->name.'</option>';
+         $select.='<option value="'.$organization->id.'">'.$organization->name.'</option>';
           }
          } 
     $select.=" </select>";
