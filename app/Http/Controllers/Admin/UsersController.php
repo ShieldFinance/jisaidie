@@ -126,7 +126,7 @@ class UsersController extends Controller
      */
     public function update($id, Request $request)
     {
-        $this->validate($request, ['name' => 'required', 'email' => 'required', 'roles' => 'required']);
+        $this->validate($request, ['name' => 'required', 'email' => 'required']);
 
         $data = $request->except('password');
         if ($request->has('password')) {
