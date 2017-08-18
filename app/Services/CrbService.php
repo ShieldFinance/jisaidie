@@ -63,10 +63,10 @@ class CrbService {
         curl_setopt($ch, CURLOPT_USERPWD, "$username:$password");
         curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $curl_req);
-
+        Log::info($curl_req);
         // execute!
         $curl_response = curl_exec($ch);
-         Log::info($curl_response);
+        Log::info($curl_response);
         //echo '<pre>';print_r($curl_response);print_r($payload);exit;
         // close the connection, release resources used
         curl_close($ch);
@@ -246,7 +246,7 @@ class CrbService {
 
         // execute!
         $curl_response = curl_exec($ch);
-
+        Log::info($curl_response);
         // close the connection, release resources used
         curl_close($ch);
         $dom = new DOMDocument();
