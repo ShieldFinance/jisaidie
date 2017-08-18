@@ -315,9 +315,9 @@ ACTIONS;
             if(isset($data['clientAccount']) && strlen($data['clientAccount'])){
                 $mobileNumber = $data['clientAccount'];
                 $prefix = mb_substr($mobileNumber, 0, 1);
-                echo $mobileNumber.' ';
                 if($prefix=='0'){
-                    $mobileNumber = str_replace($prefix, '254',$mobileNumber);
+                    $mobileNumber = ltrim($data['clientAccount'], '0');
+                    $mobileNumber = '254'+$mobileNumber;
                 }
                 if($prefix=='+'){
                     $mobileNumber = str_replace($prefix, '',$mobileNumber);
