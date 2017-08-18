@@ -86,6 +86,7 @@ class CustomerService extends ApiGuardController{
                 $newCustomer->status = config('app.customerStatus')['new'];
                 $newCustomer->save();
                 $payload['send_notification'] = true;
+                $payload['send_now']=true;
                 $payload['customer'] =  $this->response->withItem($newCustomer, new CustomerTransformer());
                 $responseStatus =config('app.responseCodes')['existing_device_new_msisdn'];
                 $commandStatus = config('app.responseCodes')['command_successful'];
