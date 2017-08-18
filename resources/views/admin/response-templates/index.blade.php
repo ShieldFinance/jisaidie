@@ -30,14 +30,21 @@
                             <table class="table table-borderless">
                                 <thead>
                                     <tr>
-                                        <th>ID</th><th>Name</th><th>Subject</th><th>Message</th><th>Actions</th>
+                                        <th>ID</th><th>Name</th>
+                                        <th>Subject</th>
+                                        <th>Message</th>
+                                        <th>Type</th>
+                                        <th>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                 @foreach($responsetemplates as $item)
                                     <tr>
                                         <td>{{ $item->id }}</td>
-                                        <td>{{ $item->name }}</td><td>{{ $item->subject }}</td><td>{{ $item->message }}</td>
+                                        <td>{{ $item->name }}</td>
+                                        <td>{{ $item->subject }}</td>
+                                        <td>{{ $item->message }}</td>
+                                        <td>{{ $item->type }}</td>
                                         <td>
                                             <a href="{{ url('/admin/response-templates/' . $item->id) }}" title="View ResponseTemplate"><button class="btn btn-info btn-xs"><i class="fa fa-eye" aria-hidden="true"></i> View</button></a>
                                             <a href="{{ url('/admin/response-templates/' . $item->id . '/edit') }}" title="Edit ResponseTemplate"><button class="btn btn-primary btn-xs"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</button></a>

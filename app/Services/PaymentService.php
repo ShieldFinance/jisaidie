@@ -49,7 +49,7 @@ class PaymentService {
                        "providerChannel"=>$providerChannel,
                        "amount"       => $payload['amount'],
                        "metadata"     => array("mobile_number"   => $payload['recepient'],
-                                               "reason" => "Develop")
+                                               "reason" => "Jisaidie Loan")
               );
         $recipients  = array($recipient);
         $responses = $gateway->mobilePaymentB2CRequest($productName,$providerChannel, $recipients);

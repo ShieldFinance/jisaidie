@@ -662,6 +662,7 @@ ACTIONS;
     }
     public function fetchLoansJson(Request $request){
         $q = $request->get('q');
+        $response = [];
         /*$loans = DB::table('loans')
         ->join('customers as c', 'c.id', '=', 'loans.customer_id')
         ->leftJoin('organization', 'organization.id', '=', 'c.organization_id')

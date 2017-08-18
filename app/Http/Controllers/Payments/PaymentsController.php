@@ -298,6 +298,7 @@ ACTIONS;
     }
     public function receivePayment(Request $request){
         $data  = $request->json()->all();
+        $providerFees = 0;
         try{
             $mobileNumber = $data['source'];
             if(isset($data['requestMetadata']) && isset($data['requestMetadata']['mobile_number'])){

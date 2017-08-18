@@ -152,7 +152,7 @@ class LoanService{
                if($loan && $loan->status==config('app.loanStatus')['disbursed']){
                 $loan->status = config('app.loanStatus')['approved'];
                 $loan->save();
-                $payload['response_string'] = 'Loan Disbursement reversed';
+                $payload['response_string'] = 'Loan Disbursed';
                 $payload['response_status'] = config('app.responseCodes')['command_successful'];
                 $payload['command_status'] = config('app.responseCodes')['command_successful'];
             }
