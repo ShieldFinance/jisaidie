@@ -90,7 +90,7 @@ class ReportsController extends Controller
 		
 		
 		$disbursed_total=$pending_total=$serviced_total=$declined_total=0;
-		$disbursed_total_amount=$pending_total_amount=$serviced_total_amount=$declined_total_amount=$serviced_revenue=0;
+		$disbursed_total_amount=$pending_total_amount=$serviced_total_amount=$declined_total_amount=$invoiced_total_amount=$serviced_revenue=0;
 		$total_borrowers_array=$disbursed=array();
 		$repeats=array();
 		
