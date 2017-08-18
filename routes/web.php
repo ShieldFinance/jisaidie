@@ -40,6 +40,7 @@ Route::resource('admin/customer-device', 'CustomerDevice\\CustomerDeviceControll
 Route::resource('admin/transactions', 'Transaction\\TransactionsController');
 Route::resource('admin/screens', 'Screens\\ScreensController');
 Route::resource('admin/loan', 'Loans\\LoanController');
+Route::get('fetch_loans', 'Loans\\LoanController@fetchLoansJson');
 Route::post('admin/service_loan', 'Loans\\LoanController@serviceLoans');
 Route::resource('admin/loan', 'Loans\\LoanController');
 Route::resource('admin/payments', 'Payments\\PaymentsController');

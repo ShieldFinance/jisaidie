@@ -9,10 +9,7 @@
                 <div class="panel panel-default">
                     <div class="panel-heading">Ussd</div>
                     <div class="panel-body">
-                        <a href="{{ url('/ussd/ussd/create') }}" class="btn btn-success btn-sm" title="Add New Ussd">
-                            <i class="fa fa-plus" aria-hidden="true"></i> Add New
-                        </a>
-
+                        
                         {!! Form::open(['method' => 'GET', 'url' => '/ussd/ussd', 'class' => 'navbar-form navbar-right', 'role' => 'search'])  !!}
                         <div class="input-group">
                             <input type="text" class="form-control" name="search" placeholder="Search...">

@@ -4,11 +4,19 @@
         {!! Form::number('amount', null, ['class' => 'form-control', 'required' => 'required']) !!}
         {!! $errors->first('amount', '<p class="help-block">:message</p>') !!}
     </div>
-</div><div class="form-group {{ $errors->has('curreny') ? 'has-error' : ''}}">
-    {!! Form::label('curreny', 'Curreny', ['class' => 'col-md-4 control-label']) !!}
+</div>
+<div class="form-group {{ $errors->has('mobile_number') ? 'has-error' : ''}}">
+    {!! Form::label('amount', 'Mobile Number', ['class' => 'col-md-4 control-label']) !!}
     <div class="col-md-6">
-        {!! Form::text('curreny', null, ['class' => 'form-control', 'required' => 'required']) !!}
-        {!! $errors->first('curreny', '<p class="help-block">:message</p>') !!}
+        {!! Form::text('mobile_number', null, ['class' => 'form-control', 'required' => 'required']) !!}
+        {!! $errors->first('mobile_number', '<p class="help-block">:message</p>') !!}
+    </div>
+</div>
+<div class="form-group {{ $errors->has('currency') ? 'has-error' : ''}}">
+    {!! Form::label('currency', 'Currency', ['class' => 'col-md-4 control-label']) !!}
+    <div class="col-md-6">
+        {!! Form::text('currency', null, ['class' => 'form-control', 'required' => 'required']) !!}
+        {!! $errors->first('currency', '<p class="help-block">:message</p>') !!}
     </div>
 </div><div class="form-group {{ $errors->has('reference') ? 'has-error' : ''}}">
     {!! Form::label('reference', 'Reference', ['class' => 'col-md-4 control-label']) !!}

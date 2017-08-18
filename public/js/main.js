@@ -92,6 +92,38 @@ jQuery(document).ready(function ($) {
     }).click(function(e) {
         e.preventDefault();
     });
+    
+   
+    $( "#loan_id" ).autocomplete({
+      source: function( request, response ) {
+        $.ajax({
+          url: "/fetch_loans",
+          dataType: "json",
+          data: {
+            q: request.term
+          },
+          success: function( data ) {
+            response( data );
+          }
+        });
+      },
+      minLength: 3,
+      select: function( event, ui ) {
+        $('loan_id').val(ui.item.id)
+      },
+      open: function() {
+        $( this ).removeClass( "ui-corner-all" ).addClass( "ui-corner-top" );
+      },
+      close: function() {
+        $( this ).removeClass( "ui-corner-top" ).addClass( "ui-corner-all" );
+      }
+    });
+    $('.reconcile_btn').on('click', function(){
+        $('#payment_id').val($(this).data('payment_id'));
+    })
+    $('#reconcileModal').on('shown.bs.modal', function (e) {
+        // do something...
+    })
 });
 
 

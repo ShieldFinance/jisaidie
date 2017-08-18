@@ -53,7 +53,11 @@
                                         <td>{{ $item->created_at }}</td>
                                         <td>
                                             <a class="btn btn-info btn-xs" href="{{ url('/admin/payments/' . $item->id) }}" title="View Payment"><i class="fa fa-eye" aria-hidden="true"></i> View</a>
-                                            
+                                            @can('can_assign_payment_to_loan')
+                                             @if(!$item->customer_name)
+                                                <a data-toggle="modal"  data-payment_id="{{ $item->id }}" data-target="#reconcileModal" class="btn btn-info btn-xs reconcile_btn">Assign to loan</a>
+                                             @endif
+                                            @endcan
                                         </td>
                                     </tr>
                                 @endforeach
@@ -67,4 +71,40 @@
             </div>
         </div>
     </div>
+<!-- line modal -->
+<div class="modal fade" id="reconcileModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+	<div class="modal-content">
+		<div class="modal-header">
+			<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
+			<h3 class="modal-title" id="lineModalLabel">Reconcile</h3>
+		</div>
+		<div class="modal-body">
+			
+            <!-- content goes here -->
+            <form action='/reconcile_loan'>
+              <div class="form-group">
+                <label for="loan_id">Select Loan</label>
+                <input type="text" class="form-control" id="loan_id" placeholder="Enter mobile number">
+                <input type='text' id="payment_id" name="payment_id" value="">
+              </div>
+            </form>
+
+		</div>
+		<div class="modal-footer">
+			<div class="btn-group btn-group-justified" role="group" aria-label="group button">
+				<div class="btn-group" role="group">
+					<button type="button" class="btn btn-default" data-dismiss="modal"  role="button">Close</button>
+				</div>
+				<div class="btn-group btn-delete hidden" role="group">
+					<button type="button" id="cancel" class="btn btn-default btn-hover-red" data-dismiss="modal"  role="button">Delete</button>
+				</div>
+				<div class="btn-group" role="group">
+					<button type="submit" id="submit" class="btn btn-default btn-hover-green" data-action="save" role="button">Save</button>
+				</div>
+			</div>
+		</div>
+	</div>
+  </div>
+</div>
 @endsection

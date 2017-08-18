@@ -33,7 +33,8 @@
                                     <tr>
                                         <th>ID</th><td>{{ $payment->id }}</td>
                                     </tr>
-                                    <tr><th> Amount </th><td> {{ $payment->amount }} </td></tr><tr><th> Curreny </th><td> {{ $payment->curreny }} </td></tr><tr><th> Reference </th><td> {{ $payment->reference }} </td></tr>
+                                    <tr><th> Amount </th><td> {{ $payment->amount }} </td>
+                                    </tr><tr><th> Currency </th><td> {{ $payment->currency }} </td></tr><tr><th> Reference </th><td> {{ $payment->reference }} </td></tr>
                                 </tbody>
                             </table>
                         </div>

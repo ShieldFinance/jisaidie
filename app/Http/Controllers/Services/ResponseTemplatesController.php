@@ -10,6 +10,7 @@ use App\Http\Models\Message;
 use App\Http\Models\Service;
 use Illuminate\Http\Request;
 use Session;
+use App\Http\Models\Transaction;
 
 class ResponseTemplatesController extends Controller
 {
@@ -159,7 +160,12 @@ class ResponseTemplatesController extends Controller
     
     public function processResponse($payload){
         $messageSent = false;
-        
+        $reqst = array();
+        $reqst['action'] = 'SendNotification';
+        $reqst['request'] = $payload;
+        $service_id = isset($payload['service_id'])?$payload['service_id']:0;
+        $transaction = new Transaction(['service_id'=>$service_id,'request'=>json_encode($reqst),'status'=>'pending']);
+        $transaction->save();
         if(isset($payload['service_id'])){
             $responseTemplates = ResponseTemplate::where(['service_id'=>$payload['service_id'], 'status'=>1])->get();
            

@@ -17,6 +17,7 @@ use Session;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use App\Helpers\RepaymentsImport;
+use App\Http\Models\Payment;
 class LoanController extends Controller
 {
     /**
@@ -659,7 +660,61 @@ ACTIONS;
 
         return redirect('admin/loan');
     }
-    
+    public function fetchLoansJson(Request $request){
+        $q = $request->get('q');
+        /*$loans = DB::table('loans')
+        ->join('customers as c', 'c.id', '=', 'loans.customer_id')
+        ->leftJoin('organization', 'organization.id', '=', 'c.organization_id')
+        
+        ->select('loans.*','c.mobile_number','c.email','c.id_number',DB::raw('CONCAT(c.surname, " ", c.last_name) AS customer_name'))
+       ->whereIn('c.id',DB::raw("select id from customers where mobile_number LIKE %".$query."%")->get()->toArray())
+                ->orderBy('loans.id','desc')->get();*/
+        $loans = DB::table('loans')
+            ->leftJoin('customers as c', 'c.id', '=', 'loans.customer_id')
+            ->select('loans.*','c.mobile_number','c.email','c.id_number',DB::raw('CONCAT(c.surname, " ", c.last_name) AS customer_name'))
+            ->whereIn('loans.customer_id', function($query) use($q)
+            {
+                $query->select(DB::raw('id'))
+                      ->from('customers')
+                      ->whereRaw("customers.mobile_number LIKE '%".$q."%'");
+            })
+            ->get();
+        if($loans->count()){
+            foreach($loans as $loan){
+                $response[]=[
+                    'id'=>$loan->id,
+                    'value'=>$loan->customer_name.'('.$loan->mobile_number.')'
+                ];
+            }
+        }
+        return response()->json($response);
+    }
+    public function reconcileLoan(Request $request){
+        $loan_id = $request->get('loan_id');
+        $payment_id = $request->get('payment_id');
+        $loan = Loan::find($loan_id);
+        $payment = Payment::find($payment_id);
+        if($loan && $payment){
+            $customer = Customer::find($loan->customer_id);
+            $balance = $loan->total-$loan->paid;
+            $payment->loan_id = $loan->id;
+            $payment->mobile_number=$customer->mobile_number;
+            if($balance > 0 && $balance >= $payment->amount){
+                $loan->paid+=$payment->amount;
+            }else if($payment->amount > $balance){
+                $overPayment = $payment->amount - $balance;
+                $loan->paid+=$balance;
+                $customer->withholding_balance += $overPayment;
+                $customer->save();
+            }
+            $loan->save();
+            $payment->save();
+            Session::flash('flash_message','Payment reconciled');
+        }else{
+            Session::flash('flash_message','Payment not reconciled, loan or payment invalid');
+        }
+        redirect('admin/payments');
+    }
     public function sendReminders(Request $request){
         $today = Carbon::today();  
         $daysAgo = $today->copy()->subDays(28)->toDateTimeString();
