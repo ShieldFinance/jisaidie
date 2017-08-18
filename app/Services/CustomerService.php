@@ -413,6 +413,7 @@ class CustomerService extends ApiGuardController{
                 $app = \App::getFacadeRoot();
                 $crbService = $app->make('Crb');
                 $crbResponse =$crbService->checkCreditScore($details);
+                $application_rate = 20;
                 if(isset($crbResponse['credit_grade'])){
                     switch($crbResponse["credit_grade"]){
                         case 'AA';
@@ -446,7 +447,11 @@ class CustomerService extends ApiGuardController{
                             $application_rate=$application_rate-15;
                             break;
                         default:
-                }*/
+                }
+                }
+                $response['crb']=$crbResponse;
+                 * */
+                 
                 $response['maximum_amount'] = $maximumAmount;
                 $response['minimum_amount'] = $minimumAmount;
                 $response['response_status']=config('app.responseCodes')['command_successful'];
