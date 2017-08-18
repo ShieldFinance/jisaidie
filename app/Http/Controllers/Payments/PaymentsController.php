@@ -338,7 +338,7 @@ ACTIONS;
             $payment->reference=$data['transactionId'];
             $payment->status=$data['status'];
              $payment->response=json_encode($data);
-            $payment->provider_reference=$data['providerRefId'];
+            $payment->provider_reference=isset($data['providerRefId'])?$data['providerRefId']:'';
             $payment->provider_fee = $providerFees[1];
             $payment->transaction_date = $data['transactionDate'];
             $payment->mobile_number = $mobileNumber;

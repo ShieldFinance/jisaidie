@@ -26,7 +26,7 @@ class ServiceProcessor extends Controller
             $serviceCommands = $serviceModel->getServiceCommandsByServiceName($request->input('action'));
            
             $payload = json_decode($request['request'], true);
-            $payload['transaction_id']=$this->logTransaction($serviceModel, $request);
+            $payload['transaction_id']=$transaction_id=$this->logTransaction($serviceModel, $request);
             $payload['service_id'] = $serviceModel->id;
             //first command will always execute
             $canProcessNext = true;
@@ -51,6 +51,7 @@ class ServiceProcessor extends Controller
                 }
             }
         }
+        $this->updateTransaction($response, $transaction_id);
         return $response;
     }
     
@@ -63,14 +64,9 @@ class ServiceProcessor extends Controller
         return $transaction->id;  
     }
     
-    public function updateTransaction($payload){
-        $transaction = Transaction::find($payload['transaction_id']);
-        foreach($payload as $key=>$value){
-            if(Schema::hasColumn($transaction->getTable(), $key))
-            {
-                $transaction->$key = $value;
-            }
-        }
+    public function updateTransaction($payload, $transaction_id){
+        $transaction = Transaction::find($transaction_id);
+        $transaction->response = json_encode($payload);
         $transaction->save();
     }
 }
