@@ -694,6 +694,7 @@ ACTIONS;
         $payment_id = $request->input('payment_id');
         $loan = Loan::find($loan_id);
         $payment = Payment::find($payment_id);
+        $message = '';
         if($loan && $payment && $payment->type=='credit'){
             $customer = Customer::find($loan->customer_id);
             $balance = $loan->total-$loan->paid;
@@ -701,20 +702,31 @@ ACTIONS;
             $payment->mobile_number=$customer->mobile_number;
             if($balance > 0 && $balance >= $payment->amount){
                 $loan->paid+=$payment->amount;
-            }else if($payment->amount > $balance){
+            }else if($balance > 0 && $payment->amount > $balance){
                 $overPayment = $payment->amount - $balance;
                 $loan->paid+=$balance;
                 $customer->withholding_balance += $overPayment;
                 $customer->save();
+            }else if($balance <= 0){
+                $message = 'Customer has no loan';
             }
-            var_dump($loan);exit;
+            $effective_balance = $loan->total - $loan->paid;
+            if($effective_balance <=0){
+                $loan->status= config('app.loanStatus')['paid'];
+            }
             $loan->save();
             $payment->save();
-            Session::flash('flash_message','Payment reconciled');
-        }else{
-            Session::flash('flash_message','Payment not reconciled, loan or payment invalid');
+            $message = 'Payment reconciled';
+        }elseif(!$loan){
+           $message = 'No loan found'; 
+        }elseif(!$payment){
+            $message = 'No payment found';
+        }elseif($payment->type=='debit'){
+            $message = "This payment is a debit";
         }
-        redirect('admin/payments');
+        
+        Session::flash('flash_message',$message);
+        return redirect('admin/payments');
     }
     public function sendReminders(Request $request){
         $today = Carbon::today();  
