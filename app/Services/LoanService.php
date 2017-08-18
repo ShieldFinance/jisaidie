@@ -554,6 +554,8 @@ class LoanService{
             $months = floor(($diff - $years * 365*60*60*24) / (30*60*60*24));
             $days = floor(($diff - $years * 365*60*60*24 - $months*30*60*60*24)/ (60*60*24));
             $loan->total=$loan->amount_processed+ceil($interestToday*$days);
+            echo $loan->id.' in '.$days.' = '.$loan->total;
+            echo "<br>";
         }
         $loan->last_fees_update = Carbon::now()->toDateTimeString();
         $loan->save();

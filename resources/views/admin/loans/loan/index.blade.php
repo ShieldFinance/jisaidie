@@ -74,6 +74,7 @@ $(document).on('click', function (e) {
                                         <th>Type</th>
                                         <th>Amount Requested</th>
                                         <th>Amount Processed</th>
+                                        <th>Daily Interest</th>
                                         <th>Total</th>
                                         <th>Balance</th>
                                         <th>Status</th>
@@ -95,6 +96,7 @@ $(document).on('click', function (e) {
                                          <td>{{ $item->type }}</td>
                                         <td>{{ $item->amount_requested }}</td>
                                         <td>{{ $item->amount_processed }}</td>
+                                        <td>{{ $item->daily_interest }}</td>
                                         <td>{{ number_format($item->total,2,'.',',')}}</td>
                                         <td>{{ number_format($item->total-$item->paid,2,'.',',')}}</td>
                                         <td>{{ array_search ($item->status, config('app.loanStatus')) }}</td>
