@@ -682,6 +682,9 @@ ACTIONS;
             ->get();
         if($loans->count()){
             foreach($loans as $loan){
+                $balance = $loan->total - $loan->paid;
+                if($balance <= 0)
+                    continue;
                 $response[]=[
                     'id'=>$loan->id,
                     'value'=>$loan->customer_name.'('.$loan->mobile_number.')'
