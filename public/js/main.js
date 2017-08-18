@@ -1,4 +1,5 @@
 jQuery(document).ready(function ($) {
+     $(".dropdown-toggle").dropdown();
     $('#search').multiselect({
         search: {
             left: '<input autocomplete="off" type="text" name="q" class="form-control" placeholder="Search..." />',

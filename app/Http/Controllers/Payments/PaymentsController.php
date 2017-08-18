@@ -287,7 +287,7 @@ $html = <<<popover
 </div>
 popover;
             $action_buttons.=<<<ACTIONS
-                      <span class='dropdown'> <a href="#" id="filter_popover" data-toggle="popover" data-trigger="click" data-placement="bottom" data-container="body" data-html="true" data-content='$html'>
+                      <span class=''> <a href="#" id="filter_popover" data-toggle="popover" data-trigger="click" data-placement="bottom" data-container="body" data-html="true" data-content='$html'>
                             <i class="fa fa-filter" aria-hidden="true"></i> Filter
                         </a></span>
                 	

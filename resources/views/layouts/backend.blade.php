@@ -19,7 +19,7 @@
         <link href="{{ asset('/css/custom-theme/jquery-ui-1.9.2.custom.css') }}" rel="stylesheet">
           <link href="{{ asset('/css/bootstrap-datetimepicker.min.css') }}" rel="stylesheet">
         <script src="{{ asset('/js/jquery.1.9.1.js') }}" type="text/javascript"></script>
-        <script src="{{ asset('/js/bootstrap.min.js') }}" type="text/javascript"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
         <script src="{{ asset('/js/moment.min.js') }}" type="text/javascript"></script>
         <script src="{{ asset('/js/jquery-ui-1.9.2.custom.min.js') }}" type="text/javascript"></script>
         <script src="{{ asset('/js/bootstrap-datetimepicker.min.js') }}" type="text/javascript"></script>
@@ -60,13 +60,14 @@
 
                     <!-- Right Side Of Navbar -->
                     <ul class="nav navbar-nav navbar-right">
+                        
                         <!-- Authentication Links -->
                         @if (Auth::guest())
                             <li><a href="{{ url('/login') }}">Login</a></li>
                             <li><a href="{{ url('/register') }}">Register</a></li>
                         @else
-                            <li class="dropdown1">
-                                <a href="#" class="dropdown-toggle" data-toggle="dropdown1" role="button" aria-expanded="false">
+                            <li class="dropdown">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
                                     {{ Auth::user()->name }} <span class="caret"></span>
                                 </a>
 
