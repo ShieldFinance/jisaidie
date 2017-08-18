@@ -10,6 +10,7 @@ use App\Http\Models\Customer;
 use App\Http\Models\Message;
 use App\Http\Models\ResponseTemplate;
 use \App\Http\Models\Transaction;
+use App\Http\Models\Organization;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use Session;
@@ -29,9 +30,11 @@ class LoanController extends Controller
         $organization_id = $request->get('search_organization');
         $type = $request->get('search_type');
         $status = $request->get('search_status');
+        $search_date_from = $request->get('search_date_from');
+        $search_date_to = $request->get('search_date_to');
         $perPage = 25;
         $action_buttons = $this->getActionButtons();
-        $organizations = \App\Http\Models\Organization::all();
+        $organizations = Organization::all();
         $wheres = array();
         $invoice_organization = $request->get('invoice_organization');
         $downloadSample = $request->get('download_sample');
@@ -53,6 +56,18 @@ class LoanController extends Controller
         }
         if(!empty($status)){
             $wheres[] =  ['loans.status','=',$status];
+        }
+        if(!empty($search_date_from)){
+            $time = strtotime($search_date_from);
+            $timeFrom = date('Y-m-d H:i:s',$time);
+            if(!empty($search_date_to)){
+                $time = strtotime($search_date_to);
+                $timeTo = date('Y-m-d H:i:s',$time);
+                $wheres[]=['loans.date_disbursed','>=',$timeFrom];
+                $wheres[]=['loans.date_disbursed','<=', $timeTo];
+            }else{
+                Session::flash('flash_message','You must specify both start and end date');
+            }
         }
         if(empty($wheres)){
             $wheres[] = ['loans.id','>',0];
@@ -244,7 +259,7 @@ class LoanController extends Controller
             if($serviceTye=='service_selected'){
                 $loan_ids = $request->input('loans');
                 $loan_ids = explode(',', $loan_ids);
-                if(!empty($loan_ids)){
+                if(!empty($loan_ids) && $loan_ids[0]!=''){
                     foreach($loan_ids as $key=>$loan_id){
                         if($loan_id=='on'){
                             unset($loan_ids[$key]);
@@ -557,8 +572,70 @@ ACTIONS;
 ACTIONS;
             }
         }
+$organizations = Organization::all();
+$select = '<select class="form-control" name="search_organization">
+         <option value="">Select</option>';
+         if(isset($organizations)){
+          foreach($organizations as $organization){
+            $select.=' <option value="'.$organization->id.'">'.$organization->name.'</option> ';
+          }
+         } 
+    $select.="</select>";
+$status='<option value="'.config('app.loanStatus')['pending'].'">Pending</option>
+         <option value="'.config('app.loanStatus')['approved'].'">Approved</option>
+         <option value="'.config('app.loanStatus')['disbursed'].'">Disbursed</option>
+         <option value="'.config('app.loanStatus')['rejected'].'">Rejected</option>
+          <option value="'.config('app.loanStatus')['locked'].'">Locked</option>
+          <option value="'.config('app.loanStatus')['paid'].'">Paid</option>';
+$html = <<<popover
+        <div id="popover-content" >
+<form method="GET" action="/admin/loan" id="search_form" class="search_form" role="search">
+    <div class="input-group">
+        <input type="text" class="form-control" name="search" placeholder="Search...">
+        
+    </div>
+ <div class="input-group">
+      <label for="">Organization</label>
+        $select
+    </div>
+<div class="input-group">
+    <label for="">Loan type</label>
+     <select class="form-control" name="search_type">
+         <option value="">Select</option>
+         <option value="co">Checkoff</option>
+         <option value="nco">Non Checkoff</option>
+     </select>
+    </div>
+<div class="input-group">
+    <label for="">Loan Status</label>
+     <select class="form-control" name="search_status">
+         <option value="">Select</option>
+         $status
+     </select>
+    </div>
+<div class="form-group">
+    <label>Date From</label>
+    <div class="input-group">
+        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+        <input type="text" name="search_date_from" id="date_from" class="form-control">
+    </div>
+</div>
+<div class="form-group">
+    <label>Date To</label>
+     <div class="input-group">
+         <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+        <input type="text" name="search_date_to" id="date_to" class="form-control">
+     </div>
+</div>
+<div style="margin-top:5px; ">
+    <button type="submit" class="btn btn-primary"><i class="fa fa-search"></i> Search</button>
+   
+</div>
+</form>
+</div> 
+popover;
         $action_buttons.=<<<ACTIONS
-                      <span class='dropdown'> <a href="#" rel="popover" data-popover-content="#myPopover">
+                      <span class='dropdown'> <a href="#" id="filter_popover" data-toggle="popover" data-trigger="click" data-placement="bottom" data-container="body" data-html="true" data-content='$html'>
                             <i class="fa fa-filter" aria-hidden="true"></i> Filter
                         </a></span>
                 	

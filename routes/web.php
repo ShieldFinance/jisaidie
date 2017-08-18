@@ -43,6 +43,7 @@ Route::resource('admin/loan', 'Loans\\LoanController');
 Route::post('admin/service_loan', 'Loans\\LoanController@serviceLoans');
 Route::resource('admin/loan', 'Loans\\LoanController');
 Route::resource('admin/payments', 'Payments\\PaymentsController');
+Route::post('admin/payments/export', 'Payments\\PaymentsController@export');
 Route::resource('admin/response-templates', 'Services\\ResponseTemplatesController');
 Route::resource('admin/messages', 'Services\\MessagesController');
 

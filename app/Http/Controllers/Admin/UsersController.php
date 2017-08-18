@@ -101,14 +101,18 @@ class UsersController extends Controller
             return redirect('admin');
         }
         $roles = Role::select('id', 'name', 'label')->get();
+        
         $roles = $roles->pluck('label', 'name');
-
+        
         $user = User::with('roles')->select('id', 'name', 'email')->findOrFail($id);
         $user_roles = [];
         foreach ($user->roles as $role) {
             $user_roles[] = $role->name;
         }
-
+        //if user cannot assign roles, don't show other permissions
+        if(!Auth::user()->can('can_assign_roles')){
+            $roles = $user_roles;
+        }
         return view('admin.users.edit', compact('user', 'roles', 'user_roles'));
     }
 
@@ -131,10 +135,12 @@ class UsersController extends Controller
 
         $user = User::findOrFail($id);
         $user->update($data);
-
-        $user->roles()->detach();
-        foreach ($request->roles as $role) {
-            $user->assignRole($role);
+        //if user can assign roles
+        if(Auth::user()->can('can_assign_roles')){
+            $user->roles()->detach();
+            foreach ($request->roles as $role) {
+                $user->assignRole($role);
+            }
         }
 
         Session::flash('flash_message', 'User updated!');

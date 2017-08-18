@@ -11,3 +11,6 @@
 .table-responsive{
     width:100% !important;
 }
+#ui-datepicker-div{
+    z-index: 1200 !important;
+}
