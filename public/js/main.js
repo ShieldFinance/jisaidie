@@ -55,7 +55,14 @@ jQuery(document).ready(function ($) {
               $("#service").val($(this).data('service'));
               $(".selected_loans").val(selectedvalue);//this will pass as array and method will be POST
               var form = $(e.target).data('form');
-              $('.'+form).submit();
+              var submit = true
+              if($(this).data('service')!='ExportLoans')
+                    submit = confirm($(e.target).data('alert'))
+               
+              if(submit)
+                $('.'+form).submit();
+              else
+                  return false;
              }else if($(this).data('service')=='ExportLoans'){
                   $("#service").val($(this).data('service'));
                  $('.loans_form').submit();

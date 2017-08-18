@@ -521,7 +521,7 @@ class LoanController extends Controller
         
             if($user->can('can_approve_loan') || $userIsAdmin) {
                 $action_buttons.=<<<ACTIONS
-                        <a data-form="loans_form" href="javascript:void(0)" data-service='ApproveLoan' class="btn btn-success btn-sm process_loan" title="Approve selected loans">
+                        <a data-alert="Are you sure you want to approve selected loans?" data-form="loans_form" href="javascript:void(0)" data-service='ApproveLoan' class="btn btn-success btn-sm process_loan" title="Approve selected loans">
                                 <i class="fa fa-check" aria-hidden="true"></i> Approve
                             </a>
 ACTIONS;
@@ -529,7 +529,7 @@ ACTIONS;
             
             if($user->can('can_reject_loan') || $userIsAdmin) {
                 $action_buttons.=<<<ACTIONS
-                       <a data-form="loans_form" href="javascript:void(0)" data-service='RejectLoanApplication' class="btn btn-danger btn-sm process_loan" title="Reject selected loans">
+                       <a data-alert="Are you sure you want to reject selected loans?" data-form="loans_form" href="javascript:void(0)" data-service='RejectLoanApplication' class="btn btn-danger btn-sm process_loan" title="Reject selected loans">
                             <i class="fa fa-close" aria-hidden="true"></i> Reject
                         </a>
 ACTIONS;
@@ -537,7 +537,7 @@ ACTIONS;
             
             if($user->can('can_disburse_loan') || $userIsAdmin) {
                 $action_buttons.=<<<ACTIONS
-                       <a data-form="loans_form" href="javascript:void(0)" data-service='DisburseLoan' class="btn btn-primary btn-sm process_loan" title="Send loan to client">
+                       <a data-alert="Are you sure you want to disburse selected loans?" data-form="loans_form" href="javascript:void(0)" data-service='DisburseLoan' class="btn btn-primary btn-sm process_loan" title="Send loan to client">
                             <i class="fa fa-send" aria-hidden="true"></i> Disburse
                         </a>
 ACTIONS;
@@ -545,7 +545,7 @@ ACTIONS;
             
             if($user->can('can_reverse_disbursal') || $userIsAdmin) {
                 $action_buttons.=<<<ACTIONS
-                       <a data-form="loans_form" href="javascript:void(0)" data-service='ReverseDisburseLoan' class="btn btn-warning btn-sm process_loan" title="Change loan to approved status">
+                       <a data-alert="Are you sure you want to reverse selected loans?" data-form="loans_form" href="javascript:void(0)" data-service='ReverseDisburseLoan' class="btn btn-warning btn-sm process_loan" title="Change loan to approved status">
                             <i class="fa fa-undo" aria-hidden="true"></i> Reverse to approved
                         </a>
 ACTIONS;
@@ -567,7 +567,7 @@ ACTIONS;
             }
             if($user->can('can_export_loans') || $userIsAdmin) {
                 $action_buttons.=<<<ACTIONS
-                      <a href="javascript:void(0)" data-service='ExportLoans'  class="btn btn-info btn-sm process_loan" title="Export Loans">
+                      <a data-form="loans_form" href="javascript:void(0)" data-service='ExportLoans'  class="btn btn-info btn-sm process_loan" title="Export Loans">
                             <i class="fa fa-download" aria-hidden="true"></i> Export to excel
                         </a>
 ACTIONS;
