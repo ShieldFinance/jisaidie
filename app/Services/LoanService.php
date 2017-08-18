@@ -262,7 +262,7 @@ class LoanService{
                 $commandStatus = config('app.responseCodes')['command_successful'];
                 $payload['message_placeholders'] = array();
                 $payload['message_placeholders']['[customer_name]'] = $loan->customer->surname;
-                $payload['message_placeholders']['[amount]'] = number_format($loan->amount,2,'.',',');
+                $payload['message_placeholders']['[amount]'] = number_format($loan->amount_requested,2,'.',',');
                 $payload['send_notification'] = true;
                 $payload['send_now'] = true;
                 

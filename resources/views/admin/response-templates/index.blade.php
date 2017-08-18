@@ -43,7 +43,7 @@
                                             <a href="{{ url('/admin/response-templates/' . $item->id . '/edit') }}" title="Edit ResponseTemplate"><button class="btn btn-primary btn-xs"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</button></a>
                                             {!! Form::open([
                                                 'method'=>'DELETE',
-                                                'url' => ['/ResponseTemplate/response-templates', $item->id],
+                                                'url' => ['/admin/response-templates', $item->id],
                                                 'style' => 'display:inline'
                                             ]) !!}
                                                 {!! Form::button('<i class="fa fa-trash-o" aria-hidden="true"></i> Delete', array(
