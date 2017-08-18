@@ -21,7 +21,7 @@ Route::get('/sendReminders', 'Loans\\LoanController@sendReminders');
 Route::get('/applyCharges', 'Loans\\LoanController@applyDailyCharges');
 Route::get('/lockLoans', 'Loans\\LoanController@lockLoans');
 Route::group(['middleware' => 'auth'], function() {
-  Route::post('/admin/sendMessage', 'Services\\MessagesController@sendMessage');
+ Route::post('/admin/sendMessage', 'Services\\MessagesController@sendMessage');
 Route::get('admin', 'Admin\AdminController@index');
 Route::get('admin/give-role-permissions', 'Admin\AdminController@getGiveRolePermissions');
 Route::post('admin/give-role-permissions', 'Admin\AdminController@postGiveRolePermissions');
@@ -41,6 +41,7 @@ Route::resource('admin/transactions', 'Transaction\\TransactionsController');
 Route::resource('admin/screens', 'Screens\\ScreensController');
 Route::resource('admin/loan', 'Loans\\LoanController');
 Route::get('fetch_loans', 'Loans\\LoanController@fetchLoansJson');
+Route::post('reconcile_loan','Loans\\LoanController@reconcileLoan');
 Route::post('admin/service_loan', 'Loans\\LoanController@serviceLoans');
 Route::resource('admin/loan', 'Loans\\LoanController');
 Route::resource('admin/payments', 'Payments\\PaymentsController');

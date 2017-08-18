@@ -94,7 +94,7 @@ jQuery(document).ready(function ($) {
     });
     
    
-    $( "#loan_id" ).autocomplete({
+    $( "#loan_id_search" ).autocomplete({
       source: function( request, response ) {
         $.ajax({
           url: "/fetch_loans",
@@ -109,7 +109,7 @@ jQuery(document).ready(function ($) {
       },
       minLength: 3,
       select: function( event, ui ) {
-        $('loan_id').val(ui.item.id)
+        $('#loan_id').val(ui.item.id);
       },
       open: function() {
         $( this ).removeClass( "ui-corner-all" ).addClass( "ui-corner-top" );
@@ -120,6 +120,11 @@ jQuery(document).ready(function ($) {
     });
     $('.reconcile_btn').on('click', function(){
         $('#payment_id').val($(this).data('payment_id'));
+    })
+    $('#submit_reconcile').on('click', function(){
+        var submit = confirm('Are you sure you want to assign this payment?')
+        if(submit)
+          $('#reconcile_form').submit();
     })
     $('#reconcileModal').on('shown.bs.modal', function (e) {
         // do something...

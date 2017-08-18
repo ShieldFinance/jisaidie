@@ -82,11 +82,13 @@
 		<div class="modal-body">
 			
             <!-- content goes here -->
-            <form action='/reconcile_loan'>
+            <form id="reconcile_form" method="POST" action='/reconcile_loan'>
               <div class="form-group">
                 <label for="loan_id">Select Loan</label>
-                <input type="text" class="form-control" id="loan_id" placeholder="Enter mobile number">
+                <input type="text" class="form-control" id="loan_id_search" placeholder="Enter mobile number">
                 <input type='text' id="payment_id" name="payment_id" value="">
+                <input type='text' id="loan_id" name="loan_id" value="">
+                <input type="hidden" name="_token" value="{{ csrf_token() }}">
               </div>
             </form>
 
@@ -100,7 +102,7 @@
 					<button type="button" id="cancel" class="btn btn-default btn-hover-red" data-dismiss="modal"  role="button">Delete</button>
 				</div>
 				<div class="btn-group" role="group">
-					<button type="submit" id="submit" class="btn btn-default btn-hover-green" data-action="save" role="button">Save</button>
+					<button type="submit" id="submit_reconcile" class="btn btn-default btn-hover-green" data-action="save" role="button">Save</button>
 				</div>
 			</div>
 		</div>

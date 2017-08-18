@@ -142,7 +142,6 @@ class MessageService {
                 ])
             ->setDevicesToken($deviceTokens);
             $response = $push->send()->getFeedback();
-
             $data['status'] = $response->success?'Success':'failed';
             if($response->failure){
                 $data['status']='failed';

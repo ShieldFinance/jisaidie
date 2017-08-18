@@ -9,7 +9,7 @@ return [
   'fcm' => [
         'priority' => 'normal',
         'dry_run' => false,
-        'apiKey' => 'AAAA-I15OnI:APA91bGQz8wT_vAFei55AxtvTErGylT9l3k4NB7R5KuehxiSnhXMhQ-mxcCTME3mRxCCAz6iEeo-1yyF5MTw0kZ25MVnOUFCSdvAvGk-dm0M_pXutT_iTlMlerVt4tvgZmRGK_XlvcXF',
+        'apiKey' => 'AAAAzaxHAuU:APA91bG8W7zA6gLqDRhb0je3ibaX-OB1ezQnhlLguA47ZRShoLm-GEOKWesE-xsBg8UsuVIjLMzVrhRhQEtxBHhbwnULJROTzSxPK0Cvpu7m9n2nlG2wcju9MuC73rwJUlRFFgSktLuh',
   ],
   'apn' => [
       'certificate' => __DIR__ . '/iosCertificates/apns-dev-cert.pem',

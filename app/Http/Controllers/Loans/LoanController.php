@@ -690,11 +690,11 @@ ACTIONS;
         return response()->json($response);
     }
     public function reconcileLoan(Request $request){
-        $loan_id = $request->get('loan_id');
-        $payment_id = $request->get('payment_id');
+        $loan_id = $request->input('loan_id');
+        $payment_id = $request->input('payment_id');
         $loan = Loan::find($loan_id);
         $payment = Payment::find($payment_id);
-        if($loan && $payment){
+        if($loan && $payment && $payment->type=='credit'){
             $customer = Customer::find($loan->customer_id);
             $balance = $loan->total-$loan->paid;
             $payment->loan_id = $loan->id;
@@ -707,6 +707,7 @@ ACTIONS;
                 $customer->withholding_balance += $overPayment;
                 $customer->save();
             }
+            var_dump($loan);exit;
             $loan->save();
             $payment->save();
             Session::flash('flash_message','Payment reconciled');
