@@ -509,14 +509,16 @@ class LoanService{
                     return $response;
                 }
                 //if there is a loan that is pending or waiting approval, cannot borrow
-                if($loan->status==config('app.loanStatus')['pending'] || $loan->status==config('app.loanStatus')['approved'] || $loan->status==config('app.loanStatus')['locked']){
+                elseif($loan->status==config('app.loanStatus')['pending'] || $loan->status==config('app.loanStatus')['approved'] || $loan->status==config('app.loanStatus')['locked']){
                     $response['can_borrow'] = false;
                     $response['reason'] = 'Existing Loan';
+                }else{
+                    $response['reason'] ="You have no outstanding loan balance"
                 }
             }else{
                 //customer has no active loans
                 $response['can_borrow'] = true;
-                $response['reason'] = 'You have outstanding loan balance';
+                $response['reason'] = 'You have no outstanding loan balance';
             }
             
         }else{
