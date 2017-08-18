@@ -140,7 +140,7 @@ class UsersController extends Controller
             $user->roles()->detach();
             foreach ($request->roles as $role) {
                 $user->assignRole($role);
-            }echo 'can assign';exit;
+            }
         }
 
         Session::flash('flash_message', 'User updated!');
