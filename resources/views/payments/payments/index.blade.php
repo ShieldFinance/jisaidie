@@ -54,7 +54,7 @@
                                         <td>
                                             <a class="btn btn-info btn-xs" href="{{ url('/admin/payments/' . $item->id) }}" title="View Payment"><i class="fa fa-eye" aria-hidden="true"></i> View</a>
                                             @can('can_assign_payment_to_loan')
-                                             @if(!$item->customer_name)
+                                             @if(!$item->customer_name && $item->type=='credit')
                                                 <a data-toggle="modal"  data-payment_id="{{ $item->id }}" data-target="#reconcileModal" class="btn btn-info btn-xs reconcile_btn">Assign to loan</a>
                                              @endif
                                             @endcan
@@ -85,8 +85,12 @@
             <form action='/reconcile_loan'>
               <div class="form-group">
                 <label for="loan_id">Select Loan</label>
-                <input type="text" class="form-control" id="loan_id" placeholder="Enter mobile number">
-                <input type='text' id="payment_id" name="payment_id" value="">
+
+                <input type="text" class="form-control" id="loan_id_search" placeholder="Enter mobile number">
+                <input type='hidden' id="payment_id" name="payment_id" value="">
+                <input type='hidden' id="loan_id" name="loan_id" value="">
+                <input type="hidden" name="_token" value="{{ csrf_token() }}">
+
               </div>
             </form>
 

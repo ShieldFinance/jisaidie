@@ -20,9 +20,12 @@
                             <table class="table table-borderless">
                                 <tbody>
                                     <tr>
-                                        <th>ID</th><td>{{ $customer->id }}</td>
+                                        <th>Phone Number</th><td>{{ $customer->mobile_number }}</td>
                                     </tr>
-                                    <tr><th> Surname </th><td> {{ $customer->surname }} </td></tr><tr><th> Last Name </th><td> {{ $customer->last_name }} </td></tr><tr><th> Other Name </th><td> {{ $customer->other_name }} </td></tr>
+                                    <tr><th> First Name </th><td> {{ $customer->surname }} </td></tr>
+                                    <tr><th> Last Name </th><td> {{ $customer->last_name }} </td></tr>
+                                    <tr><th> Other Name </th><td> {{ $customer->other_name }} </td></tr>
+                                    <tr><th> Witholding balance </th><td> {{ number_format($customer->withholding_balance,2,'.',',') }} </td></tr>
                                 </tbody>
                             </table>
                         </div>
