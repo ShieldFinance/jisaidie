@@ -513,7 +513,7 @@ class LoanService{
                     $response['can_borrow'] = false;
                     $response['reason'] = 'Existing Loan';
                 }else{
-                    $response['reason'] ="You have no outstanding loan balance"
+                    $response['reason'] ="You have no outstanding loan balance";
                 }
             }else{
                 //customer has no active loans
