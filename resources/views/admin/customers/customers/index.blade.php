@@ -124,7 +124,7 @@ $(function(){
                                         <td>{{ $item->other_name }}</td>
                                         <td>{{ $item->company_name }}</td>
 
-                                        <td>{{ $item->status?"Active":"Inactive" }}</td>
+                                        <td>{{ $statuses[$item->status] }}</td>
                                         <td>{{ $item->created_at }}</td>
                                         <td>
                                             <a href="{{ url('/admin/customers/' . $item->id) }}" title="View Customer"><button class="btn btn-info btn-xs"><i class="fa fa-eye" aria-hidden="true"></i> View</button></a>

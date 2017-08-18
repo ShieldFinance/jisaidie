@@ -545,8 +545,15 @@ class LoanService{
             $loan->daily_interest = $interestToday;
             $loan->fees = $fees;
         }else{
+            $now =Carbon::now()->toDateTimeString();
             //this is an existing loan, just add the daily fees
-            $loan->total+=ceil($interestToday);
+            $dailyInterest = ($loan->daily_interest/3000);
+            $interestToday = $dailyInterest * $loan->amount_requested;
+            $diff = abs(strtotime($now) - strtotime($loan->date_disbursed));
+            $years = floor($diff / (365*60*60*24));
+            $months = floor(($diff - $years * 365*60*60*24) / (30*60*60*24));
+            $days = floor(($diff - $years * 365*60*60*24 - $months*30*60*60*24)/ (60*60*24));
+            $loan->total=$loan->amount_processed+ceil($interestToday*$days);
         }
         $loan->last_fees_update = Carbon::now()->toDateTimeString();
         $loan->save();

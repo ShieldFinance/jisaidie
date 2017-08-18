@@ -44,6 +44,15 @@ class CustomersController extends Controller {
         }
         $wheres = array();
         $customers = DB::table('customers');
+        $statuses = [
+            config('app.customerStatus')['new']=>'New',
+            config('app.customerStatus')['active']=>'Active',
+            config('app.customerStatus')['suspended']=>'Suspended',
+            config('app.customerStatus')['deleted']=>'Deleted',
+            config('app.customerStatus')['locked']=>'Locked',
+            config('app.customerStatus')['one_time_pin']=>'One Time Pin',
+            config('app.customerStatus')['activation_code']=>'Activation Code',
+        ];
         if (!empty($organization_id)) {
             $wheres[] = ['organization_id', '=', $organization_id];
         }
@@ -81,7 +90,7 @@ class CustomersController extends Controller {
                 ->orderBy('customers.id', 'desc')
                 ->paginate($perPage);
         $request->session()->put('customers', $customers);
-        return view('admin/customers.customers.index', compact('customers', 'action_buttons', 'organizations'));
+        return view('admin/customers.customers.index', compact('customers', 'action_buttons', 'organizations','statuses'));
     }
     public function downloadImportSample(){
         Excel::create('sample-'.date('Y-m-d'), function($excel) {
